@@ -1,18 +1,19 @@
 const express = require('express');
-const app = express();
 
-// Middleware for parsing JSON and URL-encoded form data
+const app = express();
+const port = process.env.PORT || 3000;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const authRoute = require('./routes/auth');
-
-// Mount the authentication route
-app.use('/api', authRoute); // Assuming you want authentication routes under '/api'
+// Serve static files (if needed)
+app.use(express.static('public'));
 
 // Define and mount your routes (e.g., in 'routes/index.js')
 const routes = require('./routes');
 app.use('/', routes);
 
-module.exports = app;
-
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port localhost:${port}`);
+});
