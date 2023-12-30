@@ -14,15 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
-// app.use(requestLogger);
-
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// The "catchall" handler: for any request that doesn't
-// match the above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-});
+app.use(requestLogger);
 // Serve static files (if needed)
 app.use(express.static('public'));
 app.use(errorHandler);
@@ -38,6 +30,13 @@ app.get('/protected', authenticateToken, (req, res) => {
 
 // Start the server
 // Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// The "catchall" handler: for any request that doesn't
+// match the above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
