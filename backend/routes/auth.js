@@ -1,32 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../app/models/User');
+const User = require('../../app/models/User');
 const crypto = require('crypto');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 
 router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-
-    if (!user) {
-      return res.status(401).json({ message: 'Login failed' });
-    }
-
-    const hash = crypto.createHash('sha256').update(password + user.salt).digest('hex');
-
-    if (hash === user.hash) {
-      // Login successful
-      res.status(200).json({ message: 'Login successful' });
-      // Implement token generation or session creation here as needed
-    } else {
-      // Login failed
-      res.status(401).json({ message: 'Login failed' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'An error occurred' });
+  const { username, password } = req.body;
+  const user = await User.findOne({ username: username });
+  if (!user) {
+    return res.status(401).json({ message: 'Login failed' });
   }
+  const hash = crypto.createHash('sha256').update(password + user.salt).digest('hex');
+  if (user.hash !== hash) {
+    return res.status(401).json({ message: 'Login failed' });
+  }
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+  res.json({ accessToken: token });
 });
 
 

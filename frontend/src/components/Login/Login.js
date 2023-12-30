@@ -1,57 +1,60 @@
 import React, { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
 import './Login.css';
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  const response = await fetch('/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-  });
-  // Handle response...
-};
-
-
-
-function Login() {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Implement your login logic here
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Handle successful login here (e.g., redirecting to another page or storing the JWT)
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (error) {
+      setError('Failed to login');
+    }
   };
 
   return (
-    <Container>
-      <h2 className="login-container">Login</h2>
-      <Form onSubmit={handleLogin}>
-        <Form.Group>
-          <Form.Label>Username</Form.Label>
-          <Form.Control
+    <div className="login-container">
+      <form onSubmit={handleLogin} className="login-form">
+        <div className="form-group">
+          <label htmlFor="username">Username:</label>
+          <input
             type="text"
+            id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter username"
             required
           />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Password</Form.Label>
-          <Form.Control
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
             type="password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
             required
           />
-        </Form.Group>
-        <Button variant="primary" type="submit">
+        </div>
+        {error && <div className="login-error">{error}</div>}
+        <button type="submit" className="btn-login">
           Login
-        </Button>
-      </Form>
-    </Container>
+        </button>
+      </form>
+    </div>
   );
 }
 
