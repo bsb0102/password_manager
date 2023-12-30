@@ -8,11 +8,14 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
+    "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
     "openssl": "^2.0.0",
     "qrcode": "^1.5.3",
+    "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",
+    "react-scripts": "^5.0.1",
     "speakeasy": "^2.0.0",
     "url-encode-decode": "^1.0.0"
   },
@@ -26,7 +29,7 @@
   "scripts": {
     "test": "nodemon server.js",
     "start:backend": "nodemon server.js",
-    "start:frontend": "cd frontend && npm start build",
+    "start:frontend": "cd frontend && npm start",
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "build": "react-scripts build"
   }
