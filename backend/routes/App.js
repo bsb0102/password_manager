@@ -5,7 +5,10 @@ import Dashboard from './components/Dashboard';
 
 function App() {
   // You can use state to manage user login status
-  const isAuthenticated = false; // Replace with your logic for checking user authentication
+  // const isAuthenticated = false; // Replace with your logic for checking user authentication
+  isAuthenticated = true;
+
+  console.log(isAuthenticated)
 
   return (
     <Router>

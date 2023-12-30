@@ -26,7 +26,8 @@
   "scripts": {
     "test": "nodemon server.js",
     "start:backend": "nodemon server.js",
-    "start:frontend": "cd frontend && npm start",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+    "start:frontend": "cd frontend && npm start build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "build": "react-scripts build"
   }
 }

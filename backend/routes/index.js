@@ -2,11 +2,9 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-const requestLogger = require('../../middleware/requestLogger.js');
-const { validateLogin } = require('../../middleware/validation.js'); // Add validation middleware
+const { validateLogin } = require('../middleware/validation.js'); // Add validation middleware
 const { getUserByEmail } = require('../../controllers/userController.js'); // Replace with your user controller
 
-router.use(requestLogger);
 
 router.post('/api/login', validateLogin, async (req, res) => {
   try {

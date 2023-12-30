@@ -1,20 +1,22 @@
 // frontend/src/App.js
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login/Login';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import Dashboard from './components/Dashboard/Dashboard'; // Assume you have this component
+import MainPage from './MainPage';
 
-function MainApp() {
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
   return (
     <Router>
-      <Switch>
-        <Route exact path="/login" component={Login} />
-        <Route exact path="/dashboard" render={() => <div>Dashboard Page</div>} />
-        {/* Remove the Route for App as it seems to be a mistake */}
-        <Redirect to="/login" />
-      </Switch>
+      <Routes>
+        <Route path="/login" element={<Login onAuthenticated={() => setIsAuthenticated(true)} />} />
+        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/" element={<MainPage onAuthenticated={() => setIsAuthenticated(true)} />} />
+      </Routes>
     </Router>
   );
 }
 
-export default MainApp;
+export default App;
