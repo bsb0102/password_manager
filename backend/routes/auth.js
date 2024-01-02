@@ -5,11 +5,12 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { hashPassword } = require('../controllers/userController.js');
 
-router.post('/login', async (req, res) => {
+router.post(`/auth/login`, async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const user = await User.findOne({ username });
+    console.log(user)
 
     if (user && user.validatePassword(password)) {
       // Correct password, create a JWT token
@@ -24,7 +25,7 @@ router.post('/login', async (req, res) => {
 });
 
 
-router.post('/register', async (req, res) => {
+router.post(`/auth/register`, async (req, res) => {
   const { username, password } = req.body;
   try {
     // Check if the user already exists
@@ -44,13 +45,14 @@ router.post('/register', async (req, res) => {
     });
 
     // Save the user
+    console.log(user)
     await user.save();
-
-    // Create JWT token
+    
     const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(201).json({ message: 'User registered successfully', token });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Error registering user', error });
   }
 });

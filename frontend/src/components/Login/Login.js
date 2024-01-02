@@ -18,7 +18,9 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API}/login`, {
+
+      console.log('API URL:', process.env.REACT_APP_API);
+      const response = await axios.post(`${process.env.REACT_APP_API}/auth/login`, {
         username,
         password,
       });
@@ -29,7 +31,17 @@ const Login = () => {
       navigate('/dashboard'); // Navigate to the dashboard or another page
     } catch (err) {
       setIsLoading(false);
-      setError('Invalid username or password');
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(err.response.data.message || 'Invalid username or password');
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError('No response from the server. Please try again later.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError('An error occurred. Please try again.');
+      }
     }
   };
 

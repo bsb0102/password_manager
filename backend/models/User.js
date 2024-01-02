@@ -1,21 +1,28 @@
+
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-  username: String,
-  hash: String,
-  salt: String,
-  googleAuthSecret: String
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+  // You can add more fields as needed
 });
 
+// Method to hash passwords
 userSchema.methods.setPassword = function(password) {
-  this.salt = crypto.randomBytes(16).toString('hex');
-  this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha256').toString('hex');
+  this.password = bcrypt.hashSync(password, 10);
 };
 
+// Method to validate password
 userSchema.methods.validatePassword = function(password) {
-  const hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, 'sha256').toString('hex');
-  return this.hash === hash;
+  return bcrypt.compareSync(password, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);

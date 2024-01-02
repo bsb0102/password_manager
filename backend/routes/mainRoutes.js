@@ -7,7 +7,7 @@ const authenticateJWT = require('../middleware/authenticate'); // Adjust the pat
 // ... other route handlers
 
 // A protected route example
-router.get('/protected', authenticateJWT, (req, res) => {
+router.get('/user', authenticateJWT, (req, res) => {
   // The request is authenticated, and you can access the user from req.user
   res.json({ message: 'You have accessed a protected route', user: req.user });
 });

@@ -4,6 +4,9 @@ const path = require('path');
 const killPort = require('kill-port');
 const app = require('./backend/App.js'); // Import the Express app from the backend
 
+const cors = require('cors');
+app.use(cors());
+
 
 // export NODE_OPTIONS=--openssl-legacy-provider
 
@@ -29,7 +32,6 @@ async function killPortIfInUse(port) {
   try {
     await killPort(port, 'tcp');
   } catch (err) {
-    console.error(`Error killing port ${port}:`, err.message);
   }
 }
 
