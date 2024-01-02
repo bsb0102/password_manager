@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: './src/index.js',
@@ -24,16 +25,20 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
+    new webpack.HotModuleReplacementPlugin(),
   ],
   resolve: {
     extensions: ['.js', '.jsx'],
   },
   devServer: {
     allowedHosts: 'all',
-    host: process.env.HOST || 'localhost',
-    port: process.env.PORT || 3000,
+    host: process.env.HOST || '0.0.0.0', // Listen on all available network interfaces
+    port: process.env.PORT || 443, // Use port 443 for HTTPS
     open: true,
     hot: true,
     historyApiFallback: true,
+    https: true, // Enable HTTPS
+    key: fs.readFileSync('./password_manager/key.pem'), // Provide the path to your SSL/TLS key
+    cert: fs.readFileSync('./password_manager/cert.pem'), // Provide the path to your SSL/TLS certificate
   },
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App.js'; // Adjust this path as necessary
+import App from './App.jsx'; // Adjust this path as necessary
 import './index.css';
 
 ReactDOM.render(

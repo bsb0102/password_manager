@@ -1,90 +1,54 @@
-/* index.css */
-/* Box sizing rules */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* App.css (or your existing CSS file) */
 
-/* Remove default padding */
-ul[class],
-ol[class] {
-  padding: 0;
-}
-
-/* Remove default margin */
-body,
-h1,
-h2,
-h3,
-h4,
-p,
-ul[class],
-ol[class],
-li,
-figure,
-figcaption,
-blockquote,
-dl,
-dd {
-  margin: 0;
-}
-
-/* Set core body defaults */
+/* Background style */
 body {
-  min-height: 100vh;
-  scroll-behavior: smooth;
-  text-rendering: optimizeSpeed;
-  line-height: 1.5;
+  background-color: #121212; /* Dark background color */
+  color: #ffffff; /* Text color */
+  font-family: Arial, sans-serif; /* Font style */
 }
 
-/* Remove list styles on ul, ol elements with a class attribute */
-ul[class],
-ol[class] {
-  list-style: none;
-}
-
-/* A elements that don't have a class get default styles */
-a:not([class]) {
-  text-decoration-skip-ink: auto;
-}
-
-/* Make images easier to work with */
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* Natural flow and rhythm in articles by default */
-article > * + * {
-  margin-top: 1em;
-}
-
-/* Inherit fonts for inputs and buttons */
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
-
-/* All buttons should have pointer cursor */
+/* Update color for buttons */
 button {
+  background-color: #007bff; /* Blue color for buttons */
+  color: #fff;
+  border: none;
+  border-radius: 3px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-/* Remove all animations and transitions for people that prefer not to see them */
-@media (prefers-reduced-motion: reduce) {
-  html:focus-within {
-    scroll-behavior: auto;
-  }
-  
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Additional styling for form elements */
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px; /* Add space between inputs and buttons */
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #f4f4f4; /* Light gray background for inputs */
+  color: #333;
+}
+
+/* Style the tech website appearance */
+.register-container,
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(90deg, #00b894 0%, #0984e3 100%); /* Gradient background */
+}
+
+/* Style error message */
+.error-message {
+  color: #ff6b6b; /* Red color for error messages */
 }

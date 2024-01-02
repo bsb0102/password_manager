@@ -1,14 +1,12 @@
-// This is a simple example of a config-overrides.js file
-// It doesn't make any actual changes to the configuration.
+const path = require('path');
 
 module.exports = function override(config, env) {
-    // Do something with the config...
-    console.log('Running with overridden config...');
+  // Add your customizations here
   
-    // For example, to add a custom plugin:
-    // const MyAwesomeWebpackPlugin = require('my-awesome-webpack-plugin');
-    // config.plugins.push(new MyAwesomeWebpackPlugin());
+  // Example: Add a new alias for importing modules
+  config.resolve.alias['@components'] = path.resolve(__dirname, 'src/components');
 
-    // You must return the updated config object.
-    return config;
+  // You can add more customizations as needed
+  
+  return config;
 };

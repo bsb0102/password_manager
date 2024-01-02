@@ -1,63 +1,69 @@
+// frontend/src/components/Login.js
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import '../../styles/AuthForm.css';
 
-function Login() {
-  const [email, setEmail] = useState('');
+const Login = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Hook to navigate
+  const [isLoading, setIsLoading] = useState(false); // State to handle loading
 
-  const handleLogin = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post(`${process.env.REACT_APP_API}/login`, {
+        username,
+        password,
       });
+      setIsLoading(false);
 
-      if (response.ok) {
-        // Authentication successful, redirect the user
-        navigate('/dashboard'); // Redirect to the dashboard or desired path
-      } else {
-        // Authentication failed, handle the error (e.g., show an error message)
-        const errorMsg = await response.text(); // or response.json() if the server sends JSON
-        setError(errorMsg);
-      }
-    } catch (error) {
-      setError('Login failed. Please try again later.');
+      // Assuming the response contains a token and a success message
+      localStorage.setItem('token', response.data.token);
+      navigate('/dashboard'); // Navigate to the dashboard or another page
+    } catch (err) {
+      setIsLoading(false);
+      setError('Invalid username or password');
     }
   };
 
   return (
-    <div className="login-panel">
-      <h2>Login</h2>
-      {error && <div className="error-popup">{error}</div>} {/* Display error message */}
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
+    <div className="auth-form-container">
+      <form onSubmit={handleLogin} className="auth-form">
+        <h2>Login</h2>
+        {error && <div className="error-message">{error}</div>}
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+        {/* Add a link to the registration page */}
+        <p className="alt-action">
+          Don't have an account? <span onClick={() => navigate('/register')}>Register here</span>
+        </p>
       </form>
     </div>
   );
-}
+};
 
 export default Login;
