@@ -9,12 +9,23 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
 
   // Use useEffect to add animation class when component mounts
   useEffect(() => {
     setTimeout(() => {
       document.querySelector('.auth-form').classList.add('active');
     }, 100);
+
+    // Fetch the CSRF token from your server and store it in state
+    axiosInstance
+      .get('/api/csrf-token')
+      .then((response) => {
+        setCsrfToken(response.data.csrfToken);
+      })
+      .catch((error) => {
+        console.error('Error fetching CSRF token:', error);
+      });
   }, []);
 
   const handleLogin = async (e) => {
@@ -26,7 +37,14 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', {
         username,
         password,
+        // Include the CSRF token in the request headers
+      },
+      {
+        headers: {
+          'X-CSRF-Token': csrfToken,
+        },
       });
+
       setIsLoading(false);
 
       localStorage.setItem('token', response.data.token);

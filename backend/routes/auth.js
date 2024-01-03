@@ -6,15 +6,23 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
 const authenticateJWT = require('../middleware/authenticate'); // Import the authenticate middleware
+const csrfProtection = require('../middleware/csrfMiddleware');
 
 
 router.get('/testing', authenticateJWT, (req, res) => {
   res.json({ message: 'Authenticated route', user: req.user });
 });
 
+router.get('/csrf-token', csrfProtection, (req, res) => {
+  // Get the CSRF token from the request object
+  const csrfToken = req.csrfToken();
 
-router.post('/login', async (req, res) => {
-  console.log("Reached api/login: ", req)
+  // Send the CSRF token as a JSON response
+  res.json({ csrfToken });
+});
+
+
+router.post('/login', csrfProtection, async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -41,8 +49,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res) => {
-  console.log("Reached api/register: ", req)
+router.post('/register', csrfProtection, async (req, res) => {
   try {
     const { username, password } = req.body;
 

@@ -4,6 +4,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const connectDB = require('./database');
 const path = require('path');
+const csrfProtection = require('./middleware/csrfMiddleware.js')
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
@@ -18,6 +19,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(csrfProtection);
 
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);

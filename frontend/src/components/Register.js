@@ -10,6 +10,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isSlideIn, setIsSlideIn] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
 
   useEffect(() => {
     // Trigger the slide-in animation after a delay (e.g., 1000 milliseconds)
@@ -21,21 +22,39 @@ const Register = () => {
 
     // Clean up the timeout when the component unmounts
     return () => clearTimeout(slideInTimeout);
+
+    // Fetch the CSRF token from your server and store it in state
+    axiosInstance
+      .get('/api/csrf-token')
+      .then((response) => {
+        setCsrfToken(response.data.csrfToken);
+      })
+      .catch((error) => {
+        console.error('Error fetching CSRF token:', error);
+      });
   }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
-  
+
     try {
       console.log('Submitting registration form...'); // Add a console log for debugging
-      const response = await axiosInstance.post('/api/register', {
-        username,
-        password,
-      });
+      const response = await axiosInstance.post(
+        '/api/register',
+        {
+          username,
+          password,
+        },
+        {
+          headers: {
+            'X-CSRF-Token': csrfToken,
+          },
+        }
+      );
       console.log('Registration response:', response.data); // Add a console log for debugging
-  
+
       // Set success message and handle post-registration logic
       setSuccessMessage('Registration successful! You can now login.');
       setTimeout(() => navigate('/login'), 3000); // Redirect to login after 3 seconds
