@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../../api/api.js'; // Import axiosInstance
 import '../../styles/AuthForm.css';
 
 
@@ -20,8 +20,7 @@ const Login = () => {
 
     try {
 
-      console.log('API URL:', process.env.REACT_APP_API_URL);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+      const response = await axiosInstance.post('/auth/login', { // Use axiosInstance here
         username,
         password,
       });
@@ -76,8 +75,10 @@ const Login = () => {
           Don't have an account? <span onClick={() => navigate('/register')}>Register here</span>
         </p>
       </form>
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={closeLoginModal} />
     </div>
-  );
+  );  
 };
 
 export default Login;

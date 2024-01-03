@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../../api/api.js'; // Import axiosInstance
 import '../../styles/AuthForm.css'; // Unified CSS for both login and register
+
 
 const Register = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Register = () => {
       e.preventDefault();
       setError(''); // Clear any previous errors
       try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+        const response = await axiosInstance.post('/auth/register', { // Use axiosInstance here
           username,
           password,
         });

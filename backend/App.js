@@ -14,8 +14,6 @@ require('dotenv').config();
 // Use the API_BASE_URL environment variable for your backend
 const API_BASE_URL = process.env.REACT_APP_API;
 
-console.log("Loggin1: ", API_BASE_URL);
-
 const app = express();
 
 const corsOptions = {
@@ -39,8 +37,6 @@ const server = https.createServer(credentials, app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-console.log("testing: ", API_BASE_URL)
 app.use(API_BASE_URL, authRoutes);
 
 // Static file serving for production frontend
