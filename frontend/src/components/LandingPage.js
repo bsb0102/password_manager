@@ -1,27 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Modal from '../../modals/Modals.jsx'; // Import your modal component
-import '../../styles/LandingPage.css'; // Ensure the CSS file path is correct
+import { useNavigate, Link } from 'react-router-dom';
+import Modal from '../modals/Modals.jsx';
+import Login from '../components/Login.js';
+import '../styles/LandingPage.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-
-  // State to manage modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Function to open the modal
-  const openLoginModal = () => {
-    setIsModalOpen(true);
-  };
-
-  // Function to close the modal
   const closeLoginModal = () => {
     setIsModalOpen(false);
-  };
-
-  // Function to handle the login button click
-  const handleLoginClick = () => {
-    openLoginModal();
   };
 
   return (
@@ -30,9 +18,9 @@ const LandingPage = () => {
         <div className="nav-brand" onClick={() => navigate('/')}>
           TECH CJ
         </div>
-        <button onClick={handleLoginClick} className="nav-login-btn">
+        <Link to="/login" className="nav-login-btn">
           Login
-        </button>
+        </Link>
       </nav>
       <header className="landing-header">
         <h1>Innovative solutions for modern problems</h1>
@@ -53,8 +41,12 @@ const LandingPage = () => {
         <p>© {new Date().getFullYear()} TECH CJ</p>
       </footer>
 
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} onClose={closeLoginModal} />
+      {/* Conditionally render the login form within the modal */}
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={closeLoginModal}>
+          <Login />
+        </Modal>
+      )}
     </div>
   );
 };

@@ -1,75 +1,72 @@
+// backend/routes/auth.js
+
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { body, validationResult } = require('express-validator');
-const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
+const authenticateJWT = require('../middleware/authenticate'); // Import the authenticate middleware
 
-// Login route with validation
-router.post('/auth/login', [
-  body('username').notEmpty().trim(),
-  body('password').notEmpty().trim(),
-], async (req, res) => {
-  // Validate input
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
 
-  const { username, password } = req.body;
+router.get('/testing', authenticateJWT, (req, res) => {
+  res.json({ message: 'Authenticated route', user: req.user });
+});
 
+
+router.post('/login', async (req, res) => {
+  console.log("Reached api/login: ", req)
   try {
-    const user = await User.findOne({ username });
+    const { username, password } = req.body;
 
-    if (!user || !await bcrypt.compare(password, user.hash)) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+    // Authenticate the user by fetching user data from the database
+    const user = await getUserByEmail(username);
+
+    if (!user) {
+      return res.status(401).json({ error: 'Authentication failed' });
     }
 
-    const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    res.json({ message: 'Logged in successfully', token });
+    // Verify password using bcrypt
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+
+    // Generate and send a JWT token upon successful login
+    const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
+    res.json({ message: 'Login successful', token });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Registration route with validation
-router.post('/auth/register', [
-  body('username').notEmpty().trim(),
-  body('password').notEmpty().trim().isLength({ min: 6 }), // Example: Require a minimum password length
-], async (req, res) => {
-  // Validate input
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { username, password } = req.body;
-
+router.post('/register', async (req, res) => {
+  console.log("Reached api/register: ", req)
   try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ username });
+    const { username, password } = req.body;
+
+    // Check if the user already exists in the database
+    const existingUser = await getUserByEmail(username);
+
     if (existingUser) {
-      return res.status(400).json({ message: 'Username already in use' });
+      return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Hash the password
+    // Hash the user's password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
-    const newUser = new User({
-      username,
-      hash: hashedPassword,
-    });
+    // Create a new user record in the database
+    const newUser = await createUser(username, hashedPassword);
 
-    // Save the user
-    await newUser.save();
-
-    const token = jwt.sign({ username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({ message: 'User registered successfully', token });
+    // Generate and send a JWT token upon successful registration
+    const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
+    res.status(201).json({ message: 'Registration successful', token });
   } catch (error) {
-    res.status(500).json({ message: 'Error registering user', error: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 module.exports = router;

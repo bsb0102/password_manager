@@ -8,10 +8,10 @@ const hashPassword = async (password) => {
 };
 
 // Function to create a new user record in the database
-const createUser = async (email, hashedPassword) => {
+const createUser = async (username, hashedPassword) => {
   try {
     const user = new User({
-      email: email,
+      username: username,
       password: hashedPassword,
     });
     await user.save();
@@ -22,9 +22,9 @@ const createUser = async (email, hashedPassword) => {
 };
 
 // Function to fetch a user by their email
-const getUserByEmail = async (email) => {
+const getUserByEmail = async (username) => {
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
     return user;
   } catch (error) {
     throw error;
