@@ -19,46 +19,46 @@ const Login = () => {
         const response = await axiosInstance.get('/api/csrf-token');
         setCsrfToken(response.data.csrfToken);
       } catch (error) {
-        console.error('Failed to fetch CSRF token Login:', error);
+        console.error('Failed to fetch CSRF token:', error);
       }
     };
   
     fetchData();
   }, []);
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true); // Set isLoading to true while processing the login
-
+  
     // Prepare the data to be sent
     const data = {
       username: username,
       password: password,
       _csrf: csrfToken,
     };
-
+  
     try {
       // Use axiosInstance to send the POST request
       const response = await axiosInstance.post('/api/login', data);
-
+  
       // Handle successful login
       navigate('/dashboard');
     } catch (error) {
       // Handle errors
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
+        console.error('Login error:', error.response.data);
+        console.error(data)
+        // You can set an error message in your state to display to the user
         setError(error.response.data.error);
       } else if (error.request) {
         // The request was made but no response was received
-        console.error('Error:', error.request);
+        console.error('Network error:', error.request);
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error:', error.message);
+        // Something else happened while setting up the request
+        console.error('Other error:', error.message);
       }
-      setError('Internal server error');
     } finally {
-      setIsLoading(false); // Set isLoading back to false when login is complete
+      setIsLoading(false); // Set isLoading back to false when the request is done (whether success or error)
     }
   };
 

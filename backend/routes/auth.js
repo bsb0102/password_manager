@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
 const authenticateJWT = require('../middleware/authenticate'); // Import the authenticate middleware
 const csrfMiddleware = require('../middleware/csrfMiddleware'); // Import the CSRF middleware
-const csurf = require('csurf');
-
 
 
 router.get("/user_test", async (req, res) => {
@@ -26,23 +24,22 @@ router.get('/csrf-token', csrfMiddleware, async (req, res) => {
 
 
 // Route for user login
-router.post('/login', csrfMiddleware, async (req, res) => {
+router.post('/login', async (req, res) => {
   
   try {
     const { username, password } = req.body;
 
-    // Verify the CSRF token
-    if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
-      return res.status(401).json({ error: 'Invalid CSRF token' });
-    }
 
-    console.log("Valid CSRF token")
+    // // Verify the CSRF token
+    // if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
+    //   return res.status(401).json({ error: 'Invalid CSRF token' });
+    // }
 
     // Authenticate the user by fetching user data from the database
     const user = await getUserByEmail(username);
 
     if (!user) {
-      return res.status(401).json({ error: 'Authentication failed' });
+      return res.status(401).json({ error: 'Authentication failure' });
     }
 
     // Verify password using bcrypt
@@ -62,14 +59,14 @@ router.post('/login', csrfMiddleware, async (req, res) => {
 });
 
 // Route for user registration
-router.post('/register', csrfMiddleware, async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
 
     // Verify the CSRF token
-    if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
-      return res.status(401).json({ error: 'Invalid CSRF token' });
-    }
+    // if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
+    //   return res.status(401).json({ error: 'Invalid CSRF token' });
+    // }
 
     // Check if the user already exists in the database
     const existingUser = await getUserByEmail(username);

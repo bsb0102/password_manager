@@ -12,38 +12,44 @@ const Register = () => {
   const [csrfToken, setCsrfToken] = useState(''); // State to store the CSRF token
 
   useEffect(() => {
-    // Fetch the CSRF token from the server and set it in state
-    fetch('/api/csrf-token')
-      .then((response) => response.json())
-      .then((data) => {
-        setCsrfToken(data.csrfToken);
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        // Fetch the CSRF token from the server using Axios
+        const response = await axiosInstance.get('/api/csrf-token');
+        setCsrfToken(response.data.csrfToken);
+      } catch (error) {
         console.error('Failed to fetch CSRF token:', error);
-      });
+      }
+    };
+  
+    fetchData();
   }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
+  
     // Include the CSRF token in the form data
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
-    formData.append('_csrf', csrfToken);
-
+    const data = {
+      username: username,
+      password: password,
+      _csrf: csrfToken,
+    };
+  
     // Send the POST request with the CSRF token included
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
+      const response = await axiosInstance.post('/api/register', data);
+  
+      // Check the response status and handle accordingly
+      if (response.status === 201) {
         // Handle successful registration
         setSuccessMessage('Registration successful');
-      } else {
+      } else if (response.status === 400) {
+        // Handle client-side validation errors, if any
         const data = await response.json();
         setError(data.error);
+      } else {
+        // Handle other server errors
+        setError('Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
