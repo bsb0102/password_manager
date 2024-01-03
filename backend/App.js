@@ -4,16 +4,28 @@ const path = require('path');
 const errorHandler = require('./middleware/errorHandler');
 const authenticateToken = require('./middleware/authenticateToken');
 const authRoutes = require('./routes/auth');
-const appRoutes = require('./routes/mainRoutes.js'); // Assumed import, replace with your actual routes file
+const appRoutes = require('./routes/mainRoutes.js');
 const https = require('https');
 const fs = require('fs');
 const killPort = require('kill-port');
 const connectDB = require('./database');
 require('dotenv').config();
 
+// Use the API_BASE_URL environment variable for your backend
+const API_BASE_URL = process.env.REACT_APP_API;
+
+console.log("Loggin1: ", API_BASE_URL);
+
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://82.165.221.131:443'], // Update with your frontend URL during development
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 443;
 
@@ -21,17 +33,15 @@ connectDB();
 const privateKey = fs.readFileSync(path.resolve(__dirname, './key.pem'), 'utf8');
 const certificate = fs.readFileSync(path.resolve(__dirname, './cert.pem'), 'utf8');
 const credentials = { key: privateKey, cert: certificate };
-const authRoutes = require('./routes/auth');
 
 // Create an HTTPS server with the Express app
 const server = https.createServer(credentials, app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(authenticateToken); // If you want to apply this middleware globally
 
-
-app.use('/api/auth', authRoutes);
+console.log("testing: ", API_BASE_URL)
+app.use(API_BASE_URL, authRoutes);
 
 // Static file serving for production frontend
 if (process.env.NODE_ENV === 'production') {

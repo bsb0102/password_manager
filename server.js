@@ -4,25 +4,15 @@ const path = require('path');
 const killPort = require('kill-port');
 const app = require('./backend/App.js'); // Import the Express app from the backend
 
-const cors = require('cors');
-app.use(cors());
-
-
-// export NODE_OPTIONS=--openssl-legacy-provider
-
-
 require('dotenv').config();
-
-// Define the PORT variable with a default value of 443 for HTTPS
-const PORT = process.env.PORT || 443;
 
 // Load SSL/TLS certificate and private key
 const privateKey = fs.readFileSync(path.resolve(__dirname, './key.pem'), 'utf8');
 const certificate = fs.readFileSync(path.resolve(__dirname, './cert.pem'), 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
-
-// console.log(privateKey)
+// Define the PORT variable with a default value of 443 for HTTPS
+const PORT = process.env.PORT || 443;
 
 // Create an HTTPS server with the Express app
 const server = https.createServer(credentials, app);
@@ -31,7 +21,9 @@ const server = https.createServer(credentials, app);
 async function killPortIfInUse(port) {
   try {
     await killPort(port, 'tcp');
+    console.log(`Port ${port} is now free`);
   } catch (err) {
+    console.error(`Error freeing port ${port}: ${err.message}`);
   }
 }
 

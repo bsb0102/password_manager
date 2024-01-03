@@ -2,6 +2,15 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
+const fs = require('fs'); // Make sure to require 'fs' to read the files
+
+// Load environment variables from .env file
+require('dotenv').config();
+
+console.log(process.env.REACT_APP_API_URL);
+
+
+
 module.exports = {
   entry: './src/index.js',
   output: {

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../../styles/AuthForm.css';
 
+
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -19,8 +20,8 @@ const Login = () => {
 
     try {
 
-      console.log('API URL:', process.env.REACT_APP_API);
-      const response = await axios.post(`${process.env.REACT_APP_API}/auth/login`, {
+      console.log('API URL:', process.env.REACT_APP_API_URL);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
         username,
         password,
       });
@@ -30,6 +31,7 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard'); // Navigate to the dashboard or another page
     } catch (err) {
+      console.log(err)
       setIsLoading(false);
       if (err.response) {
         // The request was made and the server responded with a status code
