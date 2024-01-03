@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../api/api'; // Adjust this path according to your project structure
 import '../styles/PasswordManager.css';
+import { FaPlus, FaTrashAlt } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const PasswordManager = () => {
   const [passwords, setPasswords] = useState([]);
@@ -8,6 +10,7 @@ const PasswordManager = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [editingPasswordId, setEditingPasswordId] = useState(null);
+  const [showAddPopup, setShowAddPopup] = useState(false);
 
   useEffect(() => {
     fetchPasswords();
@@ -29,9 +32,9 @@ const PasswordManager = () => {
   const handleAddPassword = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/addPassword', newPassword);
+      const response = await axiosInstance.post('/addPassword', newPassword);
+      setPasswords([...passwords, response.data]); // Update the UI optimistically
       setNewPassword({ website: '', username: '', password: '' });
-      fetchPasswords();
     } catch (error) {
       console.error('Error adding password:', error);
     }
@@ -50,76 +53,64 @@ const PasswordManager = () => {
   const handleDeletePassword = async (id) => {
     try {
       await axiosInstance.delete(`/deletePassword/${id}`);
-      fetchPasswords();
+      setPasswords(passwords.filter(p => p.id !== id)); // Update the UI optimistically
     } catch (error) {
       console.error('Error deleting password:', error);
     }
   };
 
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}:"<>?[];,./`~';
+    const passwordLength = 12;
+    let password = '';
+    for (let i = 0; i < passwordLength; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      password += chars[randomIndex];
+    }
+    setNewPassword({ ...newPassword, password });
+  };
+
+  // Render the UI
   return (
-    <div>
-      <h1>Password Manager</h1>
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
-
-      <form onSubmit={handleAddPassword}>
-        <input 
-          type="text" 
-          placeholder="Website" 
-          value={newPassword.website} 
-          onChange={(e) => setNewPassword({...newPassword, website: e.target.value})} 
-        />
-        <input 
-          type="text" 
-          placeholder="Username" 
-          value={newPassword.username} 
-          onChange={(e) => setNewPassword({...newPassword, username: e.target.value})} 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={newPassword.password} 
-          onChange={(e) => setNewPassword({...newPassword, password: e.target.value})} 
-        />
-        <button type="submit">Add Password</button>
-      </form>
-
-      <div>
-        {passwords.map((password) => (
-          <div key={password.id}>
-            {editingPasswordId === password.id ? (
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleEditPassword(password.id, newPassword);
-              }}>
-                <input 
-                  type="text" 
-                  defaultValue={password.website} 
-                  onChange={(e) => setNewPassword({...newPassword, website: e.target.value})} 
-                />
-                <input 
-                  type="text" 
-                  defaultValue={password.username} 
-                  onChange={(e) => setNewPassword({...newPassword, username: e.target.value})} 
-                />
-                <input 
-                  type="password" 
-                  defaultValue={password.password} 
-                  onChange={(e) => setNewPassword({...newPassword, password: e.target.value})} 
-                />
-                <button type="submit">Save</button>
-                <button onClick={() => setEditingPasswordId(null)}>Cancel</button>
-              </form>
-            ) : (
-              <div>
-                <p>Website: {password.website}</p>
-                <p>Username: {password.username}</p>
-                <button onClick={() => setEditingPasswordId(password.id)}>Edit</button>
-                <button onClick={() => handleDeletePassword(password.id)}>Delete</button>
-              </div>
-            )}
+    <div className="password-manager-container">
+      <nav className="navbar">
+        <ul>
+          <li>Password Manager</li>
+          <li>Settings</li>
+        </ul>
+      </nav>
+      <div className="password-manager">
+        {/* Popup for adding or editing passwords */}
+        {showAddPopup && (
+          <div className="popup-container">
+            {/* Add form and popup code here */}
           </div>
-        ))}
+        )}
+        {/* Password list with animations */}
+        <AnimatePresence>
+          {passwords.map((password) => (
+            <motion.div
+              key={password.id}
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.5 }}
+              className="password-entry"
+            >
+              <div>Website: {password.website}</div>
+              <div>Username: {password.username}</div>
+              <div>Password: {password.password}</div> {/* Be cautious with displaying passwords */}
+              <div className="actions">
+                <button onClick={() => setEditingPasswordId(password.id)}>
+                  <FaPlus />
+                </button>
+                <button onClick={() => handleDeletePassword(password.id)}>
+                  <FaTrashAlt />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );

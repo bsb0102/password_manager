@@ -6,6 +6,7 @@ const connectDB = require('./database');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -21,6 +22,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+
+// Define the rate limit options
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+
+app.use(limiter);
 
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);
