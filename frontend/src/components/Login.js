@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js';
+import { getCsrfToken } from '../utils/csrfUtils';
 import '../styles/AuthForm.css';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,22 +11,20 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [csrfToken, setCsrfToken] = useState('');
+  const [csrfToken, setCsrfToken] = useState(null);
 
-  // Use useEffect to add animation class when component mounts
   useEffect(() => {
     setTimeout(() => {
       document.querySelector('.auth-form').classList.add('active');
     }, 100);
 
-    // Fetch the CSRF token from your server and store it in state
-    axiosInstance
-      .get('/api/csrf-token')
-      .then((response) => {
-        setCsrfToken(response.data.csrfToken);
+    // Fetch the CSRF token and store it in a state variable
+    getCsrfToken()
+      .then((token) => {
+        setCsrfToken(token);
       })
       .catch((error) => {
-        console.error('Error fetching CSRF token:', error);
+        console.error('Failed to fetch CSRF token:', error);
       });
   }, []);
 
@@ -37,11 +37,10 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', {
         username,
         password,
-        // Include the CSRF token in the request headers
       },
       {
         headers: {
-          'X-CSRF-Token': csrfToken,
+          'X-CSRF-Token': csrfToken, // Use the CSRF token in the headers
         },
       });
 

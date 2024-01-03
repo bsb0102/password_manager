@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js'; // Import axiosInstance
+import { getCsrfToken } from '../utils/csrfUtils';
 import '../styles/AuthForm.css'; // Unified CSS for both login and register
 
 const Register = () => {
@@ -10,27 +11,23 @@ const Register = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isSlideIn, setIsSlideIn] = useState(false);
-  const [csrfToken, setCsrfToken] = useState('');
+  const [csrfToken, setCsrfToken] = useState(null);
 
   useEffect(() => {
-    // Trigger the slide-in animation after a delay (e.g., 1000 milliseconds)
-    console.log('isSlideIn:', isSlideIn); // Add this line for debugging
+    console.log('isSlideIn:', isSlideIn);
     const slideInTimeout = setTimeout(() => {
       setIsSlideIn(true);
-      console.log('isSlideIn (after timeout):', isSlideIn); // Add this line for debugging
+      console.log('isSlideIn (after timeout):', isSlideIn);
     }, 1000);
-
-    // Clean up the timeout when the component unmounts
     return () => clearTimeout(slideInTimeout);
 
-    // Fetch the CSRF token from your server and store it in state
-    axiosInstance
-      .get('/api/csrf-token')
-      .then((response) => {
-        setCsrfToken(response.data.csrfToken);
+    // Fetch the CSRF token and store it in a state variable
+    getCsrfToken()
+      .then((token) => {
+        setCsrfToken(token);
       })
       .catch((error) => {
-        console.error('Error fetching CSRF token:', error);
+        console.error('Failed to fetch CSRF token for Register:', error);
       });
   }, []);
 
@@ -40,7 +37,7 @@ const Register = () => {
     setSuccessMessage('');
 
     try {
-      console.log('Submitting registration form...'); // Add a console log for debugging
+      console.log('Submitting registration form...');
       const response = await axiosInstance.post(
         '/api/register',
         {
@@ -49,19 +46,17 @@ const Register = () => {
         },
         {
           headers: {
-            'X-CSRF-Token': csrfToken,
+            'X-CSRF-Token': csrfToken, // Use the CSRF token in the headers
           },
         }
       );
-      console.log('Registration response:', response.data); // Add a console log for debugging
+      console.log('Registration response:', response.data);
 
-      // Set success message and handle post-registration logic
       setSuccessMessage('Registration successful! You can now login.');
       setTimeout(() => navigate('/login'), 3000); // Redirect to login after 3 seconds
     } catch (error) {
-      // Handle registration failure
       setError('Registration failed. Please try again.');
-      console.log('Registration error:', error); // Add a console log for debugging
+      console.log('Registration error:', error);
     }
   };
 

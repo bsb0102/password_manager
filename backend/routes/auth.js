@@ -1,28 +1,25 @@
-// backend/routes/auth.js
-
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
 const authenticateJWT = require('../middleware/authenticate'); // Import the authenticate middleware
-const csrfProtection = require('../middleware/csrfMiddleware');
+const csrfMiddleware = require('../middleware/csrfMiddleware'); // Import the CSRF middleware
 
-
+// Testing route with JWT authentication
 router.get('/testing', authenticateJWT, (req, res) => {
   res.json({ message: 'Authenticated route', user: req.user });
 });
 
-router.get('/csrf-token', csrfProtection, (req, res) => {
+// Route to fetch the CSRF token
+router.get('/csrf-token', csrfMiddleware, (req, res) => {
   // Get the CSRF token from the request object
   const csrfToken = req.csrfToken();
-
-  // Send the CSRF token as a JSON response
   res.json({ csrfToken });
 });
 
-
-router.post('/login', csrfProtection, async (req, res) => {
+// Route for user login
+router.post('/login', csrfMiddleware, async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -49,7 +46,8 @@ router.post('/login', csrfProtection, async (req, res) => {
   }
 });
 
-router.post('/register', csrfProtection, async (req, res) => {
+// Route for user registration
+router.post('/register', csrfMiddleware, async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -74,6 +72,5 @@ router.post('/register', csrfProtection, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 module.exports = router;

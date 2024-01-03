@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Modal from '../modals/Modals.jsx';
 import Login from '../components/Login.js';
+import Register from '../components/Register.js'; // Import the Register component
 import '../styles/LandingPage.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const closeLoginModal = () => {
-    setIsModalOpen(false);
+    setIsLoginModalOpen(false);
+  };
+
+  const closeRegisterModal = () => {
+    setIsRegisterModalOpen(false);
   };
 
   return (
@@ -21,6 +27,9 @@ const LandingPage = () => {
         <Link to="/login" className="nav-login-btn">
           Login
         </Link>
+        <button onClick={() => setIsRegisterModalOpen(true)} className="nav-signup-btn">
+          Sign Up
+        </button>
       </nav>
       <header className="landing-header">
         <h1>Innovative solutions for modern problems</h1>
@@ -41,10 +50,15 @@ const LandingPage = () => {
         <p>© {new Date().getFullYear()} TECH CJ</p>
       </footer>
 
-      {/* Conditionally render the login form within the modal */}
-      {isModalOpen && (
-        <Modal isOpen={isModalOpen} onClose={closeLoginModal}>
+      {/* Conditionally render the login and registration forms within modals */}
+      {isLoginModalOpen && (
+        <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
           <Login />
+        </Modal>
+      )}
+      {isRegisterModalOpen && (
+        <Modal isOpen={isRegisterModalOpen} onClose={closeRegisterModal}>
+          <Register />
         </Modal>
       )}
     </div>
