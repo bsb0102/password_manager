@@ -143,3 +143,27 @@
     background-position: 0% 50%;
   }
 }
+
+
+
+
+
+
+
+.nav-login-btn,
+.nav-signup-btn { /* Apply these styles to both Login and Sign Up buttons */
+  padding: 0.5rem 1rem;
+  background: #007bff; /* Button color */
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 1rem; /* Add some spacing between buttons */
+  text-decoration: none; /* Remove default link underline */
+}
+
+.nav-login-btn:hover,
+.nav-signup-btn:hover { /* Apply hover styles to both buttons */
+  background-color: #0056b3; /* Button hover state color */
+}
