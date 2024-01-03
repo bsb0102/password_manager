@@ -34,7 +34,7 @@ const Login = () => {
     const data = {
       username: username,
       password: password,
-      _csrf: csrfToken,
+      _csrf: csrfToken
     };
   
     try {
@@ -44,21 +44,17 @@ const Login = () => {
       // Handle successful login
       navigate('/dashboard');
     } catch (error) {
-      // Handle errors
       if (error.response) {
         console.error('Login error:', error.response.data);
         console.error(data)
-        // You can set an error message in your state to display to the user
         setError(error.response.data.error);
       } else if (error.request) {
-        // The request was made but no response was received
         console.error('Network error:', error.request);
       } else {
-        // Something else happened while setting up the request
         console.error('Other error:', error.message);
       }
     } finally {
-      setIsLoading(false); // Set isLoading back to false when the request is done (whether success or error)
+      setIsLoading(false);
     }
   };
 

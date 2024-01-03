@@ -3,8 +3,6 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
-const authenticateJWT = require('../middleware/authenticate'); // Import the authenticate middleware
-const csrfMiddleware = require('../middleware/csrfMiddleware'); // Import the CSRF middleware
 
 
 router.get("/user_test", async (req, res) => {
@@ -12,28 +10,15 @@ router.get("/user_test", async (req, res) => {
 });
 
 // Testing route with JWT authentication
-router.get('/testing', authenticateJWT, (req, res) => {
-  res.json({ message: 'Authenticated route', user: req.user });
-});
-
-router.get('/csrf-token', csrfMiddleware, async (req, res) => {
-  // Get the CSRF token from the request object
-  const csrfToken = req.csrfToken();
-  res.json({ csrfToken });
-});
 
 
-// Route for user login
+
 router.post('/login', async (req, res) => {
+
+
   
   try {
     const { username, password } = req.body;
-
-
-    // // Verify the CSRF token
-    // if (!req.csrfToken() || req.csrfToken() !== req.body._csrf) {
-    //   return res.status(401).json({ error: 'Invalid CSRF token' });
-    // }
 
     // Authenticate the user by fetching user data from the database
     const user = await getUserByEmail(username);
