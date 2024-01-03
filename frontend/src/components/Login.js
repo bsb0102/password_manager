@@ -42,6 +42,8 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', data);
   
       // Handle successful login
+
+      localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (error) {
       if (error.response) {
