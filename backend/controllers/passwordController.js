@@ -1,49 +1,57 @@
-const bcrypt = require('bcrypt');
-const Password = require('../models/Password');
 const jwt = require('jsonwebtoken');
+const Password = require('../models/Password');
+const { generateRandomIV, encrypt, decrypt } = require('../models/cryptoUtils');
 
-// Function to extract user ID from the JWT token
-const getUserIdFromToken = (token) => {
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return decoded.userId;
-    } catch (error) {
-        console.error("Error decoding JWT:", error);
-        return null;
-    }
+const secretKey = "1b6f0bb9a4f7ded7c70543378c49464f";
+
+getUserIdFromToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.userId;
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
 };
 
-// Add a new password
 exports.addPassword = async (req, res) => {
-    try {
-        const { website, username, password } = req.body;
-        const token = req.headers.authorization.split(' ')[1]; // Assuming 'Bearer TOKEN'
-        const userId = getUserIdFromToken(token);
+  try {
+    const { website, username, password: plainPassword, email } = req.body;
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
 
-        if (!userId) {
-            return res.status(401).json({ error: "Invalid or missing token" });
-        }
-
-        const encryptedPassword = await bcrypt.hash(password, 10);
-
-        const newPassword = new Password({
-            userId,
-            website,
-            username,
-            encryptedPassword
-        });
-
-        await newPassword.save();
-        res.status(201).json({ message: "Password saved successfully." });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
     }
+
+    // Generate a random IV
+    const iv = generateRandomIV();
+
+    // Encrypt the password with the IV
+    const encryptedPassword = encrypt(plainPassword, secretKey, iv);
+
+    const newPassword = new Password({
+      userId,
+      website,
+      username,
+      email,
+      encryptedPassword,
+      iv: iv.toString('hex') // Store the IV as a hexadecimal string
+    });
+
+    await newPassword.save();
+    res.status(201).json({ message: "Password saved successfully." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
 
 // Get all passwords for a user
+
 exports.getPasswords = async (req, res) => {
     try {
-        const token = req.headers.authorization.split(' ')[1]; // Assuming 'Bearer TOKEN'
+        const token = req.headers.authorization.split(' ')[1];
         const userId = getUserIdFromToken(token);
 
         if (!userId) {
@@ -51,13 +59,25 @@ exports.getPasswords = async (req, res) => {
         }
 
         const passwords = await Password.find({ userId });
-        res.status(200).json(passwords);
+
+        // Decrypt each password before sending it back
+        const decryptedPasswords = passwords.map(p => {
+            if (p.encryptedPassword && p.encryptedPassword.iv && p.encryptedPassword.content) {
+                p.encryptedPassword = decrypt(p.encryptedPassword, secretKey, Buffer.from(p.encryptedPassword.iv, 'hex'));
+            } else {
+                console.error('Invalid encrypted password:', p);
+            }
+            return p;
+        });
+
+        res.status(200).json(decryptedPasswords);
     } catch (error) {
+        console.log(secretKey);
         res.status(500).json({ error: error.message });
     }
 };
 
-// Delete a password
+
 exports.deletePassword = async (req, res) => {
     try {
         const { id } = req.params;
@@ -74,6 +94,15 @@ exports.deletePassword = async (req, res) => {
             return res.status(404).json({ error: "Password not found or access denied" });
         }
 
+        // Decrypt the password using IV before deleting it
+        const decryptedPassword = decrypt(password.encryptedPassword, secretKey, Buffer.from(password.iv, 'hex'));
+
+        // Check if decryption was successful
+        if (!decryptedPassword) {
+            return res.status(500).json({ error: "Error decrypting the password" });
+        }
+
+        // Continue with password deletion
         await Password.findByIdAndDelete(id);
         res.status(200).json({ message: "Password deleted successfully." });
     } catch (error) {

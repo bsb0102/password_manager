@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js';
-import { getCsrfToken } from '../utils/csrfUtils';
 import '../styles/AuthForm.css';
 
 const Login = () => {
@@ -11,6 +10,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
   const [csrfToken, setCsrfToken] = useState(''); // State to store the CSRF token
+
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,9 +43,10 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', data);
   
       // Handle successful login
-
       localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      // axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      navigate('/home');
     } catch (error) {
       if (error.response) {
         console.error('Login error:', error.response.data);
@@ -74,14 +76,21 @@ const Login = () => {
           required
           disabled={isLoading}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          disabled={isLoading}
-        />
+        <div className="password-input-group">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={isLoading}
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ cursor: "pointer" }}
+          >
+            {showPassword ? <i className="bi-eye-slash" /> : <i className="bi-eye" />}
+          </span>
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
@@ -89,6 +98,7 @@ const Login = () => {
           Don't have an account?{' '}
           <span onClick={() => navigate('/register')}>Register here</span>
         </p>
+        </div>
       </form>
     </div>
   );

@@ -12,4 +12,22 @@ const axiosInstance = axios.create({
   },
 });
 
+axiosInstance.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  config.headers.Authorization =  token ? `Bearer ${token}` : '';
+  return config;
+});
+
+export const decryptPassword = async (encryptedPassword) => {
+  try {
+    const response = await axiosInstance.get(`/decryptPassword?encryptedPassword=${encryptedPassword}`);
+    return response.data; // Return the decrypted password
+  } catch (error) {
+    console.error('Error decrypting password:', error);
+    throw error;
+  }
+};
+
+
+
 export default axiosInstance;

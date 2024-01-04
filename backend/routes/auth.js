@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
+const cryptoUtils = require('../models/cryptoUtils');
 
 
 router.get("/user_test", async (req, res) => {
@@ -10,6 +11,13 @@ router.get("/user_test", async (req, res) => {
 });
 
 // Testing route with JWT authentication
+
+router.get('/decryptPassword', async (req, res) => {
+  const decryptedPassword = cryptoUtils.decrypt(req.query.encryptedPassword);
+  res.send(decryptedPassword);
+});
+
+
 
 router.post('/login', async (req, res) => {
 

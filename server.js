@@ -4,6 +4,7 @@ const path = require('path');
 const app = require('./backend/App.js'); // Import the Express app
 
 require('dotenv').config();
+env = module.exports = process.env;
 
 // Load SSL/TLS certificate and private key
 const privateKey = fs.readFileSync(path.resolve(__dirname, './key.pem'), 'utf8');

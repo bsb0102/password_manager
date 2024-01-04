@@ -2,11 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
+const passwordRoutes = require('./routes/passwordRoutes');
 const connectDB = require('./database');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+require("dotenv").config();
+env = module.exports = process.env;
 
 const app = express();
 
@@ -34,6 +37,8 @@ app.use(limiter);
 
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);
+
+app.use("/api", passwordRoutes);
 
 // Static file serving for production frontend
 if (process.env.NODE_ENV === 'production') {
