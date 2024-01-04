@@ -30,7 +30,10 @@ const PasswordManager = () => {
   const fetchPasswords = async () => {
     try {
       const response = await axiosInstance.get('/api/getPasswords');
-      setData(response.data);
+      setData(response.data.map(item => ({
+        ...item,
+        showPassword: false // Add a visibility flag for each password
+      })));
     } catch (error) {
       console.error('Error fetching passwords:', error);
     }
@@ -40,11 +43,50 @@ const PasswordManager = () => {
     fetchPasswords();
   }, []);
 
+
+  // Toggle password visibility
   const togglePasswordVisibility = (id) => {
     setData(data.map(item => 
       item._id === id ? { ...item, showPassword: !item.showPassword } : item
     ));
   };
+
+  // Function to handle adding or updating a password
+  const handleAddPasswordSubmit = async () => {
+    try {
+      // First, encrypt the password
+      const encryptionResponse = await axiosInstance.post('/api/encryptPassword', {
+        password: newPasswordData.password
+      });
+  
+      const { content, iv } = encryptionResponse.data;
+  
+      // Prepare the data for adding/updating password entry
+      const passwordPayload = {
+        ...newPasswordData,
+        encryptedPassword: content,
+        iv
+      };
+  
+      let response;
+      if (editData) {
+        // Update existing item
+        response = await axiosInstance.put(`/api/updatePassword/${editData.id}`, passwordPayload);
+      } else {
+        // Add new item
+        response = await axiosInstance.post('/api/addPassword', passwordPayload);
+      }
+  
+      // Fetch updated list of passwords
+      fetchPasswords();
+      setShowAddPasswordModal(false);
+      setEditData(null);
+    } catch (error) {
+      console.error('Error adding/updating password:', error);
+    }
+  };
+
+
 
   const handleAddClick = () => {
     setShowAddPasswordModal(true);
@@ -88,15 +130,19 @@ const PasswordManager = () => {
     }
   };
 
-  const decrypt = async (encryptedPassword) => {
+  const decrypt = async (passwordId) => {
     try {
-      const response = await axiosInstance.get(`/api/decryptPassword?encryptedPassword=${encryptedPassword}`);
-      const decryptedPassword = response.data;
+      // Send a request to the backend with the password ID
+      const response = await axiosInstance.get(`/api/decryptPasswordById`, {
+        params: { id: passwordId }
+      });
+      const decryptedPassword = response.data.decryptedPassword;
+      console.log(decryptedPassword);
       setDecryptedPassword(decryptedPassword);
     } catch (error) {
       console.error('Error decrypting password:', error);
     }
-  };
+};
 
   const handleDeleteCancel = () => {
     setShowDeleteConfirmation(false);
@@ -145,22 +191,6 @@ const PasswordManager = () => {
     setShowGenerateStrongPassword(false);
   };
 
-  const handleAddPasswordSubmit = async () => {
-    try {
-      if (editData) {
-        // Handle edit logic here (update the existing item).
-        await axiosInstance.put(`/api/updatePassword/${editData.id}`, newPasswordData);
-      } else {
-        // Handle add logic here (add a new item).
-        const response = await axiosInstance.post('/api/addPassword', newPasswordData);
-        setData([...data, response.data]);
-      }
-      setShowAddPasswordModal(false);
-      setEditData(null);
-    } catch (error) {
-      console.error('Error adding/updating password:', error);
-    }
-  };
 
   return (
     <div className="table-container">
@@ -185,16 +215,16 @@ const PasswordManager = () => {
                 <td>{item.email}</td>
                 <td>{item.username}</td>
                 <td>
-                  {showPassword[item._id] ? (
+                  {item.showPassword ? (
                     <>
-                      {decryptedPassword ? decryptedPassword : 'Decrypting...'} {/* Show 'Decrypting...' while decrypting */}
+                      {item.password} {/* Display decrypted password */}
                       <button onClick={() => togglePasswordVisibility(item._id)}>
                         Hide
                       </button>
                     </>
                   ) : (
                     <>
-                      {maskPassword(item.encryptedPassword)} {/* Mask with asterisks */}
+                      {maskPassword(item.password)} {/* Mask with asterisks */}
                       <button onClick={() => togglePasswordVisibility(item._id)}>
                         Show
                       </button>

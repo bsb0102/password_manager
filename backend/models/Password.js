@@ -17,9 +17,14 @@ const passwordSchema = new mongoose.Schema({
         required: false,
         trim: true
     },
-    password: {
+    email: {
         type: String,
-        required: false
+        required: false,
+        trim: true
+    },
+    encryptedPassword: { // Store the encrypted password
+        iv: { type: String, required: true }, // The IV for the encrypted password
+        content: { type: String, required: true } // The encrypted content
     }
 }, {
     timestamps: true // Adds createdAt and updatedAt timestamps

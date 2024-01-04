@@ -65,20 +65,20 @@ exports.getPasswords = async (req, res) => {
         // Decrypt each password before sending it back
         const decryptedPasswords = passwords.map(p => {
           if (p.encryptedPassword && p.encryptedPassword.iv && p.encryptedPassword.content) {
-            p.encryptedPassword = decrypt(p.encryptedPassword, p.iv);
-            if (!p.encryptedPassword) {
-              // Handle decryption error
-              console.error('Decryption failed for password:', p);
+            const decrypted = decrypt(p.encryptedPassword, p.iv);
+            if (!decrypted) {
+              console.error('Failed to decrypt password for entry:', p);
+            } else {
+              p.password = decrypted; // Assuming you want to assign decrypted password to `password` field
             }
           } else {
-            console.error('Invalid encrypted password:', p);
+            console.error('Invalid encrypted password format:', p);
           }
           return p;
         });
 
         res.status(200).json(decryptedPasswords);
     } catch (error) {
-        console.log(secretKey);
         res.status(500).json({ error: error.message });
     }
 };

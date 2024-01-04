@@ -11,7 +11,6 @@ exports.generateRandomIV = () => {
 };
 
 exports.encrypt = (text, iv) => {
-  console.log(secretKey)
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
   return {
@@ -21,13 +20,16 @@ exports.encrypt = (text, iv) => {
 };
 
 exports.decrypt = (hash, iv) => {
+  if (!iv) {
+    console.error("IV is undefined. Cannot decrypt.");
+    return null;
+  }
   try {
     const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(iv, 'hex'));
     const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
     return decrypted.toString();
   } catch (error) {
-    console.log(secretKey)
-    console.error("Error in decryption");
-    return null; // or handle the error as per your application's needs
+    console.error("Error in decryption:", error);
+    return null;
   }
 };
