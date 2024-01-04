@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import Register from './components/Register';
-import Home from './components/Home'; // Updated component name
 import Settings from './components/Settings';
 import Sidebar from './components/Sidebar'; // Sidebar component
 import './styles/Sidebar.css'; // Updated import name
 import ProtectedRoute from './components/ProtectedRoute';
+import PasswordManager from './components/PasswordManager';
 
 const App = () => {
   return (
@@ -24,7 +24,7 @@ const App = () => {
             path="/home"
             element={
               <ProtectedRoute>
-                <Home />
+                <PasswordManager />
               </ProtectedRoute>
             }
           />

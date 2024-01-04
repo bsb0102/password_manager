@@ -15,6 +15,7 @@
         "test": "npm run test:frontend && npm run test:backend"
     },
     "dependencies": {
+        "@fortawesome/free-solid-svg-icons": "^6.5.1",
         "axios": "^1.6.3",
         "bcrypt": "^5.1.1",
         "bootstrap": "^5.3.2",
@@ -32,11 +33,14 @@
         "iptable": "^1.0.0",
         "jsonwebtoken": "^9.0.2",
         "kill-port": "^2.0.1",
+        "material-react-table": "^2.3.1",
         "mongoose": "^8.0.3",
         "openssl": "^2.0.0",
         "qrcode": "^1.5.3",
         "react": "^18.2.0",
+        "react-bootstrap": "^2.9.2",
         "react-icons": "^4.12.0",
+        "react-query": "^3.39.3",
         "react-router": "^6.21.1",
         "react-router-dom": "^6.0.0",
         "react-scripts": "^5.0.1",

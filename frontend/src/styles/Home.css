@@ -1,0 +1,93 @@
+/* Home.css */
+
+/* Style for the entire container */
+.container {
+    margin: 20px;
+  }
+  
+  /* Style for the table */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Style for the header row */
+  .table th {
+    background-color: #f2f2f2;
+  }
+  
+  /* Style for the row actions */
+  .row-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* Style for the edit and delete buttons */
+  .row-actions button {
+    padding: 8px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Style for the create/edit user modal */
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Style for the form input fields in the modal */
+  .modal-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  /* Style for the error message in the modal */
+  .modal-error {
+    color: red;
+    font-size: 0.875rem;
+  }
+  
+  /* Style for the Save and Cancel buttons in the modal */
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  /* Style for the Save button */
+  .modal-buttons button.save-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Style for the Cancel button */
+  .modal-buttons button.cancel-button {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  

@@ -1,119 +1,275 @@
-import React, { useState, useEffect } from 'react';
-import axiosInstance from '../api/api'; // Adjust this path according to your project structure
-import '../styles/PasswordManager.css';
-import { FaPlus, FaTrashAlt } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from "react";
+import '../styles/PasswordManager.css'; // Import your CSS file
+import { FaPencilAlt, FaTrash } from 'react-icons/fa'; // Import icons
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
-const PasswordManager = () => {
-  const [passwords, setPasswords] = useState([]);
-  const [newPassword, setNewPassword] = useState({ website: '', username: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [editingPasswordId, setEditingPasswordId] = useState(null);
-  const [showAddPopup, setShowAddPopup] = useState(false);
+const initialData = [
+  {
+    id: 1,
+    Website: "example1.com",
+    email: "user1@example.com",
+    username: "user1",
+    password: "Lol123",
+  },
+  {
+    id: 2,
+    Website: "example2.org",
+    email: "user2@example.org",
+    username: "user2",
+    password: "Lol123",
+  },
+];
+const CustomTable = () => {
+  const [data, setData] = useState(initialData);
+  const [showPassword, setShowPassword] = useState(false); // Password visibility state
+  const [inputBackgroundColor, setInputBackgroundColor] = useState("white");
+  const [showAddPasswordModal, setShowAddPasswordModal] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [newPasswordData, setNewPasswordData] = useState({
 
-  useEffect(() => {
-    fetchPasswords();
-  }, []);
+    id: "",
+    Website: "",
+    email: "",
+    username: "",
+    password: "",
+  });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [showGenerateStrongPassword, setShowGenerateStrongPassword] = useState(false);
 
-  const fetchPasswords = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get('/getPasswords');
-      setPasswords(response.data);
-    } catch (error) {
-      console.error('Error fetching passwords:', error);
-      setError('Failed to load passwords');
-    } finally {
-      setLoading(false);
-    }
+  const togglePasswordVisibility = (id) => {
+    setShowPassword((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
   };
 
-  const handleAddPassword = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosInstance.post('/addPassword', newPassword);
-      setPasswords([...passwords, response.data]); // Update the UI optimistically
-      setNewPassword({ website: '', username: '', password: '' });
-    } catch (error) {
-      console.error('Error adding password:', error);
-    }
+  const handleAddClick = () => {
+    setShowAddPasswordModal(true);
   };
 
-  const handleEditPassword = async (id, updatedPassword) => {
-    try {
-      await axiosInstance.put(`/updatePassword/${id}`, updatedPassword);
-      setEditingPasswordId(null);
-      fetchPasswords();
-    } catch (error) {
-      console.error('Error updating password:', error);
-    }
+  const handleEditClick = (item) => {
+    setEditData(item);
+    setShowAddPasswordModal(true);
   };
 
-  const handleDeletePassword = async (id) => {
-    try {
-      await axiosInstance.delete(`/deletePassword/${id}`);
-      setPasswords(passwords.filter(p => p.id !== id)); // Update the UI optimistically
-    } catch (error) {
-      console.error('Error deleting password:', error);
-    }
+  const handleDeleteClick = (id) => {
+    setShowDeleteConfirmation(true);
+    setDeleteId(id);
   };
 
-  const generateRandomPassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}:"<>?[];,./`~';
-    const passwordLength = 12;
-    let password = '';
-    for (let i = 0; i < passwordLength; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      password += chars[randomIndex];
-    }
-    setNewPassword({ ...newPassword, password });
+  const handleDeleteConfirm = () => {
+    // Implement logic to delete data here.
+    // For simplicity, let's log the deleted ID for now.
+    console.log("Deleted ID:", deleteId);
+
+    // You can update the data state to remove the deleted item.
+    // For example:
+    // setData(data.filter((item) => item.id !== deleteId));
+
+    setShowDeleteConfirmation(false);
+    setDeleteId(null);
   };
 
-  // Render the UI
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setDeleteId(null);
+  };
+
+
+  const handleGenerateStrongPasswordChange = () => {
+    if (!showGenerateStrongPassword) {
+      // Generate a strong password and populate the input field
+      const generatedPassword = generateStrongPassword(); // Define your password generation logic
+      setNewPasswordData({ ...newPasswordData, password: generatedPassword });
+      setInputBackgroundColor("gray"); // Change input field background color
+    } else {
+      // Clear the password input field
+      setNewPasswordData({ ...newPasswordData, password: "" });
+      setInputBackgroundColor("white"); // Reset input field background color
+    }
+  
+    setShowPassword(false); // Reset the password visibility when generating a password
+    setShowGenerateStrongPassword(!showGenerateStrongPassword);
+  };
+
+  const generateStrongPassword = () => {
+    const length = 12; // Change the length as needed
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?";
+    let password = "";
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset.charAt(randomIndex);
+    }
+
+    return password;
+  };
+
+  const handleAddPasswordModalClose = () => {
+    setShowAddPasswordModal(false);
+    setEditData(null);
+    setNewPasswordData({
+      id: "",
+      Website: "",
+      email: "",
+      username: "",
+      password: "",
+    });
+    setShowGenerateStrongPassword(false);
+  };
+
+  const handleAddPasswordSubmit = () => {
+    if (editData) {
+      // Handle edit logic here (update the existing item).
+      // For example:
+      // setData(data.map((item) => (item.id === editData.id ? newPasswordData : item)));
+    } else {
+      // Handle add logic here (add a new item).
+      // For example:
+      // setData([...data, newPasswordData]);
+    }
+
+    // Close the modal
+    handleAddPasswordModalClose();
+  };
+
+
+  
+
   return (
-    <div className="password-manager-container">
-      <nav className="navbar">
-        <ul>
-          <li>Password Manager</li>
-          <li>Settings</li>
-        </ul>
-      </nav>
-      <div className="password-manager">
-        {/* Popup for adding or editing passwords */}
-        {showAddPopup && (
-          <div className="popup-container">
-            {/* Add form and popup code here */}
-          </div>
-        )}
-        {/* Password list with animations */}
-        <AnimatePresence>
-          {passwords.map((password) => (
-            <motion.div
-              key={password.id}
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 100 }}
-              transition={{ duration: 0.5 }}
-              className="password-entry"
-            >
-              <div>Website: {password.website}</div>
-              <div>Username: {password.username}</div>
-              <div>Password: {password.password}</div> {/* Be cautious with displaying passwords */}
-              <div className="actions">
-                <button onClick={() => setEditingPasswordId(password.id)}>
-                  <FaPlus />
-                </button>
-                <button onClick={() => handleDeletePassword(password.id)}>
-                  <FaTrashAlt />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+    <div className="table-container">
+      <div className="table-box">
+        <button onClick={handleAddClick} className="add-button">+</button>
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Website</th>
+              <th>Email</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.Website}</td>
+                <td>{item.email}</td>
+                <td>{item.username}</td>
+                <td>
+                  {showPassword[item.id] ? (
+                    <>
+                      {item.password}
+                      <button onClick={() => togglePasswordVisibility(item.id)}>
+                        Hide
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {item.password.replace(/./g, "*")}
+                      <button onClick={() => togglePasswordVisibility(item.id)}>
+                        Show
+                      </button>
+                    </>
+                  )}
+                </td>
+                <td>
+                  <button onClick={() => handleEditClick(item)} className="edit-button">
+                    <FaPencilAlt />
+                  </button>
+                  <button onClick={() => handleDeleteClick(item.id)} className="delete-button">
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      {showAddPasswordModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>{editData ? "Edit Password" : "Add Password"}</h2>
+            <label>ID:
+              <input
+                type="text"
+                value={newPasswordData.id}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, id: e.target.value })}
+              />
+            </label>
+            <label>Website:
+              <input
+                type="text"
+                value={newPasswordData.Website}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, Website: e.target.value })}
+              />
+            </label>
+            <label>Email:
+              <input
+                type="text"
+                value={newPasswordData.email}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
+              />
+            </label>
+            <label>Username:
+              <input
+                type="text"
+                value={newPasswordData.username}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
+              />
+            </label>
+            <label>
+            Password:
+            <div className="password-input">
+              <div className="input-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={newPasswordData.password}
+                  onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+                  disabled={showGenerateStrongPassword}
+                  style={{ backgroundColor: inputBackgroundColor }} // Set input field background color
+                />
+                <span
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEye} />
+                  )}
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={showGenerateStrongPassword}
+                onChange={handleGenerateStrongPasswordChange}
+              />
+              Generate Strong Password
+            </div>
+          </label>
+            
+            <button onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
+            <button onClick={handleAddPasswordModalClose}>Cancel</button>
+          </div>
+        </div>
+        
+      )}
+      {showDeleteConfirmation && (
+        <div className="delete-confirmation">
+          <div className="delete-content">
+            <p>Are you sure you want to delete this data?</p>
+            <button onClick={handleDeleteConfirm}>Yes</button>
+            <button onClick={handleDeleteCancel}>No</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default PasswordManager;
+export default CustomTable;
