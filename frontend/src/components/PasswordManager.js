@@ -41,10 +41,9 @@ const PasswordManager = () => {
   }, []);
 
   const togglePasswordVisibility = (id) => {
-    setShowPassword((prevState) => ({
-      ...prevState,
-      [id]: !prevState[id],
-    }));
+    setData(data.map(item => 
+      item._id === id ? { ...item, showPassword: !item.showPassword } : item
+    ));
   };
 
   const handleAddClick = () => {

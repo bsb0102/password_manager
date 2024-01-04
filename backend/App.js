@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
@@ -6,10 +7,10 @@ const passwordRoutes = require('./routes/passwordRoutes');
 const connectDB = require('./database');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+env = module.exports = process.env;
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
-require("dotenv").config();
-env = module.exports = process.env;
+
 
 const app = express();
 

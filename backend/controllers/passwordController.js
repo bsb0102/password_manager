@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const Password = require('../models/Password');
-const { generateRandomIV, encrypt, decrypt } = require('../models/cryptoUtils');
+const { generateRandomIV, encrypt, decrypt } = require('../models/cryptoUtils'); // Adjust the path as necessary
+require('dotenv').config();
 
-const secretKey = "1b6f0bb9a4f7ded7c70543378c49464f";
+
+const secretKey = process.env.SECRET_KEY;
 
 getUserIdFromToken = (token) => {
   try {
@@ -28,7 +30,7 @@ exports.addPassword = async (req, res) => {
     const iv = generateRandomIV();
 
     // Encrypt the password with the IV
-    const encryptedPassword = encrypt(plainPassword, secretKey, iv);
+    const encryptedPassword = encrypt(plainPassword, iv);
 
     const newPassword = new Password({
       userId,
@@ -62,12 +64,16 @@ exports.getPasswords = async (req, res) => {
 
         // Decrypt each password before sending it back
         const decryptedPasswords = passwords.map(p => {
-            if (p.encryptedPassword && p.encryptedPassword.iv && p.encryptedPassword.content) {
-                p.encryptedPassword = decrypt(p.encryptedPassword, secretKey, Buffer.from(p.encryptedPassword.iv, 'hex'));
-            } else {
-                console.error('Invalid encrypted password:', p);
+          if (p.encryptedPassword && p.encryptedPassword.iv && p.encryptedPassword.content) {
+            p.encryptedPassword = decrypt(p.encryptedPassword, p.iv);
+            if (!p.encryptedPassword) {
+              // Handle decryption error
+              console.error('Decryption failed for password:', p);
             }
-            return p;
+          } else {
+            console.error('Invalid encrypted password:', p);
+          }
+          return p;
         });
 
         res.status(200).json(decryptedPasswords);

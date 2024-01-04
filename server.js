@@ -12,6 +12,7 @@ const certificate = fs.readFileSync(path.resolve(__dirname, './cert.pem'), 'utf8
 const credentials = { key: privateKey, cert: certificate };
 
 // Define the PORT variable with a default value of 443 for HTTPS
+// console.log(env.SECRET_KEY)
 const PORT = process.env.PORT || 443;
 
 // Create an HTTPS server with the Express app
