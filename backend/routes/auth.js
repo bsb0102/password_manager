@@ -32,6 +32,9 @@ router.get('/decryptPasswordById', async (req, res) => {
     // Extract the iv and content from the password entry
     const { iv, content } = passwordEntry.encryptedPassword;
 
+    console.log("iv: ", iv)
+    console.log("content: ", content)
+
     // Decrypt the password
     const decryptedPassword = cryptoUtils.decrypt({ content }, iv);
 

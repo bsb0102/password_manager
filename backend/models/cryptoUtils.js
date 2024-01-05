@@ -19,17 +19,18 @@ exports.encrypt = (text, iv) => {
   };
 };
 
-exports.decrypt = (hash, iv) => {
-  if (!iv) {
-    console.error("IV is undefined. Cannot decrypt.");
+exports.decrypt = (content, iv) => {
+  if (!content || !iv) {
+    console.error("Content or IV is undefined. Cannot decrypt.");
     return null;
   }
   try {
     const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(iv, 'hex'));
-    const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(content, 'hex')), decipher.final()]);
     return decrypted.toString();
   } catch (error) {
     console.error("Error in decryption:", error);
     return null;
   }
-};
+}
+

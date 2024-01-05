@@ -3,6 +3,8 @@ import '../styles/PasswordManager.css';
 import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
 import axiosInstance from '../api/api.js';
 
 const PasswordManager = () => {
@@ -30,6 +32,9 @@ const PasswordManager = () => {
   const fetchPasswords = async () => {
     try {
       const response = await axiosInstance.get('/api/getPasswords');
+      
+      console.log("response: ", response.data)
+
       setData(response.data.map(item => ({
         ...item,
         showPassword: false // Add a visibility flag for each password
@@ -51,29 +56,22 @@ const PasswordManager = () => {
     ));
   };
 
-  // Function to handle adding or updating a password
   const handleAddPasswordSubmit = async () => {
     try {
-      // First, encrypt the password
-      const encryptionResponse = await axiosInstance.post('/api/encryptPassword', {
-        password: newPasswordData.password
-      });
-  
-      const { content, iv } = encryptionResponse.data;
-  
-      // Prepare the data for adding/updating password entry
       const passwordPayload = {
-        ...newPasswordData,
-        encryptedPassword: content,
-        iv
+        website: newPasswordData.website,
+        email: newPasswordData.email,
+        username: newPasswordData.username,
+        password: newPasswordData.password, // send the plain password
       };
   
       let response;
       if (editData) {
-        // Update existing item
-        response = await axiosInstance.put(`/api/updatePassword/${editData.id}`, passwordPayload);
+        consoe.log("Updating Password: ", passwordPayload)
+        response = await axiosInstance.put(`/api/updatePassword/${editData._id}`, passwordPayload);
       } else {
         // Add new item
+        console.log("Adding new password: ", passwordPayload)
         response = await axiosInstance.post('/api/addPassword', passwordPayload);
       }
   
@@ -81,6 +79,7 @@ const PasswordManager = () => {
       fetchPasswords();
       setShowAddPasswordModal(false);
       setEditData(null);
+      setNewPasswordData({ id: "", website: "", email: "", username: "", password: "" }); // Reset the form
     } catch (error) {
       console.error('Error adding/updating password:', error);
     }
@@ -94,6 +93,13 @@ const PasswordManager = () => {
 
   const handleEditClick = (item) => {
     setEditData(item);
+    setNewPasswordData({
+      id: item._id,
+      website: item.website,
+      email: item.email,
+      username: item.username,
+      password: item.password // Use the decrypted password directly
+    });
     setShowAddPasswordModal(true);
   };
 
@@ -218,15 +224,15 @@ const PasswordManager = () => {
                   {item.showPassword ? (
                     <>
                       {item.password} {/* Display decrypted password */}
-                      <button onClick={() => togglePasswordVisibility(item._id)}>
-                        Hide
+                      <button onClick={() => togglePasswordVisibility(item._id)} className="password-toggle">
+                        <FaEyeSlash /> {/* Hide icon */}
                       </button>
                     </>
                   ) : (
                     <>
                       {maskPassword(item.password)} {/* Mask with asterisks */}
-                      <button onClick={() => togglePasswordVisibility(item._id)}>
-                        Show
+                      <button onClick={() => togglePasswordVisibility(item._id)} className="password-toggle">
+                        <FaEye /> {/* Show icon */}
                       </button>
                     </>
                   )}
@@ -282,7 +288,7 @@ const PasswordManager = () => {
                 <div className="input-container">
                   <input
                     type={showPassword ? "text" : "password"}
-                    value={newPasswordData.password || (editData ? decrypt(editData.encryptedPassword) : '')}
+                    value={newPasswordData.password}
                     onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
                     disabled={showGenerateStrongPassword}
                     style={{ backgroundColor: inputBackgroundColor }}
