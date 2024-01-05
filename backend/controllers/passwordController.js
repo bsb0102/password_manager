@@ -134,8 +134,10 @@ exports.updatePassword = async (req, res) => {
           website,
           username,
           email,
-          encryptedPassword,
-          iv: iv.toString('hex')
+          "encryptedPassword": {
+            encryptedPassword,
+            iv: iv.toString('hex')
+          }
       }, { new: true });
 
       if (!updatedPassword) {

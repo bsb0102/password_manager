@@ -76,7 +76,7 @@ const PasswordManager = () => {
   
       let response;
       if (editData) {
-        consoe.log("Updating Password: ", passwordPayload)
+        console.log("Updating Password: ", passwordPayload)
         response = await axiosInstance.put(`/api/updatePassword/${editData._id}`, passwordPayload);
         showNotification("Password updated successfully...");
       } else {
