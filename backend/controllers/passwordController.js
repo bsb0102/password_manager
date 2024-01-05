@@ -97,7 +97,7 @@ exports.deletePassword = async (req, res) => {
         }
 
         // Decrypt the password using IV before deleting it
-        const decryptedPassword = decrypt(password.encryptedPassword, secretKey, Buffer.from(password.iv, 'hex'));
+        const decryptedPassword = decrypt(password.encryptedPassword.content, secretKey, Buffer.from(password.encryptedPassword.iv, 'hex'));
 
         // Check if decryption was successful
         if (!decryptedPassword) {

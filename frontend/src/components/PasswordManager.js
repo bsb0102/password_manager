@@ -27,14 +27,23 @@ const PasswordManager = () => {
   const [secretKey] = useState("1b6f0bb9a4f7ded7c70543378c49464f");
   const [decryptedPassword, setDecryptedPassword] = useState(null);
 
+  const [notification, setNotification] = useState({
+    show: false,
+    message: ""
+  });
+
+  const showNotification = (message) => {
+    setNotification({ show: true, message });
+    setTimeout(() => {
+      setNotification({ show: false, message: "" });
+    }, 5000); // Hide after 5 seconds
+  };
+
   const maskPassword = (encryptedPassword) => '*';
 
   const fetchPasswords = async () => {
     try {
       const response = await axiosInstance.get('/api/getPasswords');
-      
-      console.log("response: ", response.data)
-
       setData(response.data.map(item => ({
         ...item,
         showPassword: false // Add a visibility flag for each password
@@ -69,10 +78,12 @@ const PasswordManager = () => {
       if (editData) {
         consoe.log("Updating Password: ", passwordPayload)
         response = await axiosInstance.put(`/api/updatePassword/${editData._id}`, passwordPayload);
+        showNotification("Password updated successfully...");
       } else {
         // Add new item
         console.log("Adding new password: ", passwordPayload)
         response = await axiosInstance.post('/api/addPassword', passwordPayload);
+        showNotification("Password added successfully...");
       }
   
       // Fetch updated list of passwords
@@ -110,12 +121,9 @@ const PasswordManager = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    console.log("Attempting to delete ID:", deleteId);
     try {
       await handleDeletePassword(deleteId);
-      console.log("Delete request sent for ID:", deleteId);
     } catch (error) {
-      console.error('Error deleting password:', error);
     } finally {
       setShowDeleteConfirmation(false);
       setDeleteId(null);
@@ -125,9 +133,9 @@ const PasswordManager = () => {
   const handleDeletePassword = async (id) => {
     if (id) {
       try {
-        console.log("Deleting item with ID:", id);
         await axiosInstance.delete(`/api/deletePassword/${id}`);
         setData(data.filter((item) => item._id !== id)); // Make sure to match the ID key used in your data items
+        showNotification("Password deleted successfully...");
       } catch (error) {
         console.error('Error deleting password:', error);
       }
@@ -250,6 +258,15 @@ const PasswordManager = () => {
           </tbody>
         </table>
       </div>
+      {notification.show && (
+        <div className={`notification ${notification.show ? 'show' : ''}`}>
+          {notification.message}
+          <span className="notification-close" onClick={() => setNotification({ show: false, message: "" })}>
+            ×
+          </span>
+        </div>
+      )}
+      
       {showAddPasswordModal && (
         <div className="modal">
           <div className="modal-content">
