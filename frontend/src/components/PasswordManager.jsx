@@ -353,7 +353,7 @@ const PasswordManager = () => {
                     />
                   </label>
                   {/* Insert the Generate Strong Password button here */}
-                  <button onClick={() => {
+                  <button className="gen-button" onClick={() => {
                     const generatedPassword = generatePassword();
                     setNewPasswordData({ ...newPasswordData, password: generatedPassword });
                     setPasswordGenerated(true); // Set the flag that the password was generated
@@ -361,10 +361,12 @@ const PasswordManager = () => {
                     Generate Strong Password
                   </button>
                 </div>
+                <div className="button-container">
+                  <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
+                  <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
+                </div>
               </div>
             </label>
-            <button onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
-            <button onClick={handleAddPasswordModalClose}>Cancel</button>
           </div>
         </div>
       )}
