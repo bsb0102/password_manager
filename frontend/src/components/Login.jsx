@@ -11,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
   const [csrfToken, setCsrfToken] = useState(''); // State to store the CSRF token
-
+  const [alert, setAlert] = useState({ show: false, message: '', className: '' });
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -45,15 +45,13 @@ const Login = () => {
   
       // Handle successful login
       localStorage.setItem('token', response.data.token);
-      showAlert("success", "Successfully logged in...")
+      setAlert({ show: true, message: 'Successfully Logged In...', className: 'success' });
       // axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       navigate('/home');
     } catch (error) {
-      showAlert("danger", "Failed to log in...")
+      setAlert({ show: true, message: 'Failed to Login', className: 'error' });
       if (error.response) {
-        console.error('Login error:', error.response.data);
-        console.error(data)
         setError(error.response.data.error);
       } else if (error.request) {
         console.error('Network error:', error.request);

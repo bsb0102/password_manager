@@ -134,7 +134,6 @@ exports.updatePassword = async (req, res) => {
     // Generate a new random IV for the new password
     const iv = await generateRandomIV();
     const encryptedPassword = await encrypt(plainPassword, iv);
-    console.log(encryptedPassword)
 
     // Update the password entry with only the password field
     const updatedPassword = await Password.findByIdAndUpdate(id, {
@@ -146,10 +145,6 @@ exports.updatePassword = async (req, res) => {
     if (!updatedPassword) {
       return res.status(404).json({ error: "Password not found or access denied" });
     }
-  
-    console.log(updatedPassword)
-    console.log(iv)
-    console.log(plainPassword)
 
     res.status(200).json(updatedPassword);
   } catch (error) {

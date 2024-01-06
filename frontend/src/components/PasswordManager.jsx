@@ -239,12 +239,12 @@ const PasswordManager = () => {
       {alert.show && <Alert className={alert.className} message={alert.message} />}
 
 
-    <div className="table-box">
+      <div className="table-box">
       <button onClick={handleAddClick} className="add-button">+</button>
       <table className="custom-table">
         <thead>
           <tr>
-            <th>ID</th>
+            {/* <th>ID</th> */}
             <th>Website</th>
             <th>Email</th>
             <th>Username</th>
@@ -255,26 +255,17 @@ const PasswordManager = () => {
         <tbody>
           {data.map((item) => (
             <tr key={item._id}>
-              <td>{item._id}</td>
+              {/* <td>{item._id}</td> */}
               <td>{item.website}</td>
               <td>{item.email}</td>
               <td>{item.username}</td>
-              <td>
-                {item.showPassword ? (
-                  <>
-                    {item.password} {/* Display decrypted password */}
-                    <button onClick={() => togglePasswordVisibility(item._id)} className="password-toggle">
-                      <FaEyeSlash /> {/* Hide icon */}
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {maskPassword(item.password)} {/* Mask with asterisks */}
-                    <button onClick={() => togglePasswordVisibility(item._id)} className="password-toggle">
-                      <FaEye /> {/* Show icon */}
-                    </button>
-                  </>
-                )}
+              <td className="password-cell">
+                <div className="password-input">
+                  {item.password} {/* Display decrypted password */}
+                  <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
+                    {item.showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
               </td>
               <td>
                 <button onClick={() => handleEditClick(item)} className="edit-button">
@@ -292,14 +283,15 @@ const PasswordManager = () => {
     {showAddPasswordModal && (
       <div className="modal">
         <div className="modal-content">
+          <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
           <h2>{editData ? "Edit Password" : "Add Password"}</h2>
-            <label className="filled">ID:
+            {/* <label className="filled">ID:
               <input
                 type="text"
                 value={newPasswordData.id}
                 readOnly
               />
-            </label>
+            </label> */}
             <label>Website:
               <input
                 type="text"
