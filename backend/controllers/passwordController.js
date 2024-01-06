@@ -68,7 +68,7 @@ exports.getPasswords = async (req, res) => {
           if (decrypted) {
             return { ...p.toObject(), password: decrypted }; // Include the decrypted password
           } else {
-            console.error('Failed to decrypt password for entry:', p);
+            console.error('Failed to decrypt password for entry:');
             return p;
           }
         });
@@ -114,38 +114,45 @@ exports.deletePassword = async (req, res) => {
 
 
 exports.updatePassword = async (req, res) => {
+
+
   try {
-      const { id } = req.params;
-      const { website, username, password: plainPassword, email } = req.body;
-      const token = req.headers.authorization.split(' ')[1];
-      const userId = getUserIdFromToken(token);
+    const { id } = req.params;
+    const { password: plainPassword } = req.body;
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
 
-      if (!userId) {
-          return res.status(401).json({ error: "Invalid or missing token" });
-      }
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
 
-      // Generate a new random IV for the new password
-      const iv = generateRandomIV();
-      const encryptedPassword = encrypt(plainPassword, iv);
+    // Check if the password field is provided
+    if (!plainPassword) {
+      return res.status(400).json({ error: "Password is required" });
+    }
 
-      // Update the password entry
-      const updatedPassword = await Password.findByIdAndUpdate(id, {
-          userId,
-          website,
-          username,
-          email,
-          "encryptedPassword": {
-            encryptedPassword,
-            iv: iv.toString('hex')
-          }
-      }, { new: true });
+    // Generate a new random IV for the new password
+    const iv = await generateRandomIV();
+    const encryptedPassword = await encrypt(plainPassword, iv);
+    console.log(encryptedPassword)
 
-      if (!updatedPassword) {
-          return res.status(404).json({ error: "Password not found or access denied" });
-      }
+    // Update the password entry with only the password field
+    const updatedPassword = await Password.findByIdAndUpdate(id, {
+      "encryptedPassword.content": encryptedPassword['content'],
+      "encryptedPassword.iv": iv.toString('hex')
+    }, { new: true });
+    
 
-      res.status(200).json({ message: "Password updated successfully." });
+    if (!updatedPassword) {
+      return res.status(404).json({ error: "Password not found or access denied" });
+    }
+  
+    console.log(updatedPassword)
+    console.log(iv)
+    console.log(plainPassword)
+
+    res.status(200).json(updatedPassword);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
-}
+};

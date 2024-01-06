@@ -1,0 +1,48 @@
+/* Assuming this file is for styling the Alert component */
+.alert {
+    position: fixed;
+    bottom: 20px; /* Adjust as needed for positioning */
+    left: 20px; /* Adjust as needed for positioning */
+    width: 300px; /* Adjust width as needed */
+    padding: 20px;
+    background-color: #ffffff; /* Background color of the alert */
+    color: #333; /* Dark text color for visibility */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for a bit of depth */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 1000; /* Ensures the alert is on top of other elements */
+  }
+  
+  /* Animation for alert appearing from bottom left */
+  .slide-in-bottom-left {
+    animation: slide-in-bottom-left 0.5s forwards;
+  }
+  
+  @keyframes slide-in-bottom-left {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Styling for the bottom bar (progress) */
+  .bottom-bar {
+    margin-top: 10px;
+    height: 4px;
+    background-color: #007bff; /* Adjust color as needed */
+    width: 100%;
+    animation: shrink-bar 5s linear forwards;
+  }
+  
+  @keyframes shrink-bar {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+  

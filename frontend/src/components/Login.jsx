@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js';
 import '../styles/AuthForm.css';
+import Alert from '../utils/AlertService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -44,10 +45,12 @@ const Login = () => {
   
       // Handle successful login
       localStorage.setItem('token', response.data.token);
+      showAlert("success", "Successfully logged in...")
       // axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       navigate('/home');
     } catch (error) {
+      showAlert("danger", "Failed to log in...")
       if (error.response) {
         console.error('Login error:', error.response.data);
         console.error(data)
