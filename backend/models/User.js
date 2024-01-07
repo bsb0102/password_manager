@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
@@ -11,6 +10,19 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  // MFA related fields
+  mfaSecret: {
+    type: String, // Stores the MFA secret key
+    default: ''
+  },
+  tempSecret: {
+    type: String, // Temporary secret key used during MFA setup
+    default: ''
+  },
+  mfaEnabled: {
+    type: Boolean, // Indicates whether MFA is enabled for the user
+    default: false
   }
   // You can add more fields as needed
 });

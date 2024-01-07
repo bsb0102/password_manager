@@ -1,48 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog, faBars } from '@fortawesome/free-solid-svg-icons';
 import '../styles/Sidebar.css';
 
 function Sidebar() {
   const location = useLocation();
-  const navigate = useNavigate(); // Use the useNavigate hook
+  const navigate = useNavigate();
 
-  const excludedRoutes = ['/home']; // Add any routes to exclude here
-
+  const excludedRoutes = ['/home', '/', '/features'];
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const shouldDisplaySidebar = !excludedRoutes.includes(location.pathname);
 
-
   const handleLogout = () => {
-    // Clear the token from localStorage
     localStorage.removeItem('token');
-    // Navigate to the login page
     navigate('/login');
   };
 
   return (
-    shouldDisplaySidebar && (
-      <div className="sidebar">
-        <div className="sidebar-header">
-          <h1>Your App</h1>
+    <>
+      <div
+        className={`sidebar ${isSidebarOpen ? '' : 'closed'}`}
+        style={{ width: isSidebarOpen ? '280px' : '0' }}
+      >
+        <div className="sidebar-logged-in">
+          <p>Logged in as:</p>
+          <p>John Doe</p>
         </div>
         <div className="sidebar-options">
           <Link to="/home" className={location.pathname === '/home' ? 'active' : ''}>
-            Home
+            Dashboard
           </Link>
           <Link to="/settings" className={location.pathname === '/settings' ? 'active' : ''}>
             Settings
           </Link>
         </div>
-        <div className="sidebar-user">
-          <p>Logged in as:</p>
-          <p>John Doe</p>
-        </div>
         <div className="logout-button">
-          <button onClick={handleLogout} className="logout-button-red">
-            Logout
-          </button>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
-    )
+
+      <div className="sidebar-toggle" onClick={toggleSidebar}>
+        <FontAwesomeIcon icon={faBars} />
+      </div>
+    </>
   );
 }
 

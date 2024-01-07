@@ -62,7 +62,7 @@ const PasswordManager = () => {
 
   // Toggle password visibility
   const togglePasswordVisibility = (id) => {
-    setData(data.map(item => 
+    setData(data.map(item =>
       item._id === id ? { ...item, showPassword: !item.showPassword } : item
     ));
   };
@@ -244,7 +244,7 @@ const PasswordManager = () => {
       <table className="custom-table">
         <thead>
           <tr>
-            {/* <th>ID</th> */}
+            <th>Date</th>
             <th>Website</th>
             <th>Email</th>
             <th>Username</th>
@@ -255,18 +255,19 @@ const PasswordManager = () => {
         <tbody>
           {data.map((item) => (
             <tr key={item._id}>
-              {/* <td>{item._id}</td> */}
+              <td>{item.updatedAt}</td>
               <td>{item.website}</td>
               <td>{item.email}</td>
               <td>{item.username}</td>
               <td className="password-cell">
-                <div className="password-input">
-                  {item.password} {/* Display decrypted password */}
-                  <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
-                    {item.showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </span>
-                </div>
-              </td>
+              <div className="password-input">
+                {item.showPassword ? item.password : '*****'}
+                <span className="maintoggle-password" onClick={() => togglePasswordVisibility(item._id)}>
+                  {item.showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            </td>
+
               <td>
                 <button onClick={() => handleEditClick(item)} className="edit-button">
                   <FaPencilAlt />
@@ -285,10 +286,10 @@ const PasswordManager = () => {
         <div className="modal-content">
           <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
           <h2>{editData ? "Edit Password" : "Add Password"}</h2>
-            {/* <label className="filled">ID:
+            {/* <label className="filled">Date:
               <input
                 type="text"
-                value={newPasswordData.id}
+                value={newPasswordData.updatedAt}
                 readOnly
               />
             </label> */}
@@ -372,22 +373,22 @@ const PasswordManager = () => {
       )}
       {showDeleteConfirmation && (
       <div className="delete-confirmation">
-        <div className="delete-content">
-          <p className="confirmation-text">
-            Are you sure you want to delete this data?
-          </p>
-          <button 
-            onClick={() => {
-              handleDeleteConfirm();
-            }}
-            className="confirm-button">
-            Yes
-          </button>
-          <button onClick={handleDeleteCancel} className="cancel-button">
-            No
-          </button>
-        </div>
+      <div className="delete-content">
+        <p className="confirmation-text">
+          Are you sure you want to delete this data?
+        </p>
+        <button 
+          onClick={() => {
+            handleDeleteConfirm();
+          }}
+          className="confirm-button delete-button">
+          Yes
+        </button>
+        <button onClick={handleDeleteCancel} className="confirm-button cancel-button"> {/* Hier wird die "cancel-button" Klasse hinzugefügt */}
+          No
+        </button>
       </div>
+    </div>    
     )}
     </div>
   );

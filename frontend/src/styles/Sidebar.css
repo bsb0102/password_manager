@@ -1,67 +1,132 @@
 /* Sidebar.css */
 
+.container {
+  display: flex;
+}
+
 .sidebar {
-    background-color: #333; /* Sidebar background color */
-    color: #fff; /* Text color */
-    width: 250px;
-    padding: 20px;
-    height: 100%; /* Cover the full height */
-    position: fixed; /* Fix the sidebar to the viewport */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Distribute content evenly */
-  }
-  
-  .sidebar-header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar-options {
-    width: 100%;
-  }
-  
-  .sidebar-options a {
-    display: block;
-    padding: 10px;
-    text-decoration: none;
-    color: #fff;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .sidebar-options a:hover,
-  .sidebar-options a.active {
-    background-color: #555; /* Highlight color on hover/active */
-  }
-  
-  .sidebar-user {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar-user p {
-    margin: 0;
-    font-size: 14px;
-  }
-  
-  .logout-button {
-    position: fixed; /* Fix the logout button to the viewport */
-    bottom: 20px;
-    left: 20px;
-  }
-  
-  .logout-button button {
-    background-color: red; /* Button color */
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    z-index: 1; /* Ensure it's clickable */
-  }
-  
-  .logout-button button:hover {
-    background-color: darkred; /* Button color on hover */
-  }
+  background-color: #333;
+  color: #fff;
+  width: 280px;
+  padding-top: 20px;
+  height: 100vh;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  transition: width 0.3s ease, padding 0.3s ease;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.container-main {
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar:hover {
+  width: 300px;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-logged-in {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.sidebar-logged-in p {
+  margin: 0;
+}
+
+.sidebar-settings {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.sidebar-options {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  position: relative;
+}
+
+.sidebar-options a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+}
+
+.sidebar-options a:hover,
+.sidebar-options a.active {
+  background-color: #555;
+}
+
+.logout-button {
+  text-align: center;
+  padding: 10px 0;
+  margin-top: 10px; /* Ändern Sie den Abstand nach oben */
+}
+
+.logout-button button {
+  background-color: #f44336;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button button:hover {
+  background-color: #d32f2f;
+}
+
+.sidebar.closed {
+  width: 0;
+  padding-top: 0;
+  overflow: hidden;
+  transform: translateX(-100%);
+}
+
+.sidebar.closed .sidebar-options,
+.sidebar.closed .sidebar-logged-in,
+.sidebar.closed .sidebar-settings,
+.sidebar.closed .logout-button {
+  display: none;
+  width: 0;
+  padding: 0;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  cursor: pointer;
+  background-color: #333;
+  color: #fff;
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Zentrieren Sie die Elemente horizontal */
+  margin-top: 20px;
+}
+
+.sidebar-settings {
+  text-align: center;
+  margin-top: 10px;
+}
