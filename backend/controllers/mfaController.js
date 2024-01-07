@@ -46,12 +46,19 @@ exports.verifyToken = async (req, res) => {
     }
 
     const user = await UserModel.findById(userId);
-    const verified = mfaService.verifyToken(user.tempSecret, token);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    if (!user.mfaSecret) {
+      return res.status(400).send('MFA is not enabled for this user');
+    }
+
+    const verified = mfaService.verifyToken(user.mfaSecret, token);
 
     if (verified) {
-      user.mfaSecret = user.tempSecret;
-      user.tempSecret = '';
       user.mfaEnabled = true;
+      user.tempSecret = '';
       await user.save();
 
       res.send('MFA is verified and enabled');
@@ -59,9 +66,11 @@ exports.verifyToken = async (req, res) => {
       res.status(400).send('Invalid MFA Token');
     }
   } catch (error) {
+    console.error('Error verifying MFA token:', error);
     res.status(500).send('Error verifying MFA token');
   }
 };
+
 
 exports.disableMFA = async (req, res) => {
   try {

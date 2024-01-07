@@ -6,6 +6,7 @@ const { getUserByEmail, createUser } = require('../controllers/userController');
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
+const mfaService = require('../models/mfaService'); // Import your MFA service functions here
 
 
 
@@ -70,8 +71,6 @@ router.post('/encryptPassword', (req, res) => {
 
 
 router.post('/login', async (req, res) => {
-
-  
   try {
     const { username, password } = req.body;
 
@@ -81,6 +80,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Authentication failure' });
     }
+
     // Verify password using bcrypt
     const passwordMatch = await bcrypt.compare(password, user.password);
 
@@ -88,14 +88,20 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Authentication failed' });
     }
 
+    // Determine if MFA is enabled for the user
+    const requireMfa = user.mfaEnabled;
+
     // Generate and send a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
-    res.json({ message: 'Login successful', token });
+
+    // Respond with the JWT token and whether MFA is required
+    res.json({ message: 'Login successful', token, requireMfa });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 router.post('/register', async (req, res) => {
   try {
@@ -109,6 +115,9 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await createUser(username, hashedPassword);
+    newUser.mfaEnabled = false; // Set MFA to false when registering
+
+    await newUser.save();
 
     const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
     res.status(201).json({ message: 'Registration successful', token });
@@ -117,6 +126,7 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 

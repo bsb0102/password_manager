@@ -9,8 +9,15 @@ const authenticateToken = (req, res, next) => {
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verified;
+
+    // Debugging: Log the decoded token payload
+    console.log('Decoded JWT Token:', verified);
+
     next();
   } catch (error) {
+    // Debugging: Log token verification error
+    console.error('Token Verification Error:', error);
+
     res.status(400).json({ error: 'Invalid token' });
   }
 };

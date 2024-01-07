@@ -2,55 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js';
 import '../styles/AuthForm.css';
-import Alert from '../utils/AlertService';
+import Modal from '../modals/Mfa.jsx'; // Import your MFA modal component here
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Add isLoading state
-  const [csrfToken, setCsrfToken] = useState(''); // State to store the CSRF token
-  const [alert, setAlert] = useState({ show: false, message: '', className: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
+  const [showMfaModal, setShowMfaModal] = useState(false); // State to control MFA modal visibility
+  const [mfaToken, setMfaToken] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch the CSRF token from the server using Axios
         const response = await axiosInstance.get('/api/csrf-token');
         setCsrfToken(response.data.csrfToken);
       } catch (error) {
         console.error('Failed to fetch CSRF token:', error);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set isLoading to true while processing the login
+    setIsLoading(true);
   
-    // Prepare the data to be sent
     const data = {
       username: username,
       password: password,
-      _csrf: csrfToken
+      _csrf: csrfToken,
     };
   
     try {
-      // Use axiosInstance to send the POST request
       const response = await axiosInstance.post('/api/login', data);
   
-      // Handle successful login
+      // Always store the JWT token
       localStorage.setItem('token', response.data.token);
-      setAlert({ show: true, message: 'Successfully Logged In...', className: 'success' });
-      // axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      navigate('/home');
+  
+      if (response.data.requireMfa) {
+        // MFA is required; store the JWT token temporarily
+        localStorage.setItem('tempToken', response.data.token);
+        setShowMfaModal(true); // Show the MFA modal
+      } else {
+        // Successful login without MFA
+        navigate('/home'); // Redirect to the authenticated part of the app
+      }
     } catch (error) {
-      setAlert({ show: true, message: 'Failed to Login', className: 'error' });
+      setError('Failed to Login');
       if (error.response) {
         setError(error.response.data.error);
       } else if (error.request) {
@@ -62,6 +64,35 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handleMfaLogin = async () => {
+    try {
+      const tempToken = localStorage.getItem('tempToken'); // Retrieve the temporary JWT token
+      if (!tempToken) {
+        setError('Temporary JWT token not found');
+        return;
+      }
+  
+      // Verify MFA token with the temporary JWT token
+      await axiosInstance.post(
+        '/api/verify-mfa',
+        { token: mfaToken },
+        { headers: { Authorization: `Bearer ${tempToken}` } }
+      );
+  
+      // Handle successful MFA login
+      setShowMfaModal(false);
+      navigate('/home');
+    } catch (error) {
+      console.error('Error verifying MFA token:', error);
+      setError('Invalid MFA token. Please try again.');
+      setMfaToken(''); // Clear the MFA token input field
+      setTimeout(() => setError(''), 3000); // Clear the error message after 3 seconds
+    }
+  };
+  
+  
+  
 
   return (
     <div className="auth-form-container animated-bg">
@@ -79,19 +110,14 @@ const Login = () => {
         />
         <div className="password-input-group">
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isLoading}
           />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            style={{ cursor: "pointer" }}
-          >
-            {showPassword ? <i className="bi-eye-slash" /> : <i className="bi-eye" />}
-          </span>
+        </div>
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
@@ -99,8 +125,24 @@ const Login = () => {
           Don't have an account?{' '}
           <span onClick={() => navigate('/register')}>Register here</span>
         </p>
-        </div>
       </form>
+
+      {/* MFA Modal */}
+      {showMfaModal && (
+        <Modal onClose={() => setShowMfaModal(false)}>
+          <div className="mfa-login">
+            <h3>MFA Login</h3>
+            <input
+              type="text"
+              value={mfaToken}
+              onChange={(e) => setMfaToken(e.target.value)}
+              placeholder="Enter MFA token"
+            />
+            {error && <div className="error-message">{error}</div>}
+            <button onClick={handleMfaLogin}>Login with MFA</button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
