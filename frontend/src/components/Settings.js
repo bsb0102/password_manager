@@ -1,102 +1,197 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../api/api.js';
-import '../styles/Settings.css'; // Assuming you have this CSS file for styling
+import '../styles/Settings.css'; // Make sure you have this CSS file for styling
 import Modal from '../modals/Mfa.jsx';
 
 function Settings() {
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
   const [mfaSetupData, setMfaSetupData] = useState(null);
   const [mfaToken, setMfaToken] = useState('');
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [error, setError] = useState(''); // State to manage error message
+  const [showModal, setShowModal] = useState(false); // Zustand zur Steuerung der Modal-Sichtbarkeit
+  const [confirmationModal, setConfirmationModal] = useState(false); // Zustand zur Steuerung des Bestätigungsmodals
+  const [successModal, setSuccessModal] = useState(false); // Zustand zur Steuerung des Erfolgsmeldungsmodals
+  const [error, setError] = useState(''); // Zustand zur Verwaltung von Fehlermeldungen
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
-    // Fetch the current MFA status from the backend
+    // Den aktuellen MFA-Status vom Backend abrufen
     const fetchMfaStatus = async () => {
       try {
-        // Try to get the isMfaEnabled state from local storage
-        const storedIsMfaEnabled = localStorage.getItem('isMfaEnabled');
-        if (storedIsMfaEnabled) {
-          setIsMfaEnabled(JSON.parse(storedIsMfaEnabled));
-        } else {
-          // If not found in local storage, fetch from the backend
-          const response = await axiosInstance.get('/api/mfa-status');
-          setIsMfaEnabled(response.data.isMfaEnabled);
-        }
+        const response = await axiosInstance.get('/api/mfa-status');
+        setIsMfaEnabled(response.data.mfaEnabled);
       } catch (error) {
-        console.error('Error fetching MFA status:', error);
+        console.error('Fehler beim Abrufen des MFA-Status:', error);
       }
     };
     fetchMfaStatus();
   }, []);
 
-  const handleEnableMFA = async () => {
+  const handleDisableMFA = async () => {
+    // Vor dem Deaktivieren von MFA das Bestätigungsmodal anzeigen
+    setConfirmationModal(true);
+  };
+
+  const handleAddMFA = async () => {
     try {
-      const response = await axiosInstance.post('/api/enable-mfa');
-      setMfaSetupData(response.data);
-      setShowModal(true); // Show modal on successful MFA enablement
+        const response = await axiosInstance.post('/api/add-mfa');
+        setMfaSetupData(response.data);
+        setShowModal(true); // Modal anzeigen
     } catch (error) {
-      console.error('Error enabling MFA:', error);
+        console.error('Error adding MFA:', error);
     }
   };
 
   const handleVerifyToken = async () => {
     try {
-      await axiosInstance.post('/api/verify-mfa', { token: mfaToken });
-      setIsMfaEnabled(true);
-      setMfaSetupData(null);
-      setShowModal(false); // Hide modal on successful token verification
-      setError(''); // Clear any previous error message
-      localStorage.setItem('isMfaEnabled', JSON.stringify(true)); // Save to local storage
+      const response = await axiosInstance.post('/api/verify-mfa', { token: mfaToken });
+      // Check if the verification was successful
+      if (response.data === 'MFA is verified and enabled') { // Adjust the condition based on your actual API response
+        setIsMfaEnabled(true);
+        setShowModal(false); // Modal schließen
+        setSuccessModal(true); // Erfolgsmodal anzeigen
+        setTimeout(() => {
+          setSuccessModal(false);
+        }, 3000);
+      } else {
+        // Fehlerbehandlung, wenn die Token-Überprüfung fehlschlägt
+        setError('Invalid MFA token. Please try again.');
+      }
     } catch (error) {
       console.error('Error verifying MFA token:', error);
-      setError('Invalid MFA token. Please try again.'); // Set error message
+      setError('Error verifying MFA token. Please try again.');
     }
   };
 
-  const handleDisableMFA = async () => {
+
+  const confirmDisableMFA = async () => {
     try {
       await axiosInstance.post('/api/disable-mfa');
       setIsMfaEnabled(false);
       setMfaSetupData(null);
-      localStorage.setItem('isMfaEnabled', JSON.stringify(false)); // Save to local storage
     } catch (error) {
       console.error('Error disabling MFA:', error);
+      setError('Error disabling MFA. Please try again.');
+    }
+    setConfirmationModal(false); // Close the confirmation modal regardless of success or failure
+  };
+
+  
+
+  const handleChangeUsername = async () => {
+    try {
+      // Make a request to change the username using newUsername state
+      await axiosInstance.put('/api/change-username', { newUsername });
+      // Optionally update the UI or show a success message
+      // ...
+    } catch (error) {
+      console.error('Error changing username:', error);
+      // Handle errors or show an error message
+      // ...
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      // Make a request to change the password using newPassword state
+      await axiosInstance.put('/api/change-password', { newPassword });
+      // Optionally update the UI or show a success message
+      // ...
+    } catch (error) {
+      console.error('Error changing password:', error);
+      // Handle errors or show an error message
+      // ...
+    }
+  };
+
+  const handleDeleteMFA = async () => {
+    try {
+      await axiosInstance.delete('/api/delete-mfa');
+      setIsMfaEnabled(false);
+    } catch (error) {
+      console.error('Fehler beim Löschen von MFA:', error);
     }
   };
 
   return (
     <div className="settings-container">
-      <h2>Welcome to Settings!</h2>
-      <div className="settings-options">
-        <ul>
-          <li>Change Username</li>
-          <li>Change Password</li>
-          <li>Add Payment</li>
-          <li>
+      <div className="settings-right">
+        <h2>Settings</h2>
+        <div className={`mfa-status ${isMfaEnabled ? 'active' : 'inactive'}`}>
+          MFA {isMfaEnabled ? 'Active' : 'Not Active'}
+        </div>
+
+        <div className="settings-options">
+          <div className="setting-item">
+            <label>Change Username</label>
+            <input
+              type="text"
+              placeholder="New Username"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+            />
+            <button onClick={handleChangeUsername}>Change Username</button>
+          </div>
+          <div className="setting-item">
+            <label>Change Password</label>
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <button onClick={handleChangePassword}>Change Password</button>
+          </div>
+          <div className="setting-item">
+            <label>MFA</label>
             {isMfaEnabled ? (
-              <button onClick={handleDisableMFA}>Disable MFA</button>
+              <>
+                <button onClick={handleDisableMFA}>Disable MFA</button>
+              </>
             ) : (
-              <button onClick={handleEnableMFA}>Enable MFA</button>
+              <button onClick={handleAddMFA}>Add MFA</button>
             )}
-          </li>
-        </ul>
-        {showModal && (
-          <Modal onClose={() => setShowModal(false)}>
-            <div className="mfa-setup">
-              <h3>Setup MFA</h3>
-              <p>Scan this QR Code with your MFA app:</p>
-              <div className="qr-code-container">
-                <img src={mfaSetupData.qrCode} alt="MFA QR Code" />
+          </div>
+        </div>
+      </div>
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)}>
+          <div className="mfa-setup">
+            <h3>Setup MFA</h3>
+            <p>Scan this QR Code with your MFA app:</p>
+            <div className="qr-code-container">
+              <img src={mfaSetupData.qrCode} alt="MFA QR Code" />
+            </div>
+            <input
+              type="text"
+              value={mfaToken}
+              onChange={(e) => setMfaToken(e.target.value)}
+              placeholder="Enter MFA token"
+            />
+            {error && <p className="error-message">{error}</p>}
+            <button onClick={handleVerifyToken}>Verify Token</button>
+          </div>
+        </Modal>
+      )}
+      {successModal && (
+        <Modal onClose={() => setSuccessModal(false)}>
+          <div className="success-modal-content">
+            <h3>MFA Added Successfully</h3>
+            <p>Your account is now more secure with multi-factor authentication enabled.</p>
+            <button onClick={() => setSuccessModal(false)} className="close-modal-button">OK</button>
+          </div>
+        </Modal>
+      )}
+      <div className="confirmation-modal">
+        {confirmationModal && (
+          <Modal onClose={() => setConfirmationModal(false)}>
+            <div className="mfa-confirmation">
+              <h3>Disable MFA</h3>
+              <p>Are you sure you want to disable MFA?</p>
+              <div className="confirmation-buttons">
+                <button onClick={confirmDisableMFA}>Yes</button>
+                <button onClick={() => setConfirmationModal(false)}>No</button>
               </div>
-              <input
-                type="text"
-                value={mfaToken}
-                onChange={(e) => setMfaToken(e.target.value)}
-                placeholder="Enter MFA token"
-              />
-              {error && <p className="error-message">{error}</p>}
-              <button onClick={handleVerifyToken}>Verify Token</button>
             </div>
           </Modal>
         )}

@@ -23,8 +23,13 @@ exports.enableMFA = async (req, res) => {
     }
 
     const user = await UserModel.findById(userId);
-    const secret = mfaService.generateSecret();
 
+    if (user.mfaEnabled) {
+      // MFA is already enabled for this user
+      return res.status(400).json({ error: "MFA is already enabled for this user" });
+    }
+
+    const secret = mfaService.generateSecret();
     user.tempSecret = secret.base32; // Save the secret temporarily
     await user.save();
 
@@ -34,6 +39,68 @@ exports.enableMFA = async (req, res) => {
     res.status(500).send('Error enabling MFA');
   }
 };
+
+exports.deleteMFA = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if (!user.mfaEnabled) {
+      // MFA is not enabled for this user
+      return res.status(400).json({ error: "MFA is not enabled for this user" });
+    }
+
+    // Remove MFA-related fields and disable MFA
+    user.mfaSecret = '';
+    user.mfaEnabled = false;
+    user.tempSecret = ''; // Clear temporary secret if any
+    await user.save();
+
+    res.send('MFA is deleted');
+  } catch (error) {
+    res.status(500).send('Error deleting MFA');
+  }
+};
+
+
+
+exports.addMFA = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if (user.mfaEnabled) {
+      // MFA is already enabled for this user
+      return res.status(400).json({ error: "MFA is already enabled for this user" });
+    }
+
+    const secret = mfaService.generateSecret();
+    user.mfaSecret = secret.base32; // Save the secret
+    await user.save();
+
+    const qrCode = await mfaService.generateQRCode(secret.otpauth_url);
+    res.json({ qrCode, secret: secret.base32 });
+  } catch (error) {
+    res.status(500).send('Error adding MFA');
+  }
+};
+
+
+
+
+
 
 exports.verifyToken = async (req, res) => {
   try {
@@ -57,6 +124,7 @@ exports.verifyToken = async (req, res) => {
     const verified = mfaService.verifyToken(user.mfaSecret, token);
 
     if (verified) {
+      // Only update the MFA status if the token is successfully verified
       user.mfaEnabled = true;
       user.tempSecret = '';
       await user.save();
@@ -70,6 +138,7 @@ exports.verifyToken = async (req, res) => {
     res.status(500).send('Error verifying MFA token');
   }
 };
+
 
 
 exports.disableMFA = async (req, res) => {
@@ -109,5 +178,35 @@ exports.getMfaStatus = async (req, res) => {
     res.json({ mfaEnabled: user.mfaEnabled });
   } catch (error) {
     res.status(500).send('Error fetching MFA status');
+  }
+};
+
+exports.toggleMFA = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if (user.mfaEnabled) {
+      // MFA is enabled; disable it
+      user.mfaSecret = '';
+      user.mfaEnabled = false;
+    } else {
+      // MFA is not enabled; enable it
+      const secret = mfaService.generateSecret();
+      user.tempSecret = secret.base32; // Save the secret temporarily
+      user.mfaEnabled = true; // Update the MFA status
+    }
+
+    await user.save();
+
+    res.json({ mfaEnabled: user.mfaEnabled });
+  } catch (error) {
+    res.status(500).send('Error toggling MFA');
   }
 };

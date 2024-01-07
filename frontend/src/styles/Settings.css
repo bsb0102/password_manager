@@ -1,78 +1,133 @@
+/* Settings Container */
 .settings-container {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 600px;
-    margin: 20px auto;
-    font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: space-between; /* Adjust as needed */
+  align-items: flex-start; /* Align settings to the top */
+  padding: 20px; /* Add padding around the settings content */
+}
+
+/* Settings Right Side */
+.settings-right {
+  flex: 1; /* Allow the right side to grow */
+  max-width: 60%; /* Adjust the maximum width as needed */
+  padding: 20px; /* Add padding inside the right side container */
+  background-color: #333; /* Dark gray background color */
+  color: #fff; /* Text color */
+  border-radius: 5px; /* Add rounded corners */
+}
+
+/* Settings Options */
+.settings-options {
+  display: flex;
+  flex-direction: column; /* Stack settings vertically */
+}
+
+/* Setting Item */
+.setting-item {
+  margin-bottom: 20px; /* Add space between setting items */
+}
+
+/* Label for Setting */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Buttons */
+button {
+  background-color: #007bff; /* Blue button color */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* MFA Confirmation Buttons */
+.confirmation-buttons {
+  display: flex;
+  justify-content: space-between; /* Place buttons side by side */
+}
+
+/* MFA Modal Styles */
+.mfa-setup,
+.mfa-confirmation {
+  text-align: center;
+  padding: 20px;
+}
+
+.qr-code-container {
+  margin-top: 10px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Media Query for Responsive Design (Adjust as needed) */
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column; /* Stack content on small screens */
   }
-  
-  .settings-container h2 {
-    color: #333;
-    text-align: center;
+
+  .settings-right {
+    max-width: 100%; /* Full width on small screens */
   }
-  
-  .settings-options ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .settings-options ul li {
-    background-color: #fff;
-    margin-bottom: 10px;
-    padding: 10px 15px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  input[type="text"] {
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: calc(100% - 22px);
-  }
-  
-  .mfa-setup {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    text-align: center;
-  }
-  
-  /* Modal styling */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
-  
+}
+
+.mfa-status {
+  font-weight: bold;
+  margin-bottom: 10px;
+  transition: color 0.3s ease-in-out;
+}
+
+.mfa-status.active {
+  color: green; /* Color for active MFA */
+}
+
+.mfa-status.inactive {
+  color: red; /* Color for inactive MFA */
+}
+
+.success-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.success-modal-content h3 {
+  color: #4CAF50; /* Grün */
+  margin-bottom: 15px;
+}
+
+.success-modal-content p {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.close-modal-button {
+  background-color: #4CAF50; /* Grün */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.close-modal-button:hover {
+  background-color: #45a049;
+}

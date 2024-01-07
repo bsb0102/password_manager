@@ -11,7 +11,6 @@ const authenticateToken = (req, res, next) => {
     req.user = verified;
 
     // Debugging: Log the decoded token payload
-    console.log('Decoded JWT Token:', verified);
 
     next();
   } catch (error) {
