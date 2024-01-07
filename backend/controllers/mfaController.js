@@ -1,44 +1,78 @@
+const jwt = require('jsonwebtoken');
 const mfaService = require('../models/mfaService');
-const UserModel = require('../models/User'); // Replace with your actual user model path
+const UserModel = require('../models/User'); // Adjust the path to your user model
 
-const enableMFA = async (req, res) => {
+// Helper function to extract user ID from JWT token
+const getUserIdFromToken = (token) => {
   try {
-    const user = await UserModel.findById(req.user.id); // Assuming user ID is in req.user
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.userId;
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
+};
+
+exports.enableMFA = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
     const secret = mfaService.generateSecret();
 
-    // Save the secret temporarily or until confirmed
-    user.tempSecret = secret.base32;
+    user.tempSecret = secret.base32; // Save the secret temporarily
     await user.save();
 
     const qrCode = await mfaService.generateQRCode(secret.otpauth_url);
-
     res.json({ qrCode, secret: secret.base32 });
   } catch (error) {
     res.status(500).send('Error enabling MFA');
   }
 };
 
-const verifyToken = async (req, res) => {
-  const { token } = req.body;
-  const user = await UserModel.findById(req.user.id);
+exports.verifyToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const authToken = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(authToken);
 
-  const verified = mfaService.verifyToken(user.tempSecret, token);
-  if (verified) {
-    user.mfaSecret = user.tempSecret;
-    user.tempSecret = '';
-    user.mfaEnabled = true;
-    await user.save();
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
 
-    res.send('MFA is verified and enabled');
-  } else {
-    res.status(400).send('Invalid MFA Token');
+    const user = await UserModel.findById(userId);
+    const verified = mfaService.verifyToken(user.tempSecret, token);
+
+    if (verified) {
+      user.mfaSecret = user.tempSecret;
+      user.tempSecret = '';
+      user.mfaEnabled = true;
+      await user.save();
+
+      res.send('MFA is verified and enabled');
+    } else {
+      res.status(400).send('Invalid MFA Token');
+    }
+  } catch (error) {
+    res.status(500).send('Error verifying MFA token');
   }
 };
 
-const disableMFA = async (req, res) => {
+exports.disableMFA = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.user.id);
+    const authToken = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(authToken);
 
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
     user.mfaSecret = '';
     user.mfaEnabled = false;
     await user.save();
@@ -49,8 +83,22 @@ const disableMFA = async (req, res) => {
   }
 };
 
-module.exports = {
-  enableMFA,
-  verifyToken,
-  disableMFA
+exports.getMfaStatus = async (req, res) => {
+  try {
+    const authToken = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(authToken);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Invalid or missing token" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    res.json({ mfaEnabled: user.mfaEnabled });
+  } catch (error) {
+    res.status(500).send('Error fetching MFA status');
+  }
 };

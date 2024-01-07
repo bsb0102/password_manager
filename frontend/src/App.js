@@ -4,16 +4,14 @@ import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import Register from './components/Register';
 import Settings from './components/Settings';
-import Sidebar from './components/Sidebar'; // Sidebar component
-import './styles/Sidebar.css'; // Updated import name
 import ProtectedRoute from './components/ProtectedRoute';
 import PasswordManager from './components/PasswordManager';
+import Sidebar from './components/Sidebar';
 
 const App = () => {
   return (
     <Router>
       <div className="App">
-        <Sidebar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
@@ -24,6 +22,7 @@ const App = () => {
             path="/home"
             element={
               <ProtectedRoute>
+                <Sidebar /> {/* Render Sidebar for specific route */}
                 <PasswordManager />
               </ProtectedRoute>
             }
@@ -34,6 +33,7 @@ const App = () => {
             path="/settings"
             element={
               <ProtectedRoute>
+                <Sidebar /> {/* Render Sidebar for specific route */}
                 <Settings />
               </ProtectedRoute>
             }

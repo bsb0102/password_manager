@@ -13,4 +13,6 @@ router.post('/verify-mfa', authenticateToken, mfaController.verifyToken);
 // Route to disable MFA for a user, requires authentication
 router.post('/disable-mfa', authenticateToken, mfaController.disableMFA);
 
+router.get('/mfa-status', authenticateToken, mfaController.getMfaStatus);
+
 module.exports = router;
