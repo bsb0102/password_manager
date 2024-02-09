@@ -1,0 +1,125 @@
+/* CSS */
+
+/* General styles */
+body, html {
+  height: 100%;
+  margin: 0;
+  background: #e6e7e8; /* Neutral background for a clean look */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Removing default margins and paddings */
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+/* Form container */
+.auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #333; /* Dark background for modern look */
+}
+
+/* The login form itself with a sleek design */
+.auth-form {
+  padding: 40px;
+  background: #fff; /* Contrast background for the form */
+  border-radius: 10px; /* Rounded corners for modern look */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Soft shadow for depth */
+  width: 100%;
+  max-width: 350px; /* Max width for form */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Heading with a larger font for clear visibility */
+.auth-form h2 {
+  color: #000; /* Dark text for readability */
+  font-size: 2rem; /* Larger font size for the heading */
+  margin-bottom: 1.5rem; /* Spacing below heading */
+  text-align: center;
+}
+
+/* Input field styles */
+.auth-input {
+  width: 100%;
+  border: 2px solid #ddd; /* Subtle border */
+  margin-bottom: 1rem;
+  padding: 12px 15px;
+  border-radius: 5px; /* Slight rounding on inputs */
+  font-size: 1rem; /* Comfortable font size for reading */
+  transition: border-color 0.25s ease-in-out;
+}
+
+/* Focus state for input fields */
+.auth-input:focus {
+  border-color: #007bff; /* Blue border for focus */
+  outline: none; /* Remove default outline */
+}
+
+/* Styles for the submit button */
+.auth-button {
+  background-color: #007bff; /* Primary color for the button */
+  color: #fff;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.25s;
+  margin-top: 10px; /* Spacing above button */
+}
+
+/* Hover state for the button */
+.auth-button:hover {
+  background-color: #0056b3; /* Slightly darker on hover */
+}
+
+/* Error message styling */
+.error-message {
+  color: #ff3860; /* Visible error color */
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Alternate action prompt */
+.alt-action {
+  color: #bbb; /* Subtle color for less important text */
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem; /* Spacing above alternative action */
+}
+
+/* Hover state for alternative action links */
+.alt-action span {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Fade in animation for the form */
+@keyframes fadeIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.auth-form {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Placeholder customization */
+::placeholder {
+  color: #666; /* Lighter text for placeholders */
+  opacity: 1; /* Make sure they are easy to read */
+}

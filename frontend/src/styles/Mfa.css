@@ -9,31 +9,48 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeInOverlay 0.4s ease-in-out both; /* Fade-in effect for the overlay */
 }
 
 .modal-content {
-  background-color: #EFEFEF; /* Light grey background */
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  background-color: #ffffff; /* Crisp white background */
+  padding: 30px;
+  border-radius: 15px; /* More pronounced rounded corners for a modern look */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* Smoother box shadow for depth */
   position: relative;
   max-width: 400px;
   width: 90%;
   text-align: center;
-  color: #333; /* Dark text for better contrast */
+  color: #333;
+  transform: scale(0.9); /* Start slightly smaller */
+  animation: popIn 0.4s ease-in-out forwards; /* Pop-in effect */
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   border: none;
   background: transparent;
-  padding: 1px 5px; /* Small padding around the 'x' */
-  font-size: 16px; /* Adjust size as needed */
+  font-size: 24px; /* Larger 'x' for easy clicking */
   cursor: pointer;
-  color: #333; /* Dark color for the 'x' */
-  z-index: 10;
+  color: #7f8c8d; /* Soft color for the 'x' */
+  transition: color 0.2s ease-in-out;
+}
+
+.modal-close-btn:hover {
+  color: #e74c3c; /* Highlight color when hovered for a clear indication */
+}
+
+/* Animations */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 
