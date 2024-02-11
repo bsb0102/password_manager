@@ -28,11 +28,14 @@ const httpsOptions = {
 
 // Set up middleware
 const corsOptions = {
-  origin: ['https://localhost:443', 'https://82.165.221.131:443', 'http://localhost:3000', 'https://safekey.gg:443/api'],
+  origin: "*",
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204
 };
+
+const csrfProtection = csrf({ cookie: true });
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -64,11 +67,15 @@ if (process.env.NODE_ENV === 'production') {
 // Connect to Database
 connectDB();
 
-// Global error handler
-app.use(errorHandler);
+// Set the PORT based on the environment
+let PORT;
+if (process.env.NODE_ENV === 'developing') {
+    PORT = 3002;
+} else {
+    PORT = process.env.PORT || 443;
+}
 
 // Create HTTPS server
-const PORT = process.env.PORT || 443;
 const server = https.createServer(httpsOptions, app);
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
