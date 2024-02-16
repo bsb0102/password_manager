@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../api/api.js';
-import '../styles/Settings.css'; // Make sure you have this CSS file for styling
-import Modal from '../modals/Mfa.jsx';
+import axiosInstance from '../../api/api.js';
+import './Settings.css'; // Make sure you have this CSS file for styling
+import Modal from '../../modals/Mfa.jsx';
 
 function Settings() {
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
