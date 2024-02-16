@@ -47,8 +47,6 @@ input[type="password"] {
 
 /* Buttons */
 button {
-  width: 150px;
-  display: flex;
   background-color: #fff; /* White button color */
   color: #333;
   border: 1px solid #333;
