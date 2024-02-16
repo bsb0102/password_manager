@@ -2,13 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
+const { getUserByEmail, createUser, getUserById } = require('../controllers/userController'); // Replace with your user controller
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
-
-
 
 router.get("/user_test", async (req, res) => {
   res.json({message: "Status True"})
@@ -123,6 +121,37 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ message: 'Registration successful', token });
   } catch (error) {
     console.error('Registration error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+router.put('/change-password', async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;    
+    // Fetch the user by userId
+    const user = await getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+
+    user.password = hashedNewPassword;
+
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

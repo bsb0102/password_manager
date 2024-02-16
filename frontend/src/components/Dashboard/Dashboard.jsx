@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems, secondaryListItems } from '../ListItems/listItems';
 import PasswordManager from "../PasswordManager/PasswordManager"
+import Settings from "../Settings/Settings"
 
 const drawerWidth = 240;
 
@@ -86,7 +87,7 @@ function Dashboard() {
       case 'Secret Nodes':
         return <div>Secret Nodes Content</div>; // Replace with actual Secret Nodes content
       case 'Settings':
-        return <div>Settings Content</div>; // Replace with actual Secret Nodes content
+        return <Settings />; // Replace with actual Secret Nodes content
       default:
         return <div>No content available</div>;
     }

@@ -4,7 +4,7 @@ import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Alert from '../utils/AlertService';
+import Alert from './Alert/AlertService';
 import axiosInstance from '../api/api.js';
 
 const PasswordManager = () => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Alert.css'; // Assuming you have CSS for alert styles
+import './Alert.css'; // Assuming you have CSS for alert styles
 
 const Alert = ({ className, message }) => {
     const [visible, setVisible] = useState(true);

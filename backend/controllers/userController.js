@@ -31,8 +31,19 @@ const getUserByEmail = async (username) => {
   }
 };
 
+// Function to fetch a user by their ID
+const getUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   hashPassword,
   createUser,
   getUserByEmail,
+  getUserById,
 };

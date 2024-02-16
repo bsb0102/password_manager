@@ -4,7 +4,7 @@ import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Alert from '../../utils/AlertService';
+import Alert from '../Alert/AlertService';
 import axiosInstance from '../../api/api.js';
 
 const PasswordManager = () => {
@@ -235,142 +235,139 @@ const PasswordManager = () => {
 
 
   return (
-    <div className="table-container">
-      {alert.show && <Alert className={alert.className} message={alert.message} />}
+    <div className="table-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+  {alert.show && <Alert className={alert.className} message={alert.message} />}
 
-
-      <div className="table-box">
-      <button onClick={handleAddClick} className="add-button">+</button>
-      <table className="custom-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Website</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Actions</th>
+  <div className="table-box">
+  <button onClick={handleAddClick} className="add-button">+</button>
+  <div className="table-container">
+    <table className="custom-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Website</th>
+          <th>Email</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item) => (
+          <tr key={item._id}>
+            <td>{item.updatedAt}</td>
+            <td>{item.website}</td>
+            <td>{item.email}</td>
+            <td>{item.username}</td>
+            <td className="password-cell">
+              <div className="password-input">
+                <span>{item.showPassword ? item.password : '*****'}</span>
+                <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
+                  {item.showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            </td>
+            <td>
+              <button onClick={() => handleEditClick(item)} className="edit-button">
+                <FaPencilAlt />
+              </button>
+              <button onClick={() => handleDeleteClick(item._id)} className="delete-button">
+                <FaTrash />
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {data.map((item) => (
-            <tr key={item._id}>
-              <td>{item.updatedAt}</td>
-              <td>{item.website}</td>
-              <td>{item.email}</td>
-              <td>{item.username}</td>
-              <td className="password-cell">
-  <div className="password-input">
-    <span>{item.showPassword ? item.password : '*****'}</span>
-    <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
-      {item.showPassword ? <FaEyeSlash /> : <FaEye />}
-    </span>
+        ))}
+      </tbody>
+    </table>
   </div>
-</td>
+</div>
 
-              <td>
-                <button onClick={() => handleEditClick(item)} className="edit-button">
-                  <FaPencilAlt />
-                </button>
-                <button onClick={() => handleDeleteClick(item._id)} className="delete-button">
-                  <FaTrash />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
     {showAddPasswordModal && (
-      <div className="modal">
-        <div className="modal-content">
-          <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
-          <h2>{editData ? "Edit Password" : "Add Password"}</h2>
-            {/* <label className="filled">Date:
-              <input
-                type="text"
-                value={newPasswordData.updatedAt}
-                readOnly
-              />
-            </label> */}
-            <label>Website:
-              <input
+        
+            <div className="modal-content">
+            <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
+            <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
+            <label style={{ marginBottom: '10px' }}>Website:
+                <input
                 type="text"
                 value={newPasswordData.website || (editData ? editData.website : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
-              />
+                className="input-field"
+                />
             </label>
-            <label>Email:
-              <input
+            <label style={{ marginBottom: '10px' }}>Email:
+                <input
                 type="text"
                 value={newPasswordData.email || (editData ? editData.email : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
-              />
+                className="input-field"
+                />
             </label>
-            <label>Username:
-              <input
+            <label style={{ marginBottom: '10px' }}>Username:
+                <input
                 type="text"
                 value={newPasswordData.username || (editData ? editData.username : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
-              />
+                className="input-field"
+                />
             </label>
-            <label>
-              Password:
-              <div className="password-input">
-                <div className="input-container">
+            <label style={{ marginBottom: '10px' }}>
+            Password:
+            <div className="password-input" style={{ width: 'calc(100% - 16px)' }}>
+            <input
+                type={showPassword ? "text" : "password"}
+                value={newPasswordData.password}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+                disabled={showGenerateStrongPassword}
+                className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
+            />
+            {!passwordValidation && (
+                <div className="error-message">Password cannot be empty</div>
+            )}
+            <span
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+            >
+                {showPassword ? (
+                    <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
+                ) : (
+                    <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
+                )}
+            </span>
+        </div>
+        </label>
+
+            <div className="password-settings" style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>
+                Password Length:
                 <input
-                      type={showPassword ? "text" : "password"}
-                      value={newPasswordData.password}
-                      onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
-                      disabled={showGenerateStrongPassword}
-                      style={{ backgroundColor: inputBackgroundColor }}
-                      className={!passwordValidation ? 'error-input' : ''} // Add this line
-                    />
-                    {!passwordValidation && (
-                      <div className="error-message">Password cannot be empty</div> // Add this line
-                    )}
-                  <span
-                    className="toggle-password"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <FontAwesomeIcon icon={faEyeSlash} />
-                    ) : (
-                      <FontAwesomeIcon icon={faEye} />
-                    )}
-                  </span>
-                </div>
-                {/* Password generation settings */}
-                <div className="password-settings">
-                  {/* Password Length */}
-                  <label>
-                    Password Length:
-                    <input
-                      type="range"
-                      min="8"
-                      max="20"
-                      value={passwordSettings.length}
-                      onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
-                    />
-                  </label>
-                  {/* Insert the Generate Strong Password button here */}
-                  <button className="gen-button" onClick={() => {
+                    type="range"
+                    min="8"
+                    max="20"
+                    value={passwordSettings.length}
+                    onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
+                    style={{ width: '100%' }}
+                />
+                </label>
+                <button
+                className="gen-button"
+                onClick={() => {
                     const generatedPassword = generatePassword();
                     setNewPasswordData({ ...newPasswordData, password: generatedPassword });
-                    setPasswordGenerated(true); // Set the flag that the password was generated
-                  }}>
-                    Generate Strong Password
-                  </button>
-                </div>
-                <div className="button-container">
-                  <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
-                  <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
-                </div>
-              </div>
-            </label>
-          </div>
-        </div>
-      )}
+                    setPasswordGenerated(true);
+                }}
+                style={{ width: '100%' }}
+                >
+                Generate Strong Password
+                </button>
+            </div>
+            <div className="button-container">
+                <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
+                <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
+            </div>
+            </div>
+
+        )}
       {showDeleteConfirmation && (
       <div className="delete-confirmation">
       <div className="delete-content">

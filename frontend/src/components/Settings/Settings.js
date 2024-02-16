@@ -7,15 +7,21 @@ function Settings() {
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
   const [mfaSetupData, setMfaSetupData] = useState(null);
   const [mfaToken, setMfaToken] = useState('');
-  const [showModal, setShowModal] = useState(false); // Zustand zur Steuerung der Modal-Sichtbarkeit
-  const [confirmationModal, setConfirmationModal] = useState(false); // Zustand zur Steuerung des Bestätigungsmodals
-  const [successModal, setSuccessModal] = useState(false); // Zustand zur Steuerung des Erfolgsmeldungsmodals
-  const [error, setError] = useState(''); // Zustand zur Verwaltung von Fehlermeldungen
+  const [showModal, setShowModal] = useState(false); 
+  const [confirmationModal, setConfirmationModal] = useState(false); 
+  const [successModal, setSuccessModal] = useState(false);
+  const [error, setError] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [userId, setUserId] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
 
   useEffect(() => {
-    // Den aktuellen MFA-Status vom Backend abrufen
+
+    const token = localStorage.getItem('token');
+    const decodedToken = parseJwt(token);
+    setUserId(decodedToken.userId);
+    
     const fetchMfaStatus = async () => {
       try {
         const response = await axiosInstance.get('/api/mfa-status');
@@ -63,6 +69,14 @@ function Settings() {
     }
   };
 
+  const parseJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      return {};
+    }
+  };
+
 
   const confirmDisableMFA = async () => {
     try {
@@ -93,14 +107,29 @@ function Settings() {
 
   const handleChangePassword = async () => {
     try {
-      // Make a request to change the password using newPassword state
-      await axiosInstance.put('/api/change-password', { newPassword });
-      // Optionally update the UI or show a success message
-      // ...
+
+      const requestData = {
+        userId: userId,
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      };
+
+      console.log(requestData)
+
+      const changePass = await axiosInstance.put('/api/change-password', requestData);
+
+      if (changePass) {
+        console.log("Successfully saved Password")
+        setNewPassword("");
+        setCurrentPassword("");
+      } else {
+        console.log("Failed to save password")
+        setNewPassword("");
+        setCurrentPassword("");
+      }
+
     } catch (error) {
       console.error('Error changing password:', error);
-      // Handle errors or show an error message
-      // ...
     }
   };
 
@@ -133,7 +162,13 @@ function Settings() {
             <button onClick={handleChangeUsername}>Change Username</button>
           </div>
           <div className="setting-item">
-            <label>Change Password</label>
+            <label>New Password</label>
+            <input
+              type="password"
+              placeholder="Current Password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
             <input
               type="password"
               placeholder="New Password"
@@ -142,6 +177,7 @@ function Settings() {
             />
             <button onClick={handleChangePassword}>Change Password</button>
           </div>
+
           <div className="setting-item">
             <label>MFA</label>
             {isMfaEnabled ? (

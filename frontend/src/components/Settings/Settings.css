@@ -11,8 +11,8 @@
   flex: 1; /* Allow the right side to grow */
   max-width: 60%; /* Adjust the maximum width as needed */
   padding: 20px; /* Add padding inside the right side container */
-  background-color: #333; /* Dark gray background color */
-  color: #fff; /* Text color */
+  background-color: #fff; /* White background color */
+  color: #333; /* Text color */
   border-radius: 5px; /* Add rounded corners */
 }
 
@@ -45,9 +45,9 @@ input[type="password"] {
 
 /* Buttons */
 button {
-  background-color: #007bff; /* Blue button color */
-  color: #fff;
-  border: none;
+  background-color: #fff; /* White button color */
+  color: #333;
+  border: 1px solid #333;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
@@ -101,7 +101,7 @@ button {
 }
 
 .success-modal-content {
-  background-color: white;
+  background-color: #fff; /* White background color */
   padding: 20px;
   border-radius: 10px;
   text-align: center;
@@ -109,17 +109,17 @@ button {
 }
 
 .success-modal-content h3 {
-  color: #4CAF50; /* Grün */
+  color: #333; /* Dark gray */
   margin-bottom: 15px;
 }
 
 .success-modal-content p {
-  color: #333;
+  color: #333; /* Dark gray */
   margin-bottom: 20px;
 }
 
 .close-modal-button {
-  background-color: #4CAF50; /* Grün */
+  background-color: #333; /* Dark gray */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -129,5 +129,5 @@ button {
 }
 
 .close-modal-button:hover {
-  background-color: #45a049;
+  background-color: #555; /* Darker gray */
 }
