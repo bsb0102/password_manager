@@ -12,7 +12,6 @@ env = module.exports = process.env;
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
-
 const app = express();
 
 const corsOptions = {
@@ -52,8 +51,8 @@ if (process.env.NODE_ENV === 'production') {
 
 // Connect to Database
 connectDB();
-
 // Global error handler
 app.use(errorHandler);
 
+console.log("Started Backend Server")
 module.exports = app; // Export the app object for server.js to use
