@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axiosInstance from '../../api/api.js';
-import './Settings.css'; // Make sure you have this CSS file for styling
+import './Settings.css';
 import Modal from '../../modals/Mfa.jsx';
+import {AlertContext} from '../Alert/AlertService.js';
 
 function Settings() {
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
@@ -15,6 +16,7 @@ function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [userId, setUserId] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
+  const { setAlert } = useContext(AlertContext)
 
   useEffect(() => {
 
@@ -118,18 +120,23 @@ function Settings() {
 
       const changePass = await axiosInstance.put('/api/change-password', requestData);
 
+      console.log("what is changepass", changePass)
+
       if (changePass) {
         console.log("Successfully saved Password")
+        setAlert("success", "This is a success message!");
         setNewPassword("");
         setCurrentPassword("");
-      } else {
+      } else if (!changePass) {
         console.log("Failed to save password")
+        setAlert("success", "This is a success message!");
         setNewPassword("");
         setCurrentPassword("");
       }
 
     } catch (error) {
       console.error('Error changing password:', error);
+      setAlert("error", "Failed to save Password")
     }
   };
 
@@ -182,10 +189,14 @@ function Settings() {
             <label>MFA</label>
             {isMfaEnabled ? (
               <>
-                <button onClick={handleDisableMFA}>Disable MFA</button>
+                <button className="mfa-button" onClick={handleDisableMFA}>Disable MFA</button>
               </>
             ) : (
-              <button onClick={handleAddMFA}>Add MFA</button>
+              <>
+                <button className="mfa-button" onClick={handleAddMFA}>Add Google MFA</button>
+                <button className="mfa-button">Add Email MFA</button>
+              </>
+              
             )}
           </div>
         </div>

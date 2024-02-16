@@ -24,7 +24,9 @@
 
 /* Setting Item */
 .setting-item {
-  margin-bottom: 20px; /* Add space between setting items */
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Label for Setting */
@@ -45,6 +47,8 @@ input[type="password"] {
 
 /* Buttons */
 button {
+  width: 150px;
+  display: flex;
   background-color: #fff; /* White button color */
   color: #333;
   border: 1px solid #333;
@@ -119,6 +123,7 @@ button {
 }
 
 .close-modal-button {
+  
   background-color: #333; /* Dark gray */
   color: white;
   border: none;
@@ -130,4 +135,20 @@ button {
 
 .close-modal-button:hover {
   background-color: #555; /* Darker gray */
+}
+
+.mfa-button {
+  width: 150px;
+  padding: 8px 16px; 
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.mfa-button:hover {
+  background-color: #0056b3;
 }

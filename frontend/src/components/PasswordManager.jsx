@@ -4,7 +4,6 @@ import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Alert from './Alert/AlertService';
 import axiosInstance from '../api/api.js';
 
 const PasswordManager = () => {
@@ -33,7 +32,6 @@ const PasswordManager = () => {
   });
 
 
-  const [alert, setAlert] = useState({ show: false, message: '', className: '' });
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [showGenerateStrongPassword, setShowGenerateStrongPassword] = useState(false);
@@ -88,17 +86,17 @@ const PasswordManager = () => {
       if (editData) {
         // Always send the complete payload when updating
         response = await axiosInstance.put(`/api/updatePassword/${editData._id}`, passwordPayload);
-        alertMessage = 'Password updated successfully';
+        // alertMessage = 'Password updated successfully';
       } else {
         // Add a new item
         response = await axiosInstance.post("/api/addPassword", passwordPayload);
-        alertMessage = 'Password added successfully';
+        // alertMessage = 'Password added successfully';
       }
   
       // Check if the response from the API contains the updated password
       const updatedPassword = response.data;
   
-      setAlert({ show: true, message: alertMessage, className: 'success' });
+      // setAlert({ show: true, message: alertMessage, className: 'success' });
   
       // Update the newPasswordData state with the updated password
       setNewPasswordData({
@@ -116,7 +114,7 @@ const PasswordManager = () => {
       setPasswordValidation(true); // Reset password validation
     } catch (error) {
       console.error("Error adding/updating password:", error);
-      setAlert({ show: true, message: 'Error processing request', className: 'error' });
+      // setAlert({ show: true, message: 'Error processing request', className: 'error' });
     }
   };
   
@@ -160,7 +158,7 @@ const PasswordManager = () => {
     if (id) {
       try {
         await axiosInstance.delete(`/api/deletePassword/${id}`);
-        setAlert({ show: true, message: 'Password deleted successfully', className: 'success' });
+        // setAlert({ show: true, message: 'Password deleted successfully', className: 'success' });
         setData(data.filter((item) => item._id !== id)); // Make sure to match the ID key used in your data items
 
       } catch (error) {
@@ -236,9 +234,6 @@ const PasswordManager = () => {
 
   return (
     <div className="table-container">
-      {alert.show && <Alert className={alert.className} message={alert.message} />}
-
-
       <div className="table-box">
       <button onClick={handleAddClick} className="add-button">+</button>
       <table className="custom-table">

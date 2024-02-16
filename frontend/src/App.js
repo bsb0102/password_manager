@@ -7,6 +7,7 @@ import Settings from './components/Settings/Settings';
 import PasswordManager from './components/PasswordManager';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard/Dashboard';
+import { AlertProvider } from './components/Alert/AlertService'; // Importiere den AlertProvider
 
 // Custom ProtectedRoute component
 const ProtectedRoute = ({ element, ...rest }) => {
@@ -19,32 +20,35 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        {/* Rendere den AlertProvider um deine App-Komponenten */}
+        <AlertProvider>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/home"
-            element={
-              <React.Fragment>
-                {/* <Sidebar /> */}
-                <ProtectedRoute element={<Dashboard />} />
-              </React.Fragment>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <React.Fragment>
-                <Sidebar />
-                <ProtectedRoute element={<Settings />} />
-              </React.Fragment>
-            }
-          />
-          {/* Add any other routes here */}
-        </Routes>
+            {/* Geschützte Routen */}
+            <Route
+              path="/home"
+              element={
+                <React.Fragment>
+                  {/* <Sidebar /> */}
+                  <ProtectedRoute element={<Dashboard />} />
+                </React.Fragment>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <React.Fragment>
+                  <Sidebar />
+                  <ProtectedRoute element={<Settings />} />
+                </React.Fragment>
+              }
+            />
+            {/* Füge hier weitere Routen hinzu */}
+          </Routes>
+        </AlertProvider>
       </div>
     </Router>
   );
