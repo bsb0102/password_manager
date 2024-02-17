@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
-import Login from './components/Login';
-import Register from './components/Register';
+import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 import Settings from './components/Settings/Settings';
 import PasswordManager from './components/PasswordManager';
 import Sidebar from './components/Sidebar';
@@ -20,7 +20,6 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        {/* Rendere den AlertProvider um deine App-Komponenten */}
         <AlertProvider>
           <Routes>
             <Route path="/" element={<Dashboard />} />

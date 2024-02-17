@@ -15,6 +15,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { mainListItems, secondaryListItems } from '../ListItems/listItems';
 import PasswordManager from "../PasswordManager/PasswordManager"
 import Settings from "../Settings/Settings"
+import SecretNodeCreator from "../Secret Nodes/SecretNodeCreator"
 
 const drawerWidth = 240;
 
@@ -85,7 +86,7 @@ function Dashboard() {
       case 'Passwords':
         return <PasswordManager />; // Replace with actual Passwords content
       case 'Secret Nodes':
-        return <div>Secret Nodes Content</div>; // Replace with actual Secret Nodes content
+        return <SecretNodeCreator />; // Replace with actual Secret Nodes content
       case 'Settings':
         return <Settings />; // Replace with actual Secret Nodes content
       default:
@@ -127,14 +128,7 @@ function Dashboard() {
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
+          <Toolbar>
             <IconButton onClick={toggleDrawer}>
               <ChevronLeftIcon />
             </IconButton>

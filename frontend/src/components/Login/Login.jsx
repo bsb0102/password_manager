@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/api.js';
-import '../styles/AuthForm.css';
-import Modal from '../modals/Mfa.jsx'; // Import your MFA modal component here
+import axiosInstance from '../../api/api.js';
+import './AuthForm.css';
+import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
 
 const Login = () => {
   const navigate = useNavigate();

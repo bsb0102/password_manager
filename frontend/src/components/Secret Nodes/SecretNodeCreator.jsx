@@ -24,13 +24,13 @@ const SecretNodeCreator = ({ onSave }) => {
 
   return (
     <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-      <h2 style={{ marginBottom: '20px' }}>Secret Node erstellen</h2>
+      <h2 style={{ marginBottom: '20px' }}>Create a Secret Node</h2>
       <label style={{ display: 'block', marginBottom: '10px' }}>
-        Passwort:
+        Password:
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginLeft: '10px' }} />
       </label>
       <label style={{ display: 'block', marginBottom: '10px' }}>
-        Inhalt (max. 2000 Zeichen):
+        Content (max. 2000 character):
         <textarea value={content} onChange={(e) => setContent(e.target.value)} style={{ marginLeft: '10px', width: '100%', minHeight: '100px' }} />
       </label>
       <button onClick={handleSave} style={{ marginRight: '10px' }}>Speichern</button>

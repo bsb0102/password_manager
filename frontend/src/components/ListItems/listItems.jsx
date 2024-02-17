@@ -9,12 +9,12 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 
 export const mainListItems = ({ onItemClick }) => (
   <React.Fragment>
-    <ListItemButton onClick={() => onItemClick('Dashboard')}>
+    {/* <ListItemButton onClick={() => onItemClick('Dashboard')}>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
-    </ListItemButton>
+    </ListItemButton> */}
     <ListItemButton onClick={() => onItemClick('Passwords')}>
       <ListItemIcon>
         <AssignmentIcon />

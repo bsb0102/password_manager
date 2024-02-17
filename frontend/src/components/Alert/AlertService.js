@@ -1,7 +1,7 @@
 import React, { useState, createContext, useEffect } from 'react';
-import Alert from './Alert'; // Importiere die Alert-Komponente
+import Alert from './Alert';
 
-const AlertContext = createContext(); // Erstelle den Kontext
+const AlertContext = createContext();
 
 const AlertProvider = ({ children }) => {
   const [alerts, setAlerts] = useState([]);
@@ -9,7 +9,7 @@ const AlertProvider = ({ children }) => {
   const setAlert = (type, message) => {
     const newAlert = { id: Date.now(), type, message };
     setAlerts(prevAlerts => {
-      const updatedAlerts = [...prevAlerts, newAlert].slice(-5); // Maximal 5 Alerts anzeigen
+      const updatedAlerts = [...prevAlerts, newAlert].slice(-5); 
       return updatedAlerts;
     });
   };
@@ -23,7 +23,7 @@ const AlertProvider = ({ children }) => {
       if (alerts.length > 0) {
         removeAlert(alerts[0].id);
       }
-    }, 5000); // Entferne den ältesten Alert nach 5 Sekunden
+    }, 5000);
     return () => clearInterval(timer);
   }, [alerts]);
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/api.js'; // Import axiosInstance
-import { getCsrfToken } from '../utils/csrfUtils';
-import '../styles/AuthForm.css'; // Unified CSS for both login and register
+import axiosInstance from '../../api/api.js';
+import { getCsrfToken } from '../../utils/csrfUtils.js';
+import '../Login/AuthForm.css';
 const Register = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');

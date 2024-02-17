@@ -6,6 +6,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 // import Alert from '../Alert/AlertService';
 import axiosInstance from '../../api/api.js';
+import Spinner from "../Alert/Spinner";
 
 const PasswordManager = () => {
   const [data, setData] = useState([]);
@@ -14,6 +15,7 @@ const PasswordManager = () => {
   const [showAddPasswordModal, setShowAddPasswordModal] = useState(false);
   const [editData, setEditData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [passwordGenerated, setPasswordGenerated] = useState(false);
   const [passwordValidation, setPasswordValidation] = useState(true);
   const [newPasswordData, setNewPasswordData] = useState({
@@ -40,21 +42,26 @@ const PasswordManager = () => {
 
   const maskPassword = (password) => '***';
 
-  const fetchPasswords = async () => {
-    try {
-      const response = await axiosInstance.get('/api/getPasswords');
-      setData(response.data.map(item => ({
-        ...item,
-        showPassword: false // Add a visibility flag for each password
-        
-      })))
-      ;
-    } catch (error) {
-      console.error('Error fetching passwords:', error);
-    }
-  };
+
 
   useEffect(() => {
+    const fetchPasswords = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get('/api/getPasswords');
+        setData(response.data.map(item => ({
+          ...item,
+          showPassword: false // Add a visibility flag for each password
+          }
+          )
+          )
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching passwords:', error);
+      }
+    };
+
     fetchPasswords();
   }, []);
 
@@ -230,53 +237,66 @@ const PasswordManager = () => {
     setShowGenerateStrongPassword(false);
   };
 
+  if (loading) {
+    return (
+    <div>
+      <Spinner />
+    </div>
+    )
+  }
+
 
   return (
-    <div className="table-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+    <div className="table-container">
+      <div className="table-header">
+      <button onClick={handleAddClick} className="add-button">+</button>
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Website</th>
+              <th>Email</th>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div className="table-content">
+        <table className="custom-table">
+            <tbody>
+              {data.map((item) => (
+                <tr key={item._id}>
+                  <td>{item.updatedAt}</td>
+                  <td>{item.website}</td>
+                  <td>{item.email}</td>
+                  <td>{item.username}</td>
+                  <td className="password-cell">
+                    <div className="password-input">
+                      <span>{item.showPassword ? item.password : '*****'}</span>
+                      <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
+                        {item.showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <button onClick={() => handleEditClick(item)} className="edit-button">
+                      <FaPencilAlt />
+                    </button>
+                    <button onClick={() => handleDeleteClick(item._id)} className="delete-button">
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+        </table>
+      </div>
 
-  <div className="table-box">
-  <button onClick={handleAddClick} className="add-button">+</button>
-  <div className="table-container">
-    <table className="custom-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Website</th>
-          <th>Email</th>
-          <th>Username</th>
-          <th>Password</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item) => (
-          <tr key={item._id}>
-            <td>{item.updatedAt}</td>
-            <td>{item.website}</td>
-            <td>{item.email}</td>
-            <td>{item.username}</td>
-            <td className="password-cell">
-              <div className="password-input">
-                <span>{item.showPassword ? item.password : '*****'}</span>
-                <span className="toggle-password" onClick={() => togglePasswordVisibility(item._id)}>
-                  {item.showPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            </td>
-            <td>
-              <button onClick={() => handleEditClick(item)} className="edit-button">
-                <FaPencilAlt />
-              </button>
-              <button onClick={() => handleDeleteClick(item._id)} className="delete-button">
-                <FaTrash />
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+
+
+
 
     {showAddPasswordModal && (
         
