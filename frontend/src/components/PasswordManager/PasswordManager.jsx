@@ -43,6 +43,23 @@ const PasswordManager = () => {
 
   const maskPassword = (password) => '***';
 
+  const fetchPasswords = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get('/api/getPasswords');
+      setData(response.data.map(item => ({
+        ...item,
+        showPassword: false // Add a visibility flag for each password
+        }
+        )
+        )
+      );
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching passwords:', error);
+    }
+  };
+
 
 
   useEffect(() => {
@@ -114,7 +131,7 @@ const PasswordManager = () => {
         password: updatedPassword.password, // Use the updated password
       });
   
-      fetchPasswords(); // Fetch the updated password list
+      fetchPasswords(); 
   
       setShowAddPasswordModal(false);
       setEditData(null);
@@ -206,23 +223,30 @@ const PasswordManager = () => {
     const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
     const numberChars = '0123456789';
     const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-  
+
     let characterPool = '';
-    if (passwordSettings.includeUppercase) characterPool += upperChars;
-    if (passwordSettings.includeLowercase) characterPool += lowerChars;
+    if (passwordSettings.onlyUppercase) characterPool += upperChars;
+    if (passwordSettings.onlyLowercase) characterPool += lowerChars;
     if (passwordSettings.includeNumbers) characterPool += numberChars;
     if (passwordSettings.includeSymbols) characterPool += symbolChars;
-  
+
+    if (characterPool === '') {
+        characterPool = upperChars + lowerChars + numberChars + symbolChars;
+    }
+
     let password = '';
+    const poolLength = characterPool.length;
     for (let i = 0; i < passwordSettings.length; i++) {
-      const randomIndex = Math.floor(Math.random() * characterPool.length);
-      password += characterPool[randomIndex];
+        const randomIndex = Math.floor(Math.random() * poolLength);
+        password += characterPool[randomIndex];
     }
 
     setPasswordGenerated(true);
-  
+
     return password;
-  };
+};
+
+  
   
 
   const handleAddPasswordModalClose = () => {
@@ -300,125 +324,127 @@ const PasswordManager = () => {
 
 
       {showAddPasswordModal && (
-  <div className="modal-content">
-    <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
-    <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
-    <label style={{ marginBottom: '10px' }}>Website:
-      <div className="input-field">
-        <input
-          type="text"
-          value={newPasswordData.website || (editData ? editData.website : '')}
-          onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
-        />
-      </div>
-    </label>
-    <label style={{ marginBottom: '10px' }}>Email:
-      <div className="input-field">
-        <input
-          type="text"
-          value={newPasswordData.email || (editData ? editData.email : '')}
-          onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
-        />
-      </div>
-    </label>
-    <label style={{ marginBottom: '10px' }}>Username:
-      <div className="input-field">
-        <input
-          type="text"
-          value={newPasswordData.username || (editData ? editData.username : '')}
-          onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
-        />
-      </div>
-    </label>
-    <label style={{ marginBottom: '10px' }}>
-      Password:
-      <div className="input-field password-input">
-        <input
-          type={showPassword ? "text" : "password"}
-          value={newPasswordData.password}
-          onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
-          className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
-          disabled={showGenerateStrongPassword}
-        />
-        {!passwordValidation && (
-          <div className="error-message">Password cannot be empty</div>
-        )}
-        <span
-          className="toggle-password-popup"
-          onClick={() => setShowPassword(!showPassword)}
-        >
-          {showPassword ? (
-            <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
-          ) : (
-            <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
-          )}
-        </span>
-      </div>
-    </label>
+        <div className="modal-content">
+          <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
+          <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
+          <label style={{ marginBottom: '10px' }}>Website:
+            <div className="input-field">
+              <input
+                type="text"
+                value={newPasswordData.website || (editData ? editData.website : '')}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
+              />
+            </div>
+          </label>
+          <label style={{ marginBottom: '10px' }}>Email:
+            <div className="input-field">
+              <input
+                type="text"
+                value={newPasswordData.email || (editData ? editData.email : '')}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
+              />
+            </div>
+          </label>
+          <label style={{ marginBottom: '10px' }}>Username:
+            <div className="input-field">
+              <input
+                type="text"
+                value={newPasswordData.username || (editData ? editData.username : '')}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
+              />
+            </div>
+          </label>
+          <label style={{ marginBottom: '10px' }}>
+            Password:
+            <div className="input-field password-input">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={newPasswordData.password}
+                onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+                className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
+                disabled={showGenerateStrongPassword}
+              />
+              {!passwordValidation && (
+                <div className="error-message">Password cannot be empty</div>
+              )}
+              <span
+                className="toggle-password-popup"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
+                ) : (
+                  <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
+                )}
+              </span>
+            </div>
+          </label>
 
-    <div className="password-settings" style={{ marginBottom: '10px' }}>
-      <label style={{ display: 'block', marginBottom: '5px' }}>
-        Password Length:
-        <input
-          type="range"
-          min="8"
-          max="20"
-          value={passwordSettings.length}
-          onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
-          style={{ width: '100%' }}
-        />
-      </label>
-      {/* Checkboxen für Passwortoptionen */}
-      <label>
-        <input
-          type="checkbox"
-          checked={passwordSettings.onlyUppercase}
-          onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyUppercase: e.target.checked })}
-        />
-        Only Uppercase
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={passwordSettings.onlyLowercase}
-          onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyLowercase: e.target.checked })}
-        />
-        Only Lowercase
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={passwordSettings.includeNumbers}
-          onChange={(e) => setPasswordSettings({ ...passwordSettings, includeNumbers: e.target.checked })}
-        />
-        Include Numbers
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={passwordSettings.includeSymbols}
-          onChange={(e) => setPasswordSettings({ ...passwordSettings, includeSymbols: e.target.checked })}
-        />
-        Include Symbols
-      </label>
-      <button
-        className="gen-button"
-        onClick={() => {
-          const generatedPassword = generatePassword();
-          setNewPasswordData({ ...newPasswordData, password: generatedPassword });
-          setPasswordGenerated(true);
-        }}
-        style={{ width: '100%' }}
-      >
-        Generate Strong Password
-      </button>
-    </div>
-    <div className="button-container">
-      <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
-      <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
-    </div>
-  </div>
-)}
+          <div className="password-settings" style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '5px' }}>
+              Password Length:
+              <input
+                type="range"
+                min="8"
+                max="20"
+                value={passwordSettings.length}
+                onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
+                style={{ width: '100%' }}
+              />
+            </label>
+            <div className="checkbox-container">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={passwordSettings.onlyUppercase}
+                  onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyUppercase: e.target.checked })}
+                />
+                Uppercase
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={passwordSettings.onlyLowercase}
+                  onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyLowercase: e.target.checked })}
+                />
+                Lowercase
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={passwordSettings.includeNumbers}
+                  onChange={(e) => setPasswordSettings({ ...passwordSettings, includeNumbers: e.target.checked })}
+                />
+                Numbers
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={passwordSettings.includeSymbols}
+                  onChange={(e) => setPasswordSettings({ ...passwordSettings, includeSymbols: e.target.checked })}
+                />
+                Symbols
+              </label>
+            </div>
+            <button
+              className="gen-button"
+              onClick={() => {
+                const generatedPassword = generatePassword();
+                setNewPasswordData({ ...newPasswordData, password: generatedPassword });
+                setPasswordGenerated(true);
+              }}
+              style={{ width: '100%' }}
+            >
+              Generate Strong Password
+            </button>
+          </div>
+          <div className="button-container">
+            <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
+            <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
+          </div>
+        </div>
+      )}
+
 
       {showDeleteConfirmation && (
       <div className="delete-confirmation">
