@@ -82,13 +82,13 @@ function Dashboard() {
   const renderContent = () => {
     switch (selectedItem) {
       case 'Dashboard':
-        return <div>Dashboard Content</div>; // Replace with actual Dashboard content
+        return <div>Dashboard Content</div>;
       case 'Passwords':
-        return <PasswordManager />; // Replace with actual Passwords content
+        return <PasswordManager />;
       case 'Secret Nodes':
-        return <SecretNodeCreator />; // Replace with actual Secret Nodes content
+        return <SecretNodeCreator />;
       case 'Settings':
-        return <Settings />; // Replace with actual Secret Nodes content
+        return <Settings />;
       default:
         return <div>No content available</div>;
     }

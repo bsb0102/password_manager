@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Attempt Blocked</title>
+</head>
+<body>
+    <div style="text-align:center; font-family: Arial, sans-serif; color: #000; background-color: #e6e6e6;">
+        <div style="margin: 0 auto; max-width: 600px;">
+            <img src="" alt="LastPass" style="width: 100%;">
+            <h2 style="color: #3b4a54;">Login Attempt Blocked</h2>
+            <p>Hello,</p>
+            <p><strong>Someone just used your master password</strong> to try to log in to your account from a device or location we didn't recognize. LastPass blocked this attempt, but you should take a closer look.</p>
+            <p><strong>Was this you?</strong></p>
+            <div style="background: #fffff5; padding: 10px;">
+                <p><strong>Account:</strong> {{ACCOUNT_EMAIL}}</p>
+                <p><strong>Time:</strong> {{CURRENT_DATE}}</p>
+                <p><strong>IP address:</strong> {{IP_ADDRESS}}</p>
+            </div>
+            <p><strong>Yes, it was me</strong></p>
+            <p><strong>No, it wasn't me</strong></p>
+            <p>If it wasn't you, don't worry. We blocked the attempt, but you should log in to your vault and change your master password under Account Settings.</p>
+            <p><strong>Security tip:</strong> Your master password should be unique to LastPass, but if you use it elsewhere, set new passwords for those accounts, as well.</p>
+            <p style="font-size: 10px; color: #fff;">&copy; LastPass. All Rights Reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

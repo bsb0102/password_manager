@@ -38,6 +38,7 @@
         "iptable": "^1.0.0",
         "jsonwebtoken": "^9.0.2",
         "kill-port": "^2.0.1",
+        "mailgun-js": "^0.22.0",
         "material-react-table": "^2.3.1",
         "mongoose": "^8.0.3",
         "openssl": "^2.0.0",
