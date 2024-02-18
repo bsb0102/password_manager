@@ -4,6 +4,7 @@ import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { formatDate} from "../../utils/frontendUtils";
 // import Alert from '../Alert/AlertService';
 import axiosInstance from '../../api/api.js';
 import Spinner from "../Alert/Spinner";
@@ -268,7 +269,7 @@ const PasswordManager = () => {
             <tbody>
               {data.map((item) => (
                 <tr key={item._id}>
-                  <td>{item.updatedAt}</td>
+                  <td>{formatDate(item.updatedAt)}</td>
                   <td>{item.website}</td>
                   <td>{item.email}</td>
                   <td>{item.username}</td>
@@ -298,92 +299,127 @@ const PasswordManager = () => {
 
 
 
-    {showAddPasswordModal && (
-        
-            <div className="modal-content">
-            <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
-            <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
-            <label style={{ marginBottom: '10px' }}>Website:
-                <input
-                type="text"
-                value={newPasswordData.website || (editData ? editData.website : '')}
-                onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
-                className="input-field"
-                />
-            </label>
-            <label style={{ marginBottom: '10px' }}>Email:
-                <input
-                type="text"
-                value={newPasswordData.email || (editData ? editData.email : '')}
-                onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
-                className="input-field"
-                />
-            </label>
-            <label style={{ marginBottom: '10px' }}>Username:
-                <input
-                type="text"
-                value={newPasswordData.username || (editData ? editData.username : '')}
-                onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
-                className="input-field"
-                />
-            </label>
-            <label style={{ marginBottom: '10px' }}>
-            Password:
-            <div className="password-input" style={{ width: 'calc(100% - 16px)' }}>
-            <input
-                type={showPassword ? "text" : "password"}
-                value={newPasswordData.password}
-                onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
-                disabled={showGenerateStrongPassword}
-                className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
-            />
-            {!passwordValidation && (
-                <div className="error-message">Password cannot be empty</div>
-            )}
-            <span
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-            >
-                {showPassword ? (
-                    <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
-                ) : (
-                    <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
-                )}
-            </span>
-        </div>
-        </label>
-
-            <div className="password-settings" style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', marginBottom: '5px' }}>
-                Password Length:
-                <input
-                    type="range"
-                    min="8"
-                    max="20"
-                    value={passwordSettings.length}
-                    onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
-                    style={{ width: '100%' }}
-                />
-                </label>
-                <button
-                className="gen-button"
-                onClick={() => {
-                    const generatedPassword = generatePassword();
-                    setNewPasswordData({ ...newPasswordData, password: generatedPassword });
-                    setPasswordGenerated(true);
-                }}
-                style={{ width: '100%' }}
-                >
-                Generate Strong Password
-                </button>
-            </div>
-            <div className="button-container">
-                <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
-                <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
-            </div>
-            </div>
-
+      {showAddPasswordModal && (
+  <div className="modal-content">
+    <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
+    <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
+    <label style={{ marginBottom: '10px' }}>Website:
+      <div className="input-field">
+        <input
+          type="text"
+          value={newPasswordData.website || (editData ? editData.website : '')}
+          onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
+        />
+      </div>
+    </label>
+    <label style={{ marginBottom: '10px' }}>Email:
+      <div className="input-field">
+        <input
+          type="text"
+          value={newPasswordData.email || (editData ? editData.email : '')}
+          onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
+        />
+      </div>
+    </label>
+    <label style={{ marginBottom: '10px' }}>Username:
+      <div className="input-field">
+        <input
+          type="text"
+          value={newPasswordData.username || (editData ? editData.username : '')}
+          onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
+        />
+      </div>
+    </label>
+    <label style={{ marginBottom: '10px' }}>
+      Password:
+      <div className="input-field password-input">
+        <input
+          type={showPassword ? "text" : "password"}
+          value={newPasswordData.password}
+          onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+          className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
+          disabled={showGenerateStrongPassword}
+        />
+        {!passwordValidation && (
+          <div className="error-message">Password cannot be empty</div>
         )}
+        <span
+          className="toggle-password-popup"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? (
+            <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
+          ) : (
+            <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
+          )}
+        </span>
+      </div>
+    </label>
+
+    <div className="password-settings" style={{ marginBottom: '10px' }}>
+      <label style={{ display: 'block', marginBottom: '5px' }}>
+        Password Length:
+        <input
+          type="range"
+          min="8"
+          max="20"
+          value={passwordSettings.length}
+          onChange={(e) => setPasswordSettings({ ...passwordSettings, length: Number(e.target.value) })}
+          style={{ width: '100%' }}
+        />
+      </label>
+      {/* Checkboxen für Passwortoptionen */}
+      <label>
+        <input
+          type="checkbox"
+          checked={passwordSettings.onlyUppercase}
+          onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyUppercase: e.target.checked })}
+        />
+        Only Uppercase
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={passwordSettings.onlyLowercase}
+          onChange={(e) => setPasswordSettings({ ...passwordSettings, onlyLowercase: e.target.checked })}
+        />
+        Only Lowercase
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={passwordSettings.includeNumbers}
+          onChange={(e) => setPasswordSettings({ ...passwordSettings, includeNumbers: e.target.checked })}
+        />
+        Include Numbers
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          checked={passwordSettings.includeSymbols}
+          onChange={(e) => setPasswordSettings({ ...passwordSettings, includeSymbols: e.target.checked })}
+        />
+        Include Symbols
+      </label>
+      <button
+        className="gen-button"
+        onClick={() => {
+          const generatedPassword = generatePassword();
+          setNewPasswordData({ ...newPasswordData, password: generatedPassword });
+          setPasswordGenerated(true);
+        }}
+        style={{ width: '100%' }}
+      >
+        Generate Strong Password
+      </button>
+    </div>
+    <div className="button-container">
+      <button className="save-button" onClick={handleAddPasswordSubmit}>{editData ? "Save" : "Submit"}</button>
+      <button className="cancel-button" onClick={handleAddPasswordModalClose}>Cancel</button>
+    </div>
+  </div>
+)}
+
       {showDeleteConfirmation && (
       <div className="delete-confirmation">
       <div className="delete-content">
@@ -397,7 +433,7 @@ const PasswordManager = () => {
           className="confirm-button delete-button">
           Yes
         </button>
-        <button onClick={handleDeleteCancel} className="confirm-button cancel-button"> {/* Hier wird die "cancel-button" Klasse hinzugefügt */}
+        <button onClick={handleDeleteCancel} className="confirm-button cancel-button">
           No
         </button>
       </div>
