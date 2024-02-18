@@ -7,6 +7,8 @@ const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
+const { sendLoginNotification } = require('../services/mailgunService');
+
 
 router.get("/user_test", async (req, res) => {
   res.json({message: "Status True"})
@@ -89,16 +91,20 @@ router.post('/login', async (req, res) => {
     // Determine if MFA is enabled for the user
     const requireMfa = user.mfaEnabled;
 
-    // Generate and send a JWT token upon successful login
+    // Generate a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
 
-    // Respond with the JWT token and whether MFA is required
+    // Send login notification email
+    const userIPAddress = req.ip; // Get the user's IP address
+    await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
+
     res.json({ message: 'Login successful', token, requireMfa });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 router.post('/register', async (req, res) => {

@@ -44,7 +44,7 @@ function Settings() {
     try {
         const response = await axiosInstance.post('/api/add-mfa');
         setMfaSetupData(response.data);
-        setShowModal(true); // Modal anzeigen
+        setShowModal(true);
     } catch (error) {
         console.error('Error adding MFA:', error);
     }
@@ -57,17 +57,19 @@ function Settings() {
       if (response.data === 'MFA is verified and enabled') { // Adjust the condition based on your actual API response
         setIsMfaEnabled(true);
         setShowModal(false); // Modal schließen
-        setSuccessModal(true); // Erfolgsmodal anzeigen
+        setMfaToken('');
+        setSuccessModal(true);
         setTimeout(() => {
           setSuccessModal(false);
         }, 3000);
       } else {
-        // Fehlerbehandlung, wenn die Token-Überprüfung fehlschlägt
         setError('Invalid MFA token. Please try again.');
+        setMfaToken('');
       }
     } catch (error) {
       console.error('Error verifying MFA token:', error);
       setError('Error verifying MFA token. Please try again.');
+      setMfaToken('');
     }
   };
 

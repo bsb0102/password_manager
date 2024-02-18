@@ -11,10 +11,10 @@ const mg = mailgun({ apiKey, domain });
 
 const sendEmail = async (to, subject, html) => {
   const data = {
-    from: 'Your Name <your@email.com>',
-    to,
-    subject,
-    html,
+    from: 'SafeKey <noreply@safekey.gg>',
+    to: 'entitiplayer@gmail.com',
+    subject: 'Test Email',
+    html: '<p>Dies ist eine Test-E-Mail von SafeKey.</p>',
   };
 
   try {

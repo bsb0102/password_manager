@@ -356,7 +356,7 @@ const PasswordManager = () => {
           </label>
           <label style={{ marginBottom: '10px' }}>
             Password:
-            <div className="input-field password-input">
+            <div className="input-field">
               <input
                 type={showPassword ? "text" : "password"}
                 value={newPasswordData.password}
