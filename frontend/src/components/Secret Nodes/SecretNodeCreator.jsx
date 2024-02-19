@@ -9,6 +9,7 @@ function SecretNodeCreator() {
   const [newNodeTitle, setNewNodeTitle] = useState('');
   const [newNodeContent, setNewNodeContent] = useState('');
   const [passphrase, setPassphrase] = useState('');
+  const [addSecretNodeModalOpen, setAddSecretNodeModalOpen] = useState(false);
   const [unlockPassphrase, setUnlockPassphrase] = useState('');
   const [unlockedContent, setUnlockedContent] = useState({});
   const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
@@ -22,6 +23,15 @@ function SecretNodeCreator() {
     setIsModalOpen(!isModalOpen);
     setModalNodeId(id);
     setUnlockPassphrase('');
+  };
+
+
+  const openAddSecretNodeModal = () => {
+    setAddSecretNodeModalOpen(true);
+  };
+
+  const closeAddSecretNodeModal = () => {
+    setAddSecretNodeModalOpen(false);
   };
 
 
@@ -52,6 +62,7 @@ function SecretNodeCreator() {
       setNewNodeContent('');
       setPassphrase('');
       fetchSecretNodes();
+      closeAddSecretNodeModal();
     } catch (error) {
       console.error('Error adding secret node:', error);
     }
@@ -71,18 +82,22 @@ function SecretNodeCreator() {
 
 
   const handleUnlockSubmit = async (id) => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post(`/api/openSecretNode/${id}`, { passphrase: unlockPassphrase });
       setUnlockedContent(prev => ({ ...prev, [id]: response.data.content }));
-      toggleModal(); // Schließt das Modal
+      toggleModal();
     } catch (error) {
       console.error('Error unlocking secret node:', error);
       setAlert("error", "Passphrase wrong");
       toggleModal(); 
     }
+
+    setLoading(false);
   };
 
-  const handleLockIconClick = (id) => {
+  const handleLockIconClick = (e, id) => {
+    e.stopPropagation();
     if (unlockedContent[id]) {
       setUnlockedContent(prev => {
         const updated = { ...prev };
@@ -92,8 +107,16 @@ function SecretNodeCreator() {
     } else {
       toggleModal(id);
     }
-  };
+    if (!unlockedContent[id]) {
+      toggleModal(id);
+    }
+};
 
+  const handleNodeItemClick = (id) => {
+    if (!unlockedContent[id]) {
+      toggleModal(id);
+    }
+  };
 
   if (loading) {
     return (
@@ -105,52 +128,35 @@ function SecretNodeCreator() {
 
   return (
     <div className="App">
-      <h1>Secret Nodes</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Title"
-          value={newNodeTitle}
-          onChange={(e) => setNewNodeTitle(e.target.value)}
-        />
-        <textarea
-          placeholder="Content"
-          value={newNodeContent}
-          onChange={(e) => setNewNodeContent(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Passphrase"
-          value={passphrase}
-          onChange={(e) => setPassphrase(e.target.value)}
-        />
-        <button onClick={addSecretNode}>Add Secret Node</button>
+      <div className="secret-nodes-container">      
+        <button onClick={openAddSecretNodeModal} className="add-button">+</button>
       </div>
       <div>
         <h2>Existing Secret Nodes:</h2>
         <ul className="node-list">
           {secretNodes.map((node) => (
-            <div key={node._id} className="node-item" onClick={() => handleLockIconClick(node._id)}>
+            <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>
               <div className="node-header">
                 <h3>{node.title}</h3>
                 <button className="lock-icon" onClick={(e) => {
                   e.stopPropagation();
-                  handleLockIconClick(node._id);
+                  handleLockIconClick(e, node._id);
                 }}>
                   {unlockedContent[node._id] ? '🔓' : '🔒'}
                 </button>
               </div>
-              {unlockedContent[node._id] && (
-                <p className="node-content">{unlockedContent[node._id]}</p>
+              {unlockedContent[node._id] ? (
+                <textarea className="node-content" readOnly value={unlockedContent[node._id]}></textarea>
+              ) : (
+                <p className="node-placeholder">Content is locked 🔒</p>
               )}
               <button onClick={(e) => {
-                e.stopPropagation();
+                e.stopPropagation(); 
                 deleteSecretNode(node._id);
               }}>Delete</button>
             </div>
           ))}
         </ul>
-
       </div>
       {isModalOpen && (
         <div className="modal">
@@ -164,10 +170,39 @@ function SecretNodeCreator() {
               onChange={(e) => setUnlockPassphrase(e.target.value)}
             />
             <button onClick={() => handleUnlockSubmit(modalNodeId)}>Unlock</button>
-            {/* Optional: Hier könnte die Fehlermeldung angezeigt werden, falls die Passphrase falsch ist. */}
           </div>
         </div>
       )}
+
+      {addSecretNodeModalOpen && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={closeAddSecretNodeModal}>&times;</span>
+              <h2>Enter Details</h2>
+              <input
+                type="text"
+                placeholder="Title"
+                value={newNodeTitle}
+                onChange={(e) => setNewNodeTitle(e.target.value)}
+                className="input-field"
+              />
+              <textarea
+                placeholder="Content"
+                value={newNodeContent}
+                onChange={(e) => setNewNodeContent(e.target.value)}
+                className="input-field content-field"
+              />
+              <input
+                type="password"
+                placeholder="Passphrase"
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                className="input-field passphrase-field"
+              />
+              <button onClick={addSecretNode} className="button">Add Secret Node</button>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
