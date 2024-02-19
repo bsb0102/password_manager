@@ -66,7 +66,7 @@ const Register = () => {
         {successMessage && <div className="success-message">{successMessage}</div>}
         <input
           type="text"
-          placeholder="Email-Address"
+          placeholder="E-Mail"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required

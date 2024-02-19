@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -71,7 +70,6 @@ function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const defaultSelectedItem = 'Dashboard';
   const [selectedItem, setSelectedItem] = React.useState(defaultSelectedItem);
-  const navigate = useNavigate();
 
 
   const toggleDrawer = () => {
@@ -94,9 +92,7 @@ function Dashboard() {
         return <Settings />;
 
       case 'Logout':
-        console.log("Logging out 1")
-        localStorage.removeItem('token');
-        navigate('/login');
+        handleLogout();
       
       default:
         return <div>No content available</div>;

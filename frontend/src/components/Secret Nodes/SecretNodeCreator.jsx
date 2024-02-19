@@ -6,7 +6,9 @@ function SecretNodeCreator() {
   const [newNodeTitle, setNewNodeTitle] = useState('');
   const [newNodeContent, setNewNodeContent] = useState('');
   const [passphrase, setPassphrase] = useState('');
-  const [selectedNodeId, setSelectedNodeId] = useState('');
+  const [unlockPassphrase, setUnlockPassphrase] = useState('');
+  const [unlockedContent, setUnlockedContent] = useState({});
+  const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
 
   useEffect(() => {
     fetchSecretNodes();
@@ -23,12 +25,11 @@ function SecretNodeCreator() {
 
   const addSecretNode = async () => {
     try {
-      const response = await axiosInstance.post('/api/addSecretNode', {
+      await axiosInstance.post('/api/addSecretNode', {
         title: newNodeTitle,
         content: newNodeContent,
-        passphrase: passphrase
+        passphrase: passphrase,
       });
-      console.log('Secret node added:', response.data);
       setNewNodeTitle('');
       setNewNodeContent('');
       setPassphrase('');
@@ -40,29 +41,21 @@ function SecretNodeCreator() {
 
   const deleteSecretNode = async (id) => {
     try {
-      await axiosInstance.delete(`/api/deleteSecretNode/${id}`, {
-        headers: {
-          Passphrase: passphrase
-        }
-      });
-      console.log('Secret node deleted');
+      await axiosInstance.delete(`/api/deleteSecretNode/${id}`);
       fetchSecretNodes();
     } catch (error) {
       console.error('Error deleting secret node:', error);
     }
   };
 
-  const openSecretNode = async (id) => {
+  const unlockSecretNode = async (id) => {
     try {
-      const response = await axiosInstance.get(`/api/openSecretNode/${id}`, {
-        headers: {
-          Passphrase: passphrase
-        }
-      });
-      console.log('Opened secret node:', response.data);
-      setSelectedNodeId(id);
+      const response = await axiosInstance.post(`/api/openSecretNode/${id}`, { passphrase: unlockPassphrase });
+      setUnlockedContent(prev => ({ ...prev, [id]: response.data.content }));
+      setUnlockPassphrase('');
     } catch (error) {
-      console.error('Error opening secret node:', error);
+      console.error('Error unlocking secret node:', error);
+      setUnlockedContent(prev => ({ ...prev, [id]: 'Unable to unlock content with provided passphrase.' }));
     }
   };
 
@@ -80,7 +73,7 @@ function SecretNodeCreator() {
           placeholder="Content"
           value={newNodeContent}
           onChange={(e) => setNewNodeContent(e.target.value)}
-        ></textarea>
+        />
         <input
           type="password"
           placeholder="Passphrase"
@@ -94,8 +87,21 @@ function SecretNodeCreator() {
         <ul>
           {secretNodes.map((node) => (
             <li key={node._id}>
-              <h3 onClick={() => openSecretNode(node._id)}>{node.title}</h3>
-              {selectedNodeId === node._id && <p>{node.content}</p>}
+              <h3>{node.title}</h3>
+              {unlockedContent[node._id] && !unlockAttemptFailed[node._id] ? (
+                <p>{unlockedContent[node._id]}</p>
+              ) : (
+                <>
+                  <input
+                    type="password"
+                    placeholder="Enter passphrase to unlock"
+                    value={unlockPassphrase}
+                    onChange={(e) => setUnlockPassphrase(e.target.value)}
+                  />
+                  <button onClick={() => unlockSecretNode(node._id)}>Unlock</button>
+                </>
+              )}
+              {unlockAttemptFailed[node._id] && <p style={{color: 'red'}}>Unlock failed. Try again.</p>}
               <button onClick={() => deleteSecretNode(node._id)}>Delete</button>
             </li>
           ))}

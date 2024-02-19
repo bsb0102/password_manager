@@ -20,19 +20,19 @@ exports.addSecretNode = async (req, res) => {
         const ivPassphrase = generateRandomIV();
     
         // Encrypt content and passphrase
-        const encryptedContent = encrypt(content, ivContent).toString('hex');
-        const encryptedPassphrase = encrypt(passphrase, ivPassphrase).toString('hex');
+        const encryptedContent = encrypt(content, ivContent);
+        const encryptedPassphrase = encrypt(passphrase, ivPassphrase);
     
         const newSecretNode = new SecretNode({
             userId,
             title,
             encryptedContent: {
-            iv: ivContent.toString('hex'),
-            content: encryptedContent
+                iv: encryptedContent.iv,
+                content: encryptedContent.content
             },
             encryptedPassphrase: {
-            iv: ivPassphrase.toString('hex'),
-            content: encryptedPassphrase
+                iv: encryptedPassphrase.iv,
+                content: encryptedPassphrase.content
             }
         });
     
@@ -42,13 +42,12 @@ exports.addSecretNode = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
   };
-  
-  
-  
+
 
 exports.getSecretNodes = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
     const secretNodes = await SecretNode.find({ userId });
     res.status(200).json(secretNodes);
   } catch (error) {
@@ -59,7 +58,8 @@ exports.getSecretNodes = async (req, res) => {
 exports.deleteSecretNode = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = getUserIdFromToken(token);
 
     // Check if the secret node belongs to the user
     const secretNode = await SecretNode.findById(id);
@@ -77,9 +77,10 @@ exports.deleteSecretNode = async (req, res) => {
 exports.updateSecretNode = async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, content, passphrase } = req.body; // Annahme, dass Titel auch aktualisiert werden kann.
+      const { title, content, passphrase } = req.body;
       const userId = req.user.id;
   
+      // Check if the secret node belongs to the user
       const secretNode = await SecretNode.findById(id);
       if (!secretNode || secretNode.userId.toString() !== userId) {
         return res.status(404).json({ error: "Secret node not found or access denied" });
@@ -90,19 +91,19 @@ exports.updateSecretNode = async (req, res) => {
       const ivPassphrase = generateRandomIV();
   
       // Encrypt content and passphrase
-      const encryptedContent = encrypt(content, ivContent).toString('hex');
-      const encryptedPassphrase = encrypt(passphrase, ivPassphrase).toString('hex');
+      const encryptedContent = encrypt(content, ivContent); // 
+      const encryptedPassphrase = encrypt(passphrase, ivPassphrase); // 
   
       // Update the secret node with the new encrypted content and passphrase
       await SecretNode.findByIdAndUpdate(id, {
         title,
         encryptedContent: {
-          content: encryptedContent,
-          iv: ivContent.toString('hex')
+          iv: encryptedContent.iv, // 
+          content: encryptedContent.content // 
         },
         encryptedPassphrase: {
-          content: encryptedPassphrase,
-          iv: ivPassphrase.toString('hex')
+          iv: encryptedPassphrase.iv, // 
+          content: encryptedPassphrase.content // 
         }
       });
   
@@ -112,3 +113,35 @@ exports.updateSecretNode = async (req, res) => {
     }
   };
   
+  exports.openSecretNode = async (req, res) => {
+    try {
+      const { id } = req.params; 
+      const { passphrase } = req.body; // Passphrase from the client
+      const token = req.headers.authorization.split(' ')[1];
+      const userId = getUserIdFromToken(token);
+  
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+  
+      const secretNode = await SecretNode.findById(id);
+      if (!secretNode) {
+        return res.status(404).json({ error: "Secret node not found" });
+      }
+
+      if (secretNode.userId.toString() !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+  
+      const decryptedPassphrase = decrypt(secretNode.encryptedPassphrase.content, secretNode.encryptedPassphrase.iv);
+      if (passphrase !== decryptedPassphrase) {
+        return res.status(401).json({ error: "Incorrect passphrase" });
+      }
+  
+      const decryptedContent = decrypt(secretNode.encryptedContent.content, secretNode.encryptedContent.iv);
+      res.json({ content: decryptedContent });
+    } catch (error) {
+      console.error("Error opening secret node:", error);
+      res.status(500).json({ error: error.message });
+    }
+  };

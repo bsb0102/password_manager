@@ -375,7 +375,6 @@ const PasswordManager = () => {
                   <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
                 ) : (
                   <FontAwesomeIcon icon={faEye} style={{ color: '#333', transform: 'translateY(-50%)' }} />
-
                 )}
               </span>
             </div>
