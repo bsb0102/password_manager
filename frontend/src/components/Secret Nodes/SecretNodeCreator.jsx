@@ -1,41 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axiosInstance from '../../api/api.js';
 
-const SecretNodeCreator = ({ onSave }) => {
-  const [password, setPassword] = useState('');
-  const [content, setContent] = useState('');
+function SecretNodeCreator() {
+  const [secretNodes, setSecretNodes] = useState([]);
+  const [newNodeTitle, setNewNodeTitle] = useState('');
+  const [newNodeContent, setNewNodeContent] = useState('');
+  const [passphrase, setPassphrase] = useState('');
+  const [selectedNodeId, setSelectedNodeId] = useState('');
 
-  const handleSave = () => {
-    // Überprüfe, ob das Passwort und der Inhalt vorhanden sind
-    if (password && content) {
-      // Überprüfe, ob der Inhalt nicht mehr als 2000 Zeichen hat
-      if (content.length <= 2000) {
-        // Speichere den Secret Node
-        onSave({ password, content });
-        // Setze das Passwort und den Inhalt zurück
-        setPassword('');
-        setContent('');
-      } else {
-        alert('Der Inhalt darf maximal 2000 Zeichen haben.');
-      }
-    } else {
-      alert('Bitte geben Sie ein Passwort und Inhalt ein.');
+  useEffect(() => {
+    fetchSecretNodes();
+  }, []);
+
+  const fetchSecretNodes = async () => {
+    try {
+      const response = await axiosInstance.get('/api/getSecretNodes');
+      setSecretNodes(response.data);
+    } catch (error) {
+      console.error('Error fetching secret nodes:', error);
+    }
+  };
+
+  const addSecretNode = async () => {
+    try {
+      const response = await axiosInstance.post('/api/addSecretNode', {
+        title: newNodeTitle,
+        content: newNodeContent,
+        passphrase: passphrase
+      });
+      console.log('Secret node added:', response.data);
+      setNewNodeTitle('');
+      setNewNodeContent('');
+      setPassphrase('');
+      fetchSecretNodes();
+    } catch (error) {
+      console.error('Error adding secret node:', error);
+    }
+  };
+
+  const deleteSecretNode = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/deleteSecretNode/${id}`, {
+        headers: {
+          Passphrase: passphrase
+        }
+      });
+      console.log('Secret node deleted');
+      fetchSecretNodes();
+    } catch (error) {
+      console.error('Error deleting secret node:', error);
+    }
+  };
+
+  const openSecretNode = async (id) => {
+    try {
+      const response = await axiosInstance.get(`/api/openSecretNode/${id}`, {
+        headers: {
+          Passphrase: passphrase
+        }
+      });
+      console.log('Opened secret node:', response.data);
+      setSelectedNodeId(id);
+    } catch (error) {
+      console.error('Error opening secret node:', error);
     }
   };
 
   return (
-    <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-      <h2 style={{ marginBottom: '20px' }}>Create a Secret Node</h2>
-      <label style={{ display: 'block', marginBottom: '10px' }}>
-        Password:
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginLeft: '10px' }} />
-      </label>
-      <label style={{ display: 'block', marginBottom: '10px' }}>
-        Content (max. 2000 character):
-        <textarea value={content} onChange={(e) => setContent(e.target.value)} style={{ marginLeft: '10px', width: '100%', minHeight: '100px' }} />
-      </label>
-      <button onClick={handleSave} style={{ marginRight: '10px' }}>Speichern</button>
+    <div className="App">
+      <h1>Secret Nodes</h1>
+      <div>
+        <input
+          type="text"
+          placeholder="Title"
+          value={newNodeTitle}
+          onChange={(e) => setNewNodeTitle(e.target.value)}
+        />
+        <textarea
+          placeholder="Content"
+          value={newNodeContent}
+          onChange={(e) => setNewNodeContent(e.target.value)}
+        ></textarea>
+        <input
+          type="password"
+          placeholder="Passphrase"
+          value={passphrase}
+          onChange={(e) => setPassphrase(e.target.value)}
+        />
+        <button onClick={addSecretNode}>Add Secret Node</button>
+      </div>
+      <div>
+        <h2>Existing Secret Nodes:</h2>
+        <ul>
+          {secretNodes.map((node) => (
+            <li key={node._id}>
+              <h3 onClick={() => openSecretNode(node._id)}>{node.title}</h3>
+              {selectedNodeId === node._id && <p>{node.content}</p>}
+              <button onClick={() => deleteSecretNode(node._id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
-};
+}
 
 export default SecretNodeCreator;

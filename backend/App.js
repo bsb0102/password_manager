@@ -4,6 +4,7 @@ const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const passwordRoutes = require('./routes/passwordRoutes');
+const secretNodesRoutes = require('./routes/secretNodeRoutes');
 const mfaRoutes = require('./routes/mfaRoutes');
 const connectDB = require('./database');
 const path = require('path');
@@ -39,7 +40,8 @@ app.use(limiter);
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);
 app.use("/api", passwordRoutes);
-app.use('/api', mfaRoutes)
+app.use('/api', mfaRoutes);
+app.use('/api', secretNodesRoutes);
 
 // Static file serving for production frontend
 if (process.env.NODE_ENV === 'production') {
