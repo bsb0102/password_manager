@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/api.js';
+import './secretNodes.css'; // Import CSS file for styling
+import Spinner from "../Alert/Spinner";
 
 function SecretNodeCreator() {
   const [secretNodes, setSecretNodes] = useState([]);
@@ -9,8 +11,10 @@ function SecretNodeCreator() {
   const [unlockPassphrase, setUnlockPassphrase] = useState('');
   const [unlockedContent, setUnlockedContent] = useState({});
   const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     fetchSecretNodes();
   }, []);
 
@@ -18,6 +22,7 @@ function SecretNodeCreator() {
     try {
       const response = await axiosInstance.get('/api/getSecretNodes');
       setSecretNodes(response.data);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching secret nodes:', error);
     }
@@ -55,9 +60,23 @@ function SecretNodeCreator() {
       setUnlockPassphrase('');
     } catch (error) {
       console.error('Error unlocking secret node:', error);
-      setUnlockedContent(prev => ({ ...prev, [id]: 'Unable to unlock content with provided passphrase.' }));
+      setUnlockAttemptFailed(prev => ({ ...prev, [id]: true }));
     }
   };
+
+  const toggleNodeLock = (id) => {
+    // Toggle the lock status of the node
+    setUnlockedContent(prev => ({ ...prev, [id]: null })); // Clear unlocked content
+    setUnlockAttemptFailed(prev => ({ ...prev, [id]: false })); // Clear unlock attempt status
+  };
+
+  if (loading) {
+    return (
+    <div>
+      <Spinner />
+    </div>
+    )
+  }
 
   return (
     <div className="App">
@@ -84,24 +103,48 @@ function SecretNodeCreator() {
       </div>
       <div>
         <h2>Existing Secret Nodes:</h2>
-        <ul>
+        <ul className="node-list">
           {secretNodes.map((node) => (
-            <li key={node._id}>
-              <h3>{node.title}</h3>
-              {unlockedContent[node._id] && !unlockAttemptFailed[node._id] ? (
-                <p>{unlockedContent[node._id]}</p>
-              ) : (
-                <>
-                  <input
-                    type="password"
-                    placeholder="Enter passphrase to unlock"
-                    value={unlockPassphrase}
-                    onChange={(e) => setUnlockPassphrase(e.target.value)}
-                  />
-                  <button onClick={() => unlockSecretNode(node._id)}>Unlock</button>
-                </>
+            <li key={node._id} className="node-item">
+              <div className="node-header">
+                <h3>{node.title}</h3>
+                {/* Modal */}
+                {unlockAttemptFailed[node._id] && (
+                  <div className="modal">
+                    <div className="modal-content">
+                      <span className="close" onClick={() => setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: false }))}>
+                        &times;
+                      </span>
+                      <input
+                        type="password"
+                        placeholder="Enter passphrase"
+                        value={unlockPassphrase}
+                        onChange={(e) => setUnlockPassphrase(e.target.value)}
+                      />
+                      <button onClick={() => {
+                        unlockSecretNode(node._id);
+                        setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: false }));
+                        setUnlockPassphrase(''); // Clear passphrase input field
+                      }}>Unlock</button>
+                      {unlockAttemptFailed[node._id] === true && <p className="error-message">Incorrect passphrase. Try again.</p>}
+                    </div>
+                  </div>
+                )}
+                {/* Lock icon */}
+                <button className="lock-icon" onClick={() => {
+                  if (unlockedContent[node._id]) {
+                    setUnlockedContent(prev => ({ ...prev, [node._id]: null }));
+                    setUnlockPassphrase(''); // Clear passphrase input field
+                  } else {
+                    setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: true }));
+                  }
+                }}>
+                  {unlockedContent[node._id] ? '🔓' : '🔒'}
+                </button>
+              </div>
+              {unlockedContent[node._id] && (
+                <p className="node-content">{unlockedContent[node._id]}</p>
               )}
-              {unlockAttemptFailed[node._id] && <p style={{color: 'red'}}>Unlock failed. Try again.</p>}
               <button onClick={() => deleteSecretNode(node._id)}>Delete</button>
             </li>
           ))}
@@ -109,6 +152,12 @@ function SecretNodeCreator() {
       </div>
     </div>
   );
+  
+  
+  
+  
+  
+  
 }
 
 export default SecretNodeCreator;
