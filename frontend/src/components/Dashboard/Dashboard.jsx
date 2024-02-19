@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -12,10 +13,11 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { mainListItems, secondaryListItems } from '../ListItems/listItems';
+import { mainListItems, secondaryListItems, footerListItem } from '../ListItems/listItems';
 import PasswordManager from "../PasswordManager/PasswordManager"
 import Settings from "../Settings/Settings"
 import SecretNodeCreator from "../Secret Nodes/SecretNodeCreator"
+import { handleLogout } from "../../utils/frontendUtils"
 
 const drawerWidth = 240;
 
@@ -69,6 +71,7 @@ function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const defaultSelectedItem = 'Dashboard';
   const [selectedItem, setSelectedItem] = React.useState(defaultSelectedItem);
+  const navigate = useNavigate();
 
 
   const toggleDrawer = () => {
@@ -89,6 +92,12 @@ function Dashboard() {
         return <SecretNodeCreator />;
       case 'Settings':
         return <Settings />;
+
+      case 'Logout':
+        console.log("Logging out 1")
+        localStorage.removeItem('token');
+        navigate('/login');
+      
       default:
         return <div>No content available</div>;
     }
@@ -134,11 +143,13 @@ function Dashboard() {
             </IconButton>
           </Toolbar>
           <Divider />
-          <List component="nav">
+          <List component="nav" style={{ position: 'relative', minHeight: '100vh' }}>
             {mainListItems({ onItemClick: handleSidebarItemClick })}
             <Divider sx={{ my: 1 }} />
             {secondaryListItems({ onItemClick: handleSidebarItemClick })}
+            {footerListItem({ onItemClick: handleSidebarItemClick })}
           </List>
+
         </Drawer>
         <Box
           component="main"

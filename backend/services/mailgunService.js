@@ -1,29 +1,27 @@
 
 require('dotenv').config();
-const mailgun = require('mailgun-js');
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
 const fs = require('fs');
 const path = require('path');
 
-const apiKey = process.env.MAILGUN_API_KEY;
-const domain = process.env.MAILGUN_DOMAIN;
+const API_KEY = process.env.MAILGUN_API_KEY;
+const DOMAIN = process.env.MAILGUN_DOMAIN;
 
-const mg = mailgun({ apiKey, domain });
+const mailgun = new Mailgun(formData);
+const client = mailgun.client({username: 'api', key: API_KEY});
+
 
 const sendEmail = async (to, subject, html) => {
-  const data = {
-    from: 'SafeKey <noreply@safekey.gg>',
-    to: 'entitiplayer@gmail.com',
-    subject: 'Test Email',
-    html: '<p>Dies ist eine Test-E-Mail von SafeKey.</p>',
-  };
-
-  try {
-    await mg.messages().send(data);
-    console.log('Email sent successfully');
-  } catch (error) {
-    console.error('Failed to send email:', error);
-    throw new Error('Failed to send email');
-  }
+  client.messages.create('noreply.safekey.gg', {
+    from: "SafeKey <noreply@safekey.gg>",
+    to: ["entitiplayer@gmail.com"],
+    subject: "Hello",
+    text: "Testing some Mailgun awesomness!",
+    html: "<h1>Testing some Mailgun awesomness!</h1>"
+  })
+  .then(msg => console.log(msg))
+  .catch(err => console.error(err));
 };
 
 const sendLoginNotification = async (ACCOUNT_EMAIL, IP_ADDRESS) => {

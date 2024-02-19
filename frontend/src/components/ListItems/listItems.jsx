@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // Import des Logout-Icons
 
 export const mainListItems = ({ onItemClick }) => (
   <React.Fragment>
@@ -40,3 +41,13 @@ export const secondaryListItems = ({ onItemClick }) => (
     </ListItemButton>
   </React.Fragment>
 );
+
+export const footerListItem = ({ onItemClick }) => (
+  <ListItemButton onClick={() => onItemClick('Logout')} style={{ bottom: 0 }}>
+    <ListItemIcon>
+      <ExitToAppIcon />
+    </ListItemIcon>
+    <ListItemText primary="Logout" />
+  </ListItemButton>
+);
+
