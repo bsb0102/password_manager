@@ -16,23 +16,23 @@ const Alert = ({ type, message, onClose }) => {
   let bgColor;
   switch (type) {
     case 'success':
-      bgColor = 'rgba(76, 175, 80, 0.8)'; // Green with transparency
+      bgColor = 'rgba(76, 175, 80, 0.8)';
       break;
     case 'error':
-      bgColor = 'rgba(244, 67, 54, 0.8)'; // Red with transparency
+      bgColor = 'rgba(244, 67, 54, 0.8)';
       break;
     case 'info':
-      bgColor = 'rgba(255, 152, 0, 0.8)'; // Orange with transparency
+      bgColor = 'rgba(255, 152, 0, 0.8)';
       break;
     default:
-      bgColor = 'rgba(0, 0, 0, 0.8)'; // Default to black with transparency
+      bgColor = 'rgba(0, 0, 0, 0.8)';
   }
 
   const alertStyle = {
     backgroundColor: bgColor,
-    borderRadius: '10px', // Rounded corners
-    padding: '10px', // Add padding for better appearance
-    marginBottom: '10px', // Add margin to separate alerts
+    borderRadius: '10px',
+    padding: '10px',
+    marginBottom: '10px', 
   };
 
   return (
