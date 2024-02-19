@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const navigate = useNavigate();
 
 const formatDate = (dateString) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
@@ -9,6 +8,7 @@ const formatDate = (dateString) => {
 };
 
 const handleLogout = () => {
+  const navigate = useNavigate();
   localStorage.removeItem('token');
   navigate('/login');
 };

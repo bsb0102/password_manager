@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import './PasswordManager.css';
 import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -374,7 +374,8 @@ const PasswordManager = () => {
                 {showPassword ? (
                   <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
                 ) : (
-                  <FontAwesomeIcon icon={faEye} style={{ color: '#333' }} />
+                  <FontAwesomeIcon icon={faEye} style={{ color: '#333', transform: 'translateY(-50%)' }} />
+
                 )}
               </span>
             </div>
