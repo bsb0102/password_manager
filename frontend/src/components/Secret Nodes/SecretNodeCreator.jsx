@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axiosInstance from '../../api/api.js';
 import './secretNodes.css'; // Import CSS file for styling
 import Spinner from "../Alert/Spinner";
+import {AlertContext} from '../Alert/AlertService.js';
 
 function SecretNodeCreator() {
   const [secretNodes, setSecretNodes] = useState([]);
@@ -12,6 +13,18 @@ function SecretNodeCreator() {
   const [unlockedContent, setUnlockedContent] = useState({});
   const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
   const [loading, setLoading] = useState(false);
+  const { setAlert } = useContext(AlertContext)
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalNodeId, setModalNodeId] = useState(null);
+
+  const toggleModal = (id) => {
+    setIsModalOpen(!isModalOpen);
+    setModalNodeId(id);
+    setUnlockPassphrase('');
+  };
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -46,35 +59,47 @@ function SecretNodeCreator() {
 
   const deleteSecretNode = async (id) => {
     try {
+      setLoading(true);
       await axiosInstance.delete(`/api/deleteSecretNode/${id}`);
-      fetchSecretNodes();
+      const updatedNodes = secretNodes.filter(node => node._id !== id);
+      setSecretNodes(updatedNodes);
+      setLoading(false);
     } catch (error) {
       console.error('Error deleting secret node:', error);
     }
   };
 
-  const unlockSecretNode = async (id) => {
+
+  const handleUnlockSubmit = async (id) => {
     try {
       const response = await axiosInstance.post(`/api/openSecretNode/${id}`, { passphrase: unlockPassphrase });
       setUnlockedContent(prev => ({ ...prev, [id]: response.data.content }));
-      setUnlockPassphrase('');
+      toggleModal(); // Schließt das Modal
     } catch (error) {
       console.error('Error unlocking secret node:', error);
-      setUnlockAttemptFailed(prev => ({ ...prev, [id]: true }));
+      setAlert("error", "Passphrase wrong");
+      toggleModal(); 
     }
   };
 
-  const toggleNodeLock = (id) => {
-    // Toggle the lock status of the node
-    setUnlockedContent(prev => ({ ...prev, [id]: null })); // Clear unlocked content
-    setUnlockAttemptFailed(prev => ({ ...prev, [id]: false })); // Clear unlock attempt status
+  const handleLockIconClick = (id) => {
+    if (unlockedContent[id]) {
+      setUnlockedContent(prev => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
+    } else {
+      toggleModal(id);
+    }
   };
+
 
   if (loading) {
     return (
-    <div>
-      <Spinner />
-    </div>
+      <div>
+        <Spinner />
+      </div>
     )
   }
 
@@ -105,39 +130,12 @@ function SecretNodeCreator() {
         <h2>Existing Secret Nodes:</h2>
         <ul className="node-list">
           {secretNodes.map((node) => (
-            <li key={node._id} className="node-item">
+            <div key={node._id} className="node-item" onClick={() => handleLockIconClick(node._id)}>
               <div className="node-header">
                 <h3>{node.title}</h3>
-                {/* Modal */}
-                {unlockAttemptFailed[node._id] && (
-                  <div className="modal">
-                    <div className="modal-content">
-                      <span className="close" onClick={() => setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: false }))}>
-                        &times;
-                      </span>
-                      <input
-                        type="password"
-                        placeholder="Enter passphrase"
-                        value={unlockPassphrase}
-                        onChange={(e) => setUnlockPassphrase(e.target.value)}
-                      />
-                      <button onClick={() => {
-                        unlockSecretNode(node._id);
-                        setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: false }));
-                        setUnlockPassphrase(''); // Clear passphrase input field
-                      }}>Unlock</button>
-                      {unlockAttemptFailed[node._id] === true && <p className="error-message">Incorrect passphrase. Try again.</p>}
-                    </div>
-                  </div>
-                )}
-                {/* Lock icon */}
-                <button className="lock-icon" onClick={() => {
-                  if (unlockedContent[node._id]) {
-                    setUnlockedContent(prev => ({ ...prev, [node._id]: null }));
-                    setUnlockPassphrase(''); // Clear passphrase input field
-                  } else {
-                    setUnlockAttemptFailed(prev => ({ ...prev, [node._id]: true }));
-                  }
+                <button className="lock-icon" onClick={(e) => {
+                  e.stopPropagation();
+                  handleLockIconClick(node._id);
                 }}>
                   {unlockedContent[node._id] ? '🔓' : '🔒'}
                 </button>
@@ -145,19 +143,33 @@ function SecretNodeCreator() {
               {unlockedContent[node._id] && (
                 <p className="node-content">{unlockedContent[node._id]}</p>
               )}
-              <button onClick={() => deleteSecretNode(node._id)}>Delete</button>
-            </li>
+              <button onClick={(e) => {
+                e.stopPropagation();
+                deleteSecretNode(node._id);
+              }}>Delete</button>
+            </div>
           ))}
         </ul>
+
       </div>
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={toggleModal}>&times;</span>
+            <h2>Enter your Passphrase</h2>
+            <input
+              type="password"
+              placeholder="Enter passphrase"
+              value={unlockPassphrase}
+              onChange={(e) => setUnlockPassphrase(e.target.value)}
+            />
+            <button onClick={() => handleUnlockSubmit(modalNodeId)}>Unlock</button>
+            {/* Optional: Hier könnte die Fehlermeldung angezeigt werden, falls die Passphrase falsch ist. */}
+          </div>
+        </div>
+      )}
     </div>
   );
-  
-  
-  
-  
-  
-  
 }
 
 export default SecretNodeCreator;

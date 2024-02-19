@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { mainListItems, secondaryListItems, footerListItem } from '../ListItems/listItems';
+import { mainListItems, secondaryListItems, footerListItem } from '../Sidebar/Sidebar';
 import PasswordManager from "../PasswordManager/PasswordManager"
 import Settings from "../Settings/Settings"
 import SecretNodeCreator from "../Secret Nodes/SecretNodeCreator"
