@@ -37,6 +37,8 @@ function SecretNodeCreator() {
 
 
   useEffect(() => {
+
+    setAlert('success', 'This is a success message!');
     setLoading(true);
     fetchSecretNodes();
   }, []);

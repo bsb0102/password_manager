@@ -1,3 +1,5 @@
+// AlertService.js
+
 import React, { useState, createContext, useEffect } from 'react';
 import Alert from './Alert';
 
@@ -33,7 +35,7 @@ const AlertProvider = ({ children }) => {
         {alerts.map(alert => (
           <Alert
             key={alert.id}
-            className={alert.type}
+            type={alert.type}
             message={alert.message}
             onClose={() => removeAlert(alert.id)}
           />
