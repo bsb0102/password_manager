@@ -14,6 +14,24 @@ router.get("/user_test", async (req, res) => {
   res.json({message: "Status True"})
 });
 
+const validateToken = (req, res, next) => {
+  // Get token from headers, cookies, or wherever you're sending it from
+  const token = req.headers.authorization;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+      // Verify token
+      const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+      // Attach user data to request for later use if needed
+      req.user = decoded;
+      next();
+  } catch (error) {
+      console.error('Token validation failed:', error);
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
+
 // Testing route with JWT authentication
 
 router.get('/decryptPasswordById', async (req, res) => {
@@ -34,9 +52,6 @@ router.get('/decryptPasswordById', async (req, res) => {
 
     // Extract the iv and content from the password entry
     const { iv, content } = passwordEntry.encryptedPassword;
-
-    console.log("iv: ", iv)
-    console.log("content: ", content)
 
     // Decrypt the password
     const decryptedPassword = cryptoUtils.decrypt({ content }, iv);
@@ -70,6 +85,11 @@ router.post('/encryptPassword', (req, res) => {
 });
 
 
+router.post('/validate-token', validateToken, (req, res) => {
+  res.json({ isValid: true });
+});
+
+
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -94,16 +114,24 @@ router.post('/login', async (req, res) => {
     // Generate a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
 
+    // Set the token as an HTTP cookie with HttpOnly flag
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true, // Ensure this is enabled in production
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+    });
+    
     // Send login notification email
     const userIPAddress = req.ip; // Get the user's IP address
     // await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
 
-    res.json({ message: 'Login successful', token, requireMfa });
+    res.json({ message: 'Login successful', token: token,  requireMfa });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 

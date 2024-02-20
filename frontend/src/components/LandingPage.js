@@ -16,9 +16,9 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <nav className="landing-nav">
-        <div className="nav-brand" onClick={() => navigate('/')}>
+        {/* <div className="nav-brand" onClick={() => navigate('/')}>
           TECH CJ
-        </div>
+        </div> */}
         <div>
           <button onClick={handleLoginClick} className="nav-login-btn">
             Login
@@ -28,7 +28,7 @@ const LandingPage = () => {
           </button>
         </div>
       </nav>
-      <header className="landing-header">
+      {/* <header className="landing-header">
         <h1>Innovative solutions for modern problems</h1>
       </header>
       <main className="landing-main">
@@ -45,7 +45,7 @@ const LandingPage = () => {
       </main>
       <footer className="landing-footer">
         <p>© {new Date().getFullYear()} TECH CJ</p>
-      </footer>
+      </footer> */}
     </div>
   );
 };

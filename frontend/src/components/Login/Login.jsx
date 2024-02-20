@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
 import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -40,17 +41,27 @@ const Login = () => {
     try {
       const response = await axiosInstance.post('/api/login', data);
   
-      // Always store the JWT token
-      localStorage.setItem('token', response.data.token);
-  
-      if (response.data.requireMfa) {
-        // MFA is required; store the JWT token temporarily
-        localStorage.setItem('tempToken', response.data.token);
-        setShowMfaModal(true); // Show the MFA modal
+      if (response.data.message === "Login successful") {
+
+        // Store the token in cookies
+        Cookies.set('token', response.data.token, { expires: 7 }); // Token is stored for 7 days. Adjust as necessary.
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        localStorage.setItem('token', response.data.token);
+        navigate('/home');
+
+        // If MFA is not required, navigate to /home
+        if (!response.data.requireMfa) {
+          // Navigate to /home using React Router
+          navigate('/home'); // Assuming 'navigate' is obtained from useNavigate() hook.
+          console.log("Successfully logged in");
+        } else {
+          localStorage.setItem('tempToken', response.data.token);
+          setShowMfaModal(true);
+        }
       } else {
-        // Successful login without MFA
-        navigate('/home'); // Redirect to the authenticated part of the app
+        setError('Failed to Login');
       }
+
     } catch (error) {
       setError('Failed to Login');
       if (error.response) {
@@ -64,6 +75,8 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+  
+  
 
   const handleMfaLogin = async () => {
     try {
@@ -102,7 +115,7 @@ const Login = () => {
         {error && <div className="error-message">{error}</div>}
         <input
           type="text"
-          placeholder="E-Mail"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required

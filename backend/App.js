@@ -16,7 +16,7 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 
 const corsOptions = {
-  origin: ['https://localhost:443', 'https://82.165.221.131:443', 'http://localhost:3000'], // Add your frontend URL here
+  origin: ['https://localhost:443', 'https://82.165.221.131:443', 'http://localhost:3000', 'https://safekey.gg:443/api'], // Add your frontend URL here
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204,
@@ -51,10 +51,16 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
+
 // Connect to Database
 connectDB();
 // Global error handler
 app.use(errorHandler);
 
 console.log("Started Backend Server")
-module.exports = app; // Export the app object for server.js to use
+module.exports = app;

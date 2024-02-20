@@ -12,6 +12,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -53,13 +54,13 @@ module.exports = {
   },
   devServer: {
     allowedHosts: 'all',
-    host: process.env.HOST || '0.0.0.0', // Listen on all available network interfaces
-    port: process.env.PORT || 3000, // Use port 443 for HTTPS
+    host: process.env.HOST || 'safekey.gg', // Listen on all available network interfaces
+    port: process.env.PORT || 443, // Use port 443 for HTTPS
     open: true,
     hot: true,
     historyApiFallback: true,
     https: true, // Enable HTTPS
-    key: fs.readFileSync('../key.pem'), // Provide the path to your SSL/TLS key
-    cert: fs.readFileSync('../cert.pem'), // Provide the path to your SSL/TLS certificate
+    key: fs.readFileSync('/etc/letsencrypt/live/safekey.gg/privkey.pem'), // Provide the path to your SSL/TLS key
+    cert: fs.readFileSync('/etc/letsencrypt/live/safekey.gg/fullchain.pem'), // Provide the path to your SSL/TLS certificate
   },
 };

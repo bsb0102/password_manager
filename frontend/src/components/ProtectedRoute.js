@@ -1,17 +1,37 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Navigate } from 'react-router-dom';
+import axiosInstance from '../api/api.js';
 
 const ProtectedRoute = ({ children }) => {
-  // Retrieve the JWT token from localStorage or sessionStorage
-  const token = localStorage.getItem('token');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check if the token exists
-  if (!token) {
-    // If no token is found, redirect to the login page
-    return <Navigate to="/login" />;
-  }
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        // Assuming your axiosInstance is already set up to include credentials like cookies
+        // If not, ensure to include { withCredentials: true } in the config
+        const response = await axiosInstance.post('/api/validate-token');
+        if (response.data.isValid) {
+          setIsAuthenticated(true);
+        } else {
+          throw new Error('Token validation failed');
+        }
+      } catch (error) {
+        console.error(error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    verifyToken();
+  }, []);
 
-  // If the token exists, render the children components (protected content)
+  // if (!isAuthenticated) {
+  //   console.log("")
+  //   return <Navigate to="/login" />
+  // }
+  
   return children;
 };
 

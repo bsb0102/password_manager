@@ -1,17 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Settings from './components/Settings/Settings';
 import Dashboard from './components/Dashboard/Dashboard';
-import { AlertProvider } from './components/Alert/AlertService'; // Importiere den AlertProvider
-
-// Custom ProtectedRoute component
-const ProtectedRoute = ({ element, ...rest }) => {
-  // Add your authentication logic here
-  const isAuthenticated = true; // Example: Change this based on your authentication state
-  return isAuthenticated ? element : <Navigate to="/login" />;
-};
+import { AlertProvider } from './components/Alert/AlertService';
+import ProtectedRoute from "./components/ProtectedRoute";
+import LandingPage from "./components/LandingPage"
 
 const App = () => {
   return (
@@ -19,25 +14,26 @@ const App = () => {
       <div className="App">
         <AlertProvider>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route
               path="/home"
               element={
-                <React.Fragment>
-                  <ProtectedRoute element={<Dashboard />} />
-                </React.Fragment>
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/settings"
               element={
-                <React.Fragment>
-                  <ProtectedRoute element={<Settings />} />
-                </React.Fragment>
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
               }
             />
+            <Route path="/Dashboard" element={<Dashboard />} />
           </Routes>
         </AlertProvider>
       </div>
