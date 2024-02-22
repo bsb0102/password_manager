@@ -325,60 +325,63 @@ const PasswordManager = () => {
 
       {showAddPasswordModal && (
         <div className="modal-content">
-          <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
-          <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
-          <label style={{ marginBottom: '10px' }}>Website:
-            <div className="input-field">
-              <input
+        <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
+        <h2 style={{ color: '#333', marginBottom: '20px' }}>{editData ? "Edit Password" : "Add Password"}</h2>
+        <div className="form-group">
+            <label>Website:</label>
+            <input
                 type="text"
                 value={newPasswordData.website || (editData ? editData.website : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
-              />
-            </div>
-          </label>
-          <label style={{ marginBottom: '10px' }}>Email:
-            <div className="input-field">
-              <input
+                className="input-field"
+            />
+        </div>
+        <div className="form-group">
+            <label>Email:</label>
+            <input
                 type="text"
                 value={newPasswordData.email || (editData ? editData.email : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
-              />
-            </div>
-          </label>
-          <label style={{ marginBottom: '10px' }}>Username:
-            <div className="input-field">
-              <input
+                className="input-field"
+            />
+        </div>
+        <div className="form-group">
+            <label>Username:</label>
+            <input
                 type="text"
                 value={newPasswordData.username || (editData ? editData.username : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
-              />
-            </div>
-          </label>
-          <label style={{ marginBottom: '10px' }}>
-            Password:
-            <div className="input-field">
+                className="input-field"
+            />
+        </div>
+        <div className="form-group password-group">
+          <label>Password:</label>
+          <div className="input-container">
               <input
-                type={showPassword ? "text" : "password"}
-                value={newPasswordData.password}
-                onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
-                className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
-                disabled={showGenerateStrongPassword}
+                  type={showPassword ? "text" : "password"}
+                  value={newPasswordData.password}
+                  onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+                  className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
+                  disabled={showGenerateStrongPassword}
               />
-              {!passwordValidation && (
-                <div className="error-message">Password cannot be empty</div>
-              )}
-              <span
-                className="toggle-password-popup"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <FontAwesomeIcon icon={faEyeSlash} style={{ color: '#333' }} />
-                ) : (
-                  <FontAwesomeIcon icon={faEye} style={{ color: '#333', transform: 'translateY(-50%)' }} />
-                )}
+              <span className={`toggle-password ${showPassword ? 'hide' : ''}`} onClick={() => setShowPassword(!showPassword)}>
+                  <FontAwesomeIcon icon={faEye} />
               </span>
-            </div>
-          </label>
+              <span className={`toggle-password ${!showPassword ? 'hide' : ''}`} onClick={() => setShowPassword(!showPassword)}>
+                  <FontAwesomeIcon icon={faEyeSlash} />
+              </span>
+          </div>
+          {!passwordValidation && (
+              <div className="error-message">Password cannot be empty</div>
+          )}
+      </div>
+
+
+
+
+
+
+      
 
           <div className="password-settings" style={{ marginBottom: '10px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>

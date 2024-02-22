@@ -37,7 +37,6 @@ function SecretNodeCreator() {
 
 
   useEffect(() => {
-
     setAlert('success', 'This is a success message!');
     setLoading(true);
     fetchSecretNodes();
@@ -134,7 +133,7 @@ function SecretNodeCreator() {
         <button onClick={openAddSecretNodeModal} className="add-button">+</button>
       </div>
       <div>
-        <h2>Existing Secret Nodes:</h2>
+        <h2>Existing Secret Notes:</h2>
         <ul className="node-list">
           {secretNodes.map((node) => (
             <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>

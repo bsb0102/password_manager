@@ -42,7 +42,6 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', data);
   
       if (response.data.message === "Login successful") {
-
         // Store the token in cookies
         Cookies.set('token', response.data.token, { expires: 7 }); // Token is stored for 7 days. Adjust as necessary.
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
