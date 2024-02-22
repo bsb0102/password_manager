@@ -19,6 +19,8 @@ function SecretNodeCreator() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalNodeId, setModalNodeId] = useState(null);
   const [currentPassphrase, setCurrentPassphrase] = useState(null); // Added state for current passphrase
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [nodeToDelete, setNodeToDelete] = useState(null);
 
   const toggleModal = (id) => {
     setIsModalOpen(!isModalOpen);
@@ -35,8 +37,31 @@ function SecretNodeCreator() {
   };
 
   const handleEditClick = (id) => {
-    setEditingNodeId(id);
+    // Check if the note is unlocked before allowing editing
+    if (unlockedContent[id]) {
+      setEditingNodeId(id);
+    } else {
+      setAlert("error", "Note must be unlocked to edit.");
+    }
   };
+
+  const openDeleteConfirmation = (id) => {
+    // Check if the note is unlocked or locked
+    if (unlockedContent[id]) {
+      // If note is unlocked, directly open delete confirmation modal
+      setIsDeleteConfirmationOpen(true);
+      setNodeToDelete(id);
+    } else {
+      // If note is locked, ask for passphrase first
+      toggleModal(id);
+    }
+  };
+
+  const closeDeleteConfirmation = () => {
+    setIsDeleteConfirmationOpen(false); // Close the delete confirmation modal
+    setNodeToDelete(null); // Reset the node to delete
+  };
+  
 
   const updateSecretNote = async (id, updatedTitle, updatedContent) => {
     try {
@@ -46,6 +71,7 @@ function SecretNodeCreator() {
         passphrase: currentPassphrase, // Use the current passphrase
       });
       console.log('Secret note updated successfully.');
+      setAlert("success", "Successfully updated Note!")
     } catch (error) {
       console.error('Error updating secret note:', error);
     }
@@ -84,17 +110,26 @@ function SecretNodeCreator() {
     }
   };
 
-  const deleteSecretNode = async (id) => {
+  const confirmDelete = async () => {
     try {
-      setLoading(true);
-      await axiosInstance.delete(`/api/deleteSecretNote/${id}`);
-      const updatedNodes = secretNodes.filter(node => node._id !== id);
-      setSecretNodes(updatedNodes);
-      setLoading(false);
+      const id = nodeToDelete;
+      // Check if the note is unlocked or passphrase is provided before deleting
+      if (unlockedContent[id] || unlockPassphrase === currentPassphrase) {
+        setLoading(true);
+        await axiosInstance.delete(`/api/deleteSecretNote/${id}`);
+        const updatedNodes = secretNodes.filter(node => node._id !== id);
+        setSecretNodes(updatedNodes);
+        setLoading(false);
+      } else {
+        // If note is locked and passphrase is incorrect, show an error message
+        setAlert("error", "Note must be unlocked or passphrase provided to delete.");
+      }
     } catch (error) {
       console.error('Error deleting secret node:', error);
     }
+    closeDeleteConfirmation();
   };
+
 
   const handleUnlockSubmit = async (id) => {
     setLoading(true);
@@ -148,41 +183,45 @@ function SecretNodeCreator() {
         <button onClick={openAddSecretNodeModal} className="add-button">+</button>
       </div>
       <div>
-        <h2>Existing Secret Notes:</h2>
-        <ul className="node-list">
-        {secretNodes.map((node) => (
-          <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>
-            <div className="node-header">
-              <h3>{node.title}</h3>
-              <button className="lock-icon" onClick={(e) => {
-                e.stopPropagation();
-                handleLockIconClick(e, node._id);
-              }}>
-                {unlockedContent[node._id] ? '🔓' : '🔒'}
-              </button>
-            </div>
-            {unlockedContent[node._id] ? (
-              <textarea
-                className="node-content"
-                value={unlockedContent[node._id] || newNodeContent}
-                onChange={(e) => setUnlockedContent(prev => ({ ...prev, [node._id]: e.target.value }))}
-              ></textarea>
-            ) : (
-              <p className="node-content">Content is locked 🔒</p>
-            )}
-            {unlockedContent[node._id] ? (
-              <button onClick={() => updateSecretNote(node._id, node.title, unlockedContent[node._id])}>Save</button>
-            ) : null}
-            {unlockedContent[node._id] ? null : (
-              <button onClick={() => handleEditClick(node._id)}>Edit</button>
-            )}
-            <button onClick={(e) => {
-              e.stopPropagation(); 
-              deleteSecretNode(node._id);
-            }}>Delete</button>
-          </div>
-        ))}
-        </ul>
+      <h2>Existing Secret Notes:</h2>
+        {secretNodes.length === 0 ? (
+          <p>You don't have any secret notes yet.</p>
+        ) : (
+          <ul className="node-list">
+            {secretNodes.map((node) => (
+              <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>
+                <div className="node-header">
+                  <h3>{node.title}</h3>
+                  <button className="lock-icon" onClick={(e) => {
+                    e.stopPropagation();
+                    handleLockIconClick(e, node._id);
+                  }}>
+                    {unlockedContent[node._id] ? '🔓' : '🔒'}
+                  </button>
+                </div>
+                {unlockedContent[node._id] ? (
+                  <textarea
+                    className="node-content"
+                    value={unlockedContent[node._id] || newNodeContent}
+                    onChange={(e) => setUnlockedContent(prev => ({ ...prev, [node._id]: e.target.value }))}
+                  ></textarea>
+                ) : (
+                  <p className="node-content">Content is locked 🔒</p>
+                )}
+                {unlockedContent[node._id] ? (
+                  <button onClick={() => updateSecretNote(node._id, node.title, unlockedContent[node._id])}>Save</button>
+                ) : null}
+                {unlockedContent[node._id] ? null : (
+                  <button onClick={() => handleEditClick(node._id)}>Edit</button>
+                )}
+                <button onClick={(e) => {
+                    e.stopPropagation(); 
+                    openDeleteConfirmation(node._id);
+                  }}>Delete</button>
+              </div>
+            ))}
+          </ul>
+        )}
       </div>
       {isModalOpen && (
         <div className="modal">
@@ -226,6 +265,21 @@ function SecretNodeCreator() {
                 className="input-field passphrase-field"
               />
               <button onClick={addSecretNode} className="button">Add Secret Node</button>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {isDeleteConfirmationOpen && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={closeDeleteConfirmation}>&times;</span>
+              <h2>Delete Confirmation</h2>
+              <p>Are you sure you want to delete this secret note?</p>
+              <div className="modal-buttons">
+                <button onClick={confirmDelete} className="confirm-button">Confirm</button>
+                <button onClick={closeDeleteConfirmation} className="cancel-button">Cancel</button>
+              </div>
             </div>
           </div>
         )}
