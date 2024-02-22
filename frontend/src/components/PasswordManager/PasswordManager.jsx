@@ -105,6 +105,8 @@ const PasswordManager = () => {
         username: newPasswordData.username,
         password: newPasswordData.password, // Use the password from newPasswordData
       };
+
+      console.log(passwordPayload)
   
       let response;
   
@@ -364,17 +366,18 @@ const PasswordManager = () => {
                   className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
                   disabled={showGenerateStrongPassword}
               />
-              <span className={`toggle-password ${showPassword ? 'hide' : ''}`} onClick={() => setShowPassword(!showPassword)}>
-                  <FontAwesomeIcon icon={faEye} />
-              </span>
-              <span className={`toggle-password ${!showPassword ? 'hide' : ''}`} onClick={() => setShowPassword(!showPassword)}>
+              <span className={`toggle-password ${showPassword ? '' : 'hidden'}`} onClick={() => setShowPassword(false)}>
                   <FontAwesomeIcon icon={faEyeSlash} />
+              </span>
+              <span className={`toggle-password ${showPassword ? 'hidden' : ''}`} onClick={() => setShowPassword(true)}>
+                  <FontAwesomeIcon icon={faEye} />
               </span>
           </div>
           {!passwordValidation && (
               <div className="error-message">Password cannot be empty</div>
           )}
       </div>
+
 
 
 
