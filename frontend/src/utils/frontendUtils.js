@@ -9,7 +9,11 @@ const formatDate = (dateString) => {
 
 const handleLogout = () => {
   const navigate = useNavigate();
-  localStorage.removeItem('token');
+  try {
+    localStorage.removeItem('token' || 'Bearer');
+  } catch(error){
+    console.log(console.log(error))
+  }
   navigate('/login');
 };
   

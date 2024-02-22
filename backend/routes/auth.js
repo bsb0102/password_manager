@@ -123,7 +123,7 @@ router.post('/login', async (req, res) => {
     
     // Send login notification email
     const userIPAddress = req.ip; // Get the user's IP address
-    // await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
+    await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
   } catch (error) {

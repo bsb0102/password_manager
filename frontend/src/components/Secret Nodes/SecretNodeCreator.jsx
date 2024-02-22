@@ -15,16 +15,16 @@ function SecretNodeCreator() {
   const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
   const [loading, setLoading] = useState(false);
   const { setAlert } = useContext(AlertContext)
-
+  const [editingNodeId, setEditingNodeId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalNodeId, setModalNodeId] = useState(null);
+  const [currentPassphrase, setCurrentPassphrase] = useState(null); // Added state for current passphrase
 
   const toggleModal = (id) => {
     setIsModalOpen(!isModalOpen);
     setModalNodeId(id);
     setUnlockPassphrase('');
   };
-
 
   const openAddSecretNodeModal = () => {
     setAddSecretNodeModalOpen(true);
@@ -34,17 +34,32 @@ function SecretNodeCreator() {
     setAddSecretNodeModalOpen(false);
   };
 
+  const handleEditClick = (id) => {
+    setEditingNodeId(id);
+  };
 
+  const updateSecretNote = async (id, updatedTitle, updatedContent) => {
+    try {
+      await axiosInstance.put(`/api/updateSecretNote/${id}`, {
+        title: updatedTitle,
+        content: updatedContent,
+        passphrase: currentPassphrase, // Use the current passphrase
+      });
+      console.log('Secret note updated successfully.');
+    } catch (error) {
+      console.error('Error updating secret note:', error);
+    }
+  };
 
   useEffect(() => {
-    setAlert('success', 'This is a success message!');
     setLoading(true);
     fetchSecretNodes();
+    setPassphrase(null); // Reset passphrase when component mounts
   }, []);
 
   const fetchSecretNodes = async () => {
     try {
-      const response = await axiosInstance.get('/api/getSecretNodes');
+      const response = await axiosInstance.get('/api/getSecretNotes');
       setSecretNodes(response.data);
       setLoading(false);
     } catch (error) {
@@ -54,14 +69,14 @@ function SecretNodeCreator() {
 
   const addSecretNode = async () => {
     try {
-      await axiosInstance.post('/api/addSecretNode', {
+      await axiosInstance.post('/api/addSecretNote', {
         title: newNodeTitle,
         content: newNodeContent,
         passphrase: passphrase,
       });
       setNewNodeTitle('');
       setNewNodeContent('');
-      setPassphrase('');
+      setPassphrase(null); // Reset passphrase after adding secret node
       fetchSecretNodes();
       closeAddSecretNodeModal();
     } catch (error) {
@@ -72,7 +87,7 @@ function SecretNodeCreator() {
   const deleteSecretNode = async (id) => {
     try {
       setLoading(true);
-      await axiosInstance.delete(`/api/deleteSecretNode/${id}`);
+      await axiosInstance.delete(`/api/deleteSecretNote/${id}`);
       const updatedNodes = secretNodes.filter(node => node._id !== id);
       setSecretNodes(updatedNodes);
       setLoading(false);
@@ -81,19 +96,18 @@ function SecretNodeCreator() {
     }
   };
 
-
   const handleUnlockSubmit = async (id) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.post(`/api/openSecretNode/${id}`, { passphrase: unlockPassphrase });
+      const response = await axiosInstance.post(`/api/openSecretNote/${id}`, { passphrase: unlockPassphrase });
       setUnlockedContent(prev => ({ ...prev, [id]: response.data.content }));
+      setCurrentPassphrase(unlockPassphrase); // Set current passphrase
       toggleModal();
     } catch (error) {
       console.error('Error unlocking secret node:', error);
       setAlert("error", "Passphrase wrong");
       toggleModal(); 
     }
-
     setLoading(false);
   };
 
@@ -103,6 +117,7 @@ function SecretNodeCreator() {
       setUnlockedContent(prev => {
         const updated = { ...prev };
         delete updated[id];
+        setCurrentPassphrase(null); // Reset current passphrase when content is locked
         return updated;
       });
     } else {
@@ -111,7 +126,7 @@ function SecretNodeCreator() {
     if (!unlockedContent[id]) {
       toggleModal(id);
     }
-};
+  };
 
   const handleNodeItemClick = (id) => {
     if (!unlockedContent[id]) {
@@ -135,28 +150,38 @@ function SecretNodeCreator() {
       <div>
         <h2>Existing Secret Notes:</h2>
         <ul className="node-list">
-          {secretNodes.map((node) => (
-            <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>
-              <div className="node-header">
-                <h3>{node.title}</h3>
-                <button className="lock-icon" onClick={(e) => {
-                  e.stopPropagation();
-                  handleLockIconClick(e, node._id);
-                }}>
-                  {unlockedContent[node._id] ? '🔓' : '🔒'}
-                </button>
-              </div>
-              {unlockedContent[node._id] ? (
-                <textarea className="node-content" readOnly value={unlockedContent[node._id]}></textarea>
-              ) : (
-                <p className="node-placeholder">Content is locked 🔒</p>
-              )}
-              <button onClick={(e) => {
-                e.stopPropagation(); 
-                deleteSecretNode(node._id);
-              }}>Delete</button>
+        {secretNodes.map((node) => (
+          <div key={node._id} className="node-item" onClick={() => handleNodeItemClick(node._id)}>
+            <div className="node-header">
+              <h3>{node.title}</h3>
+              <button className="lock-icon" onClick={(e) => {
+                e.stopPropagation();
+                handleLockIconClick(e, node._id);
+              }}>
+                {unlockedContent[node._id] ? '🔓' : '🔒'}
+              </button>
             </div>
-          ))}
+            {unlockedContent[node._id] ? (
+              <textarea
+                className="node-content"
+                value={unlockedContent[node._id] || newNodeContent}
+                onChange={(e) => setUnlockedContent(prev => ({ ...prev, [node._id]: e.target.value }))}
+              ></textarea>
+            ) : (
+              <p className="node-content">Content is locked 🔒</p>
+            )}
+            {unlockedContent[node._id] ? (
+              <button onClick={() => updateSecretNote(node._id, node.title, unlockedContent[node._id])}>Save</button>
+            ) : null}
+            {unlockedContent[node._id] ? null : (
+              <button onClick={() => handleEditClick(node._id)}>Edit</button>
+            )}
+            <button onClick={(e) => {
+              e.stopPropagation(); 
+              deleteSecretNode(node._id);
+            }}>Delete</button>
+          </div>
+        ))}
         </ul>
       </div>
       {isModalOpen && (

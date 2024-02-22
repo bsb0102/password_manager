@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Define the schema for the secret nodes
-const secretNodeSchema = new mongoose.Schema({
+const secretNoteSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -25,6 +25,6 @@ const secretNodeSchema = new mongoose.Schema({
 });
 
 // Create the model from the schema
-const SecretNode = mongoose.model('SecretNode', secretNodeSchema);
+const SecretNote = mongoose.model('SecretNode', secretNoteSchema);
 
-module.exports = SecretNode;
+module.exports = SecretNote;
