@@ -10,7 +10,7 @@ const formatDate = (dateString) => {
 const handleLogout = () => {
   const navigate = useNavigate();
   try {
-    localStorage.removeItem('token' || 'Bearer');
+    localStorage.removeItem('Bearer');
   } catch(error){
     console.log(console.log(error))
   }

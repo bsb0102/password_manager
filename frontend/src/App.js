@@ -5,7 +5,7 @@ import Register from './components/Register/Register';
 import Settings from './components/Settings/Settings';
 import Dashboard from './components/Dashboard/Dashboard';
 import { AlertProvider } from './components/Alert/AlertService';
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoute";
 import LandingPage from "./components/LandingPage"
 
 const App = () => {

@@ -25,6 +25,6 @@ const secretNoteSchema = new mongoose.Schema({
 });
 
 // Create the model from the schema
-const SecretNote = mongoose.model('SecretNode', secretNoteSchema);
+const SecretNote = mongoose.model('SecretNote', secretNoteSchema);
 
 module.exports = SecretNote;

@@ -3,7 +3,6 @@ import axios from 'axios';
 // Use an environment variable or default to a specific URL
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'https://safekey.gg/';
 
-console.log(baseURL)
 
 const axiosInstance = axios.create({
   baseURL: baseURL,

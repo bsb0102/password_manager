@@ -8,21 +8,20 @@ const path = require('path');
 const API_KEY = process.env.MAILGUN_API_KEY;
 const DOMAIN = process.env.MAILGUN_DOMAIN;
 
-const mg = mailgun({apiKey: "11ea574b7f132edef5d0c309bcc09be7-408f32f3-0fc03ea3", domain: "noreply.safekey.gg"});
+const mg = mailgun({apiKey: "bf1d632514e6f4d170112f1f106a860d-408f32f3-46b138a7", domain: "noreply.safekey.gg"});
 
 
 const sendEmail = async (to, subject, html) => {
   console.log("Sending Email 2", mg)
   const data = {
-    from: "SafeKey <postmaster@noreply.safekey.gg>",
+    from: "SafeKey <noreply.safekey.gg>",
     to: "entitiplayer@gmail.com",
     subject: "Login Alert",
     html: '<p>Dies ist eine Test-E-Mail von SafeKey.</p>',
   };
 
   mg.messages().send(data, function (error, body) {
-    console.log(error);
-    console.log(body);
+    console.log("")
   });
 
 
@@ -40,7 +39,7 @@ const sendLoginNotification = async (ACCOUNT_EMAIL, IP_ADDRESS) => {
 
   console.log("Sending Email 1")
 
-  await sendEmail('recipient@example.com', subject, htmlTemplate);
+  // await sendEmail('recipient@example.com', subject, htmlTemplate);
 };
 
 module.exports = {
