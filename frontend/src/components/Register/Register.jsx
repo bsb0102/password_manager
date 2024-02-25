@@ -55,11 +55,6 @@ const Register = () => {
       if (registrationResponse.status === 201) {
         // Prompt the user to enter the verification code
         const enteredVerificationCode = prompt("Please enter the verification code sent to your email:");
-  
-        // Include the verification code in the form data
-
-        console.log("password: ", password)
-
         const verificationData = {
           username: username,
           verificationCode: enteredVerificationCode,
