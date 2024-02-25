@@ -7,6 +7,7 @@ const passwordRoutes = require('./routes/passwordRoutes');
 const secretNodesRoutes = require('./routes/secretNodeRoutes');
 const mfaRoutes = require('./routes/mfaRoutes');
 const connectDB = require('./database');
+const mailGunService = require("./services/mailgunService")
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 env = module.exports = process.env;

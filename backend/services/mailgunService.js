@@ -1,48 +1,81 @@
-
+// emailUtils.js
+const nodemailer = require("nodemailer");
+const fs = require("fs");
 require('dotenv').config();
-const formData = require('form-data');
-const mailgun = require("mailgun-js");
-const fs = require('fs');
-const path = require('path');
 
-const API_KEY = process.env.MAILGUN_API_KEY;
-const DOMAIN = process.env.MAILGUN_DOMAIN;
+const transporter = nodemailer.createTransport({
+  host: "smtp.eu.mailgun.org",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.MAILGUN_USERNAME,
+    pass: process.env.MAILGUN_PASSWORD
+  }
+});
 
-const mg = mailgun({apiKey: "bf1d632514e6f4d170112f1f106a860d-408f32f3-46b138a7", domain: "noreply.safekey.gg"});
+const sendLoginNotification = (to, IP_ADDRESS) => {
+  const templatePath = '/root/password_manager/backend/services/templates/loginAttempt.html'; // Hardcoded path to the template file
 
+  // Read HTML template from file
+  fs.readFile(templatePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading template file:", err);
+      return;
+    }
 
-const sendEmail = async (to, subject, html) => {
-  console.log("Sending Email 2", mg)
-  const data = {
-    from: "SafeKey <noreply.safekey.gg>",
-    to: "entitiplayer@gmail.com",
-    subject: "Login Alert",
-    html: '<p>Dies ist eine Test-E-Mail von SafeKey.</p>',
-  };
+    // Replace placeholders with provided parameters
+    const html = data
+      .replace('{{ACCOUNT_EMAIL}}', to)
+      .replace('{{CURRENT_DATE}}', new Date().toLocaleString())
+      .replace('{{IP_ADDRESS}}', IP_ADDRESS);
 
-  mg.messages().send(data, function (error, body) {
-    console.log("")
+    const mailOptions = {
+      from: "noreply@noreply.safekey.gg",
+      to: to,
+      subject: "Login Attempt Notification",
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent successfully!", info.response);
+      }
+    });
   });
-
-
 };
 
-const sendLoginNotification = async (ACCOUNT_EMAIL, IP_ADDRESS) => {
-  const subject = 'Login Attempt';
-  const templatePath = path.join(__dirname, './templates/loginAttempt.html');
-  let htmlTemplate = fs.readFileSync(templatePath, 'utf8');
+// New function to send verification email with code
+const sendVerificationCodeEmail = (to, verificationCode) => {
+  const templatePath = '/root/password_manager/backend/services/templates/verificationEmail.html'; // Path to the verification email template file
 
-  htmlTemplate = htmlTemplate
-    .replace('{{ACCOUNT_EMAIL}}', ACCOUNT_EMAIL)
-    .replace('{{CURRENT_DATE}}', new Date().toLocaleString())
-    .replace('{{IP_ADDRESS}}', IP_ADDRESS);
+  // Read HTML template from file
+  fs.readFile(templatePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading verification email template file:", err);
+      return;
+    }
 
-  console.log("Sending Email 1")
+    // Replace placeholders with provided parameters
+    const html = data
+      .replace('{{VERIFICATION_CODE}}', verificationCode);
 
-  // await sendEmail('recipient@example.com', subject, htmlTemplate);
+    const mailOptions = {
+      from: "noreply@noreply.safekey.gg",
+      to: to,
+      subject: "Verification Code",
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.error("Error sending verification email:", error);
+      } else {
+        console.log("Verification email sent successfully!");
+      }
+    });
+  });
 };
 
-module.exports = {
-  sendEmail,
-  sendLoginNotification,
-};
+module.exports = { sendLoginNotification, sendVerificationCodeEmail };

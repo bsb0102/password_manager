@@ -2,12 +2,22 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { getUserByEmail, createUser, getUserById } = require('../controllers/userController'); // Replace with your user controller
+const { 
+  getUserByEmail, 
+  createUser, 
+  getUserById, 
+  storeVerificationCode, 
+  getVerificationCode, 
+  getVerificationCodeExpiration, 
+  deleteVerificationCode, 
+  generateVerificationCode, 
+  calculateVerificationCodeExpiration 
+} = require('../controllers/userController'); // Replace with your user controller
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
-const { sendLoginNotification } = require('../services/mailgunService');
+const { sendLoginNotification, sendVerificationCodeEmail } = require('../services/mailgunService');
 
 
 router.get("/user_test", async (req, res) => {
@@ -122,7 +132,7 @@ router.post('/login', async (req, res) => {
     });
     
     // Send login notification email
-    const userIPAddress = req.ip; // Get the user's IP address
+    const userIPAddress = req.ip.toString(); // Get the user's IP address
     await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
@@ -138,26 +148,90 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const existingUser = await getUserByEmail(username);
 
+    // Check if the user already exists
+    const existingUser = await getUserByEmail(username);
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generate a verification code
+    const generatedVerificationCode = generateVerificationCode();
 
-    const newUser = await createUser(username, hashedPassword);
-    newUser.mfaEnabled = false; // Set MFA to false when registering
+    // Calculate the expiration time for the verification code
+    const expiresAt = calculateVerificationCodeExpiration();
 
-    await newUser.save();
+    // Store the verification code and its expiration time in the database
+    await storeVerificationCode(username, generatedVerificationCode, expiresAt);
 
-    const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
-    res.status(201).json({ message: 'Registration successful', token });
+    // Respond with success message
+    res.status(201).json({ message: 'Verification code generated. Please check your email for the verification code.' });
+
+    // Send the verification code to the user's email
+    await sendVerificationCodeEmail(username, generatedVerificationCode); // Implement this function
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+
+
+
+
+router.post('/verifyCode', async (req, res) => {
+  try {
+    const { username, verificationCode, password } = req.body;
+
+    console.log(password)
+
+    // Retrieve the stored verification code and expiration time
+    const storedVerificationCode = await getVerificationCode(username);
+
+    // Check if there is a stored verification code for the user
+    if (!storedVerificationCode) {
+      return res.status(400).json({ error: 'No verification code found for this user' });
+    }
+
+    // Check if the provided verification code matches the stored one
+    if (verificationCode !== storedVerificationCode.code) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+
+    // Check if the verification code has expired
+    const currentTime = new Date();
+    if (currentTime > storedVerificationCode.expiresAt) {
+      return res.status(400).json({ error: 'Verification code has expired' });
+    }
+
+    // Check if the user already exists
+    const existingUser = await getUserByEmail(username);
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash the password
+    console.log(password)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Proceed with registration logic to create the new user
+    const newUser = await createUser(username, hashedPassword);
+    await newUser.save();
+
+    // Optionally, delete the verification code from the database
+    await deleteVerificationCode(username);
+
+    // Return a success message along with any additional data, such as a JWT token
+    const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
+    res.status(201).json({ message: 'Registration successful', token });
+  } catch (error) {
+    console.error('Verification error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 router.put('/change-password', async (req, res) => {

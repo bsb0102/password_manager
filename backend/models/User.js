@@ -23,8 +23,16 @@ const userSchema = new mongoose.Schema({
   mfaEnabled: {
     type: Boolean, // Indicates whether MFA is enabled for the user
     default: false
+  },
+  // Verification code related fields
+  verificationCode: {
+    type: String,
+    default: ''
+  },
+  verificationCodeExpiresAt: {
+    type: Date,
+    default: null
   }
-  // You can add more fields as needed
 });
 
 // Method to hash passwords

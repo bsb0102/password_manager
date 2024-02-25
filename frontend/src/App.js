@@ -25,15 +25,6 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/Dashboard" element={<Dashboard />} />
           </Routes>
         </AlertProvider>
       </div>
