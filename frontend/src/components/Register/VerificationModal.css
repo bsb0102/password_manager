@@ -1,89 +1,89 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure the full height is used for centering */
+}
+
 .modal-overlay {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    max-width: 600px;
-    width: 80%; /* Adjust as needed */
-    max-height: 80%; /* Adjust as needed */
-    overflow-y: auto; /* Add scrollbar if content exceeds max-height */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    border: none;
-    background: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  
-  .modal-title {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .modal-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  
-  .modal-input {
-    padding: 15px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    font-size: 1.2rem;
-    transition: border-color 0.3s;
-  }
-  
-  .modal-input:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .submit-button,
-  .cancel-button {
-    padding: 10px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-  }
-  
-  .submit-button {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .cancel-button {
-    background-color: #6c757d;
-    color: white;
-  }
-  
-  .submit-button:hover,
-  .cancel-button:hover {
-    opacity: 0.9;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
+  z-index: 1000; /* Make sure it's on top of other content */
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* This will center the modal exactly */
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px; /* Adjust as needed */
+}
+
+
+.close-button {
+  float: right;
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-title {
+  text-align: center;
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between form elements */
+}
+
+.modal-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.modal-actions {
+  flex-wrap: wrap; /* Allow buttons to wrap if needed */
+  justify-content: center; /* Center buttons if they wrap */
+}
+
+.submit-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.submit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+  color: white;
+}

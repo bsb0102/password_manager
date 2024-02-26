@@ -14,7 +14,7 @@ function SecretNodeCreator() {
   const [unlockedContent, setUnlockedContent] = useState({});
   const [unlockAttemptFailed, setUnlockAttemptFailed] = useState({});
   const [loading, setLoading] = useState(false);
-  const { setAlert } = useContext(AlertContext)
+  const { setAlert } = useContext(AlertContext);
   const [editingNodeId, setEditingNodeId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalNodeId, setModalNodeId] = useState(null);
@@ -70,7 +70,6 @@ function SecretNodeCreator() {
         content: updatedContent,
         passphrase: currentPassphrase, // Use the current passphrase
       });
-      console.log('Secret note updated successfully.');
       setAlert("success", "Successfully updated Note!")
     } catch (error) {
       console.error('Error updating secret note:', error);
@@ -200,26 +199,29 @@ function SecretNodeCreator() {
                   </button>
                 </div>
                 {unlockedContent[node._id] ? (
-                  <textarea
-                    className="node-content"
-                    value={unlockedContent[node._id] || newNodeContent}
-                    onChange={(e) => setUnlockedContent(prev => ({ ...prev, [node._id]: e.target.value }))}
-                  ></textarea>
+                  <div className="textarea-container">
+                    <textarea
+                      className="node-content"
+                      value={unlockedContent[node._id] || newNodeContent}
+                      onChange={(e) => setUnlockedContent(prev => ({ ...prev, [node._id]: e.target.value }))}
+                      style={{ resize: 'none', height: '150px', width: "320px" }} // Apply inline style
+                    ></textarea>
+                    <div className="buttons-container">
+                      <button onClick={() => updateSecretNote(node._id, node.title, unlockedContent[node._id])}>Save</button>
+                      {/* <button onClick={() => handleEditClick(node._id)}>Edit</button> */}
+                      <button onClick={(e) => {
+                        e.stopPropagation(); 
+                        openDeleteConfirmation(node._id);
+                      }}>Delete</button>
+                    </div>
+                  </div>
                 ) : (
                   <p className="node-content">Content is locked 🔒</p>
                 )}
-                {unlockedContent[node._id] ? (
-                  <button onClick={() => updateSecretNote(node._id, node.title, unlockedContent[node._id])}>Save</button>
-                ) : null}
-                {unlockedContent[node._id] ? null : (
-                  <button onClick={() => handleEditClick(node._id)}>Edit</button>
-                )}
-                <button onClick={(e) => {
-                    e.stopPropagation(); 
-                    openDeleteConfirmation(node._id);
-                  }}>Delete</button>
               </div>
             ))}
+
+
           </ul>
         )}
       </div>
@@ -240,31 +242,31 @@ function SecretNodeCreator() {
       )}
 
       {addSecretNodeModalOpen && (
-          <div className="modal">
-            <div className="modal-content">
-              <span className="close" onClick={closeAddSecretNodeModal}>&times;</span>
+          <div className="modal-addnotes">
+            <div className="modal-addnotes-content">
+              <span className="modal-addnotes-close" onClick={closeAddSecretNodeModal}>&times;</span>
               <h2>Enter Details</h2>
               <input
                 type="text"
                 placeholder="Title"
                 value={newNodeTitle}
                 onChange={(e) => setNewNodeTitle(e.target.value)}
-                className="input-field"
+                className="modal-addnotes-input-field"
               />
               <textarea
                 placeholder="Content"
                 value={newNodeContent}
                 onChange={(e) => setNewNodeContent(e.target.value)}
-                className="input-field content-field"
+                className="modal-addnotes-input-field content-field"
               />
               <input
                 type="password"
                 placeholder="Passphrase"
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
-                className="input-field passphrase-field"
+                className="modal-addnotes-input-field passphrase-field"
               />
-              <button onClick={addSecretNode} className="button">Add Secret Node</button>
+              <button onClick={addSecretNode} className="modal-addnotes-button">Add Secret Node</button>
             </div>
           </div>
         )}

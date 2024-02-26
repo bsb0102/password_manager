@@ -84,11 +84,11 @@ const Register = () => {
         }, 1500);
         setShowVerificationModal(false); // Close the modal after successful verification
       } else {
-        setVerificationError('Verification failed. Please try again.'); // Set verification error if failed
+        setAlert('error', 'Verificationcode incorrect. Please try again.'); // Set verification error if failed
       }
     } catch (error) {
       console.error('Verification error:', error);
-      setVerificationError('Failed to verify. Please try again.'); // Set verification error if failed
+      setAlert('error', 'Failed to verify. Please try again.'); // Set verification error if failed
     }
   };
 

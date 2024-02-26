@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -15,7 +16,8 @@ import { mainListItems, secondaryListItems, footerListItem } from '../Sidebar/Si
 import PasswordManager from "../PasswordManager/PasswordManager"
 import Settings from "../Settings/Settings"
 import SecretNodeCreator from "../Secret Nodes/SecretNodeCreator"
-import { handleLogout } from "../../utils/frontendUtils"
+import axiosInstance from '../../api/api.js';
+import Cookies from 'js-cookie';
 
 const drawerWidth = 240;
 
@@ -65,15 +67,37 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const defaultTheme = createTheme();
 
+
 function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const defaultSelectedItem = 'Dashboard';
   const [selectedItem, setSelectedItem] = React.useState(defaultSelectedItem);
+  const navigate = useNavigate();
 
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const handleLogout = () => {
+    // Remove the token from cookies
+    Cookies.remove('token'); // This removes the token stored in the cookies
+    
+    // Clear the Authorization header from the axios instance
+    if (axiosInstance.defaults.headers.common['Authorization']) {
+      delete axiosInstance.defaults.headers.common['Authorization'];
+    }
+    
+    // Remove the token and any other related data from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('tempToken'); // Remove tempToken if used for MFA
+    
+    // Navigate to the login page or another appropriate page
+    navigate('/login'); // Assuming 'navigate' is obtained from useNavigate() hook.
+    
+    console.log("Successfully logged out");
+  };
+  
 
   const handleSidebarItemClick = (text) => {
     setSelectedItem(text || "");
@@ -92,6 +116,7 @@ function Dashboard() {
 
       case 'Logout':
         handleLogout();
+        return <div>Successfully logged out</div>;
       
       default:
         return <div>No content available</div>;
@@ -155,7 +180,7 @@ function Dashboard() {
                 : theme.palette.grey[900],
             flexGrow: 1,
             height: '100vh',
-            overflow: 'auto',
+            // overflow: 'auto',
           }}
         >
           <Toolbar />
