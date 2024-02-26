@@ -48,8 +48,7 @@ const Login = () => {
         localStorage.setItem('tempToken', response.data.token);
         setShowMfaModal(true); // Show the MFA modal
       } else {
-        // Successful login without MFA
-        navigate('/home'); // Redirect to the authenticated part of the app
+        navigate('/home');
       }
     } catch (error) {
       setError('Failed to Login');
