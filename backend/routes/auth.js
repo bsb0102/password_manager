@@ -224,7 +224,7 @@ router.post('/verifyCode', async (req, res) => {
 
     // Return a success message along with any additional data, such as a JWT token
     const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
-    res.status(201).json({ message: 'Registration successful', token });
+    res.status(200).json({ message: 'Registration successful', token });
   } catch (error) {
     console.error('Verification error:', error);
     res.status(500).json({ error: 'Internal server error' });
