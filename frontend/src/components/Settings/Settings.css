@@ -1,0 +1,152 @@
+/* Settings Container */
+.settings-container {
+  display: flex;
+  justify-content: space-between; /* Adjust as needed */
+  align-items: flex-start; /* Align settings to the top */
+  padding: 20px; /* Add padding around the settings content */
+}
+
+/* Settings Right Side */
+.settings-right {
+  flex: 1; /* Allow the right side to grow */
+  max-width: 60%; /* Adjust the maximum width as needed */
+  padding: 20px; /* Add padding inside the right side container */
+  background-color: #fff; /* White background color */
+  color: #333; /* Text color */
+  border-radius: 5px; /* Add rounded corners */
+}
+
+/* Settings Options */
+.settings-options {
+  display: flex;
+  flex-direction: column; /* Stack settings vertically */
+}
+
+/* Setting Item */
+.setting-item {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label for Setting */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Buttons */
+button {
+  background-color: #fff; /* White button color */
+  color: #333;
+  border: 1px solid #333;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* MFA Confirmation Buttons */
+.confirmation-buttons {
+  display: flex;
+  justify-content: space-between; /* Place buttons side by side */
+}
+
+/* MFA Modal Styles */
+.mfa-setup,
+.mfa-confirmation {
+  text-align: center;
+  padding: 20px;
+}
+
+.qr-code-container {
+  margin-top: 10px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+/* Media Query for Responsive Design (Adjust as needed) */
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column; /* Stack content on small screens */
+  }
+
+  .settings-right {
+    max-width: 100%; /* Full width on small screens */
+  }
+}
+
+.mfa-status {
+  font-weight: bold;
+  margin-bottom: 10px;
+  transition: color 0.3s ease-in-out;
+}
+
+.mfa-status.active {
+  color: green; /* Color for active MFA */
+}
+
+.mfa-status.inactive {
+  color: red; /* Color for inactive MFA */
+}
+
+.success-modal-content {
+  background-color: #fff; /* White background color */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.success-modal-content h3 {
+  color: #333; /* Dark gray */
+  margin-bottom: 15px;
+}
+
+.success-modal-content p {
+  color: #333; /* Dark gray */
+  margin-bottom: 20px;
+}
+
+.close-modal-button {
+  
+  background-color: #333; /* Dark gray */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.close-modal-button:hover {
+  background-color: #555; /* Darker gray */
+}
+
+.mfa-button {
+  width: 150px;
+  padding: 8px 16px; 
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.mfa-button:hover {
+  background-color: #0056b3;
+}
