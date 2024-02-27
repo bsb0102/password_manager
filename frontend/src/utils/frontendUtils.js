@@ -1,5 +1,3 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-
 
 const formatDate = (dateString) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
@@ -7,14 +5,5 @@ const formatDate = (dateString) => {
     return formattedDate;
 };
 
-const handleLogout = () => {
-  const navigate = useNavigate();
-  try {
-    localStorage.removeItem('Bearer');
-  } catch(error){
-    console.log(console.log(error))
-  }
-  navigate('/login');
-};
   
-export { formatDate, handleLogout };
+export { formatDate };

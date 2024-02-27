@@ -78,4 +78,38 @@ const sendVerificationCodeEmail = (to, verificationCode) => {
   });
 };
 
-module.exports = { sendLoginNotification, sendVerificationCodeEmail };
+const sendPasswordResetEmail = (to, resetPasswordLink) => {
+  const templatePath = '/root/password_manager/backend/services/templates/passwordResetEmail.html'; // Path to the password reset email template file
+
+  // Read HTML template from file
+  fs.readFile(templatePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading password reset email template file:", err);
+      return;
+    }
+
+    // Replace placeholders with provided parameters
+    const html = data
+      .replace('{{RESET_PASSWORD_LINK}}', resetPasswordLink);
+
+    const mailOptions = {
+      from: "noreply@noreply.safekey.gg",
+      to: to,
+      subject: "Password Reset",
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.error("Error sending password reset email:", error);
+      } else {
+        console.log("Password reset email sent successfully!");
+      }
+    });
+  });
+};
+
+module.exports = { 
+  sendLoginNotification, 
+  sendVerificationCodeEmail,
+  sendPasswordResetEmail };

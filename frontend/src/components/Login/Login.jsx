@@ -14,6 +14,7 @@ const Login = () => {
   const [csrfToken, setCsrfToken] = useState('');
   const [showMfaModal, setShowMfaModal] = useState(false); // State to control MFA modal visibility
   const [mfaToken, setMfaToken] = useState('');
+  const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,6 +76,10 @@ const Login = () => {
     }
   };
   
+
+  const handleForgotPassword = () => {
+    setShowResetPasswordForm(true); // Show the PasswordResetForm when "Forgot Password" link is clicked
+  };
   
 
   const handleMfaLogin = async () => {
@@ -137,6 +142,10 @@ const Login = () => {
           Don't have an account?{' '}
           <span onClick={() => navigate('/register')}>Register here</span>
         </p>
+        <span className="forgot-password-link" onClick={handleForgotPassword}>
+          You forgot your Password? Click here
+        </span>
+
       </form>
 
       {/* MFA Modal */}

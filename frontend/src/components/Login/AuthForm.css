@@ -100,6 +100,26 @@
 
 
 
+.forgot-password-link {
+  color: #007bff;
+  display: block;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* For smaller screens, you may want to stack the elements vertically */
+@media screen and (max-width: 600px) {
+  .alt-action span,
+  .forgot-password-link {
+    display: inline; /* Stack elements horizontally on smaller screens */
+  }
+}
+
+
+
+
+
+
 
 .auth-form-container {
   display: flex;

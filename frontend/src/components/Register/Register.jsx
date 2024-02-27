@@ -4,7 +4,7 @@ import axiosInstance from '../../api/api.js';
 import { getCsrfToken } from '../../utils/csrfUtils.js';
 import '../Login/AuthForm.css';
 import { AlertContext } from '../Alert/AlertService.js';
-import VerificationModal from './VerificationModal'; // Import the modal component
+import VerificationModal from './VerificationModal/VerificationModal.jsx'; // Import the modal component
 
 const Register = () => {
   const navigate = useNavigate();
