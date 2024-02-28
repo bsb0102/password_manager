@@ -4,6 +4,7 @@ import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
 import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
 import Cookies from 'js-cookie';
+import ResetPasswordModal from "../ResetPassword/ResetPasswordModal.jsx"
 
 const Login = () => {
   const navigate = useNavigate();
@@ -79,6 +80,9 @@ const Login = () => {
 
   const handleForgotPassword = () => {
     setShowResetPasswordForm(true); // Show the PasswordResetForm when "Forgot Password" link is clicked
+  };
+  const handleForgotPasswordClose = () => {
+    setShowResetPasswordForm(false);
   };
   
 
@@ -164,6 +168,13 @@ const Login = () => {
           </div>
         </Modal>
       )}
+
+      {showResetPasswordForm && (
+        <ResetPasswordModal 
+        onClose={handleForgotPasswordClose}
+        />
+      )}
+
     </div>
   );
 };

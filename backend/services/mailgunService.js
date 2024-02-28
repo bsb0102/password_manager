@@ -46,7 +46,7 @@ const sendLoginNotification = (to, IP_ADDRESS) => {
   });
 };
 
-// New function to send verification email with code
+
 const sendVerificationCodeEmail = (to, verificationCode) => {
   const templatePath = '/root/password_manager/backend/services/templates/verificationEmail.html'; // Path to the verification email template file
 
@@ -78,6 +78,7 @@ const sendVerificationCodeEmail = (to, verificationCode) => {
   });
 };
 
+
 const sendPasswordResetEmail = (to, resetPasswordLink) => {
   const templatePath = '/root/password_manager/backend/services/templates/passwordResetEmail.html'; // Path to the password reset email template file
 
@@ -95,7 +96,7 @@ const sendPasswordResetEmail = (to, resetPasswordLink) => {
     const mailOptions = {
       from: "noreply@noreply.safekey.gg",
       to: to,
-      subject: "Password Reset",
+      subject: "Password Reset Instruction",
       html: html
     };
 
@@ -112,4 +113,5 @@ const sendPasswordResetEmail = (to, resetPasswordLink) => {
 module.exports = { 
   sendLoginNotification, 
   sendVerificationCodeEmail,
-  sendPasswordResetEmail };
+  sendPasswordResetEmail 
+};

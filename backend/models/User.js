@@ -32,6 +32,15 @@ const userSchema = new mongoose.Schema({
   verificationCodeExpiresAt: {
     type: Date,
     default: null
+  },
+  // Reset password token related fields
+  resetToken: {
+    type: String,
+    default: ''
+  },
+  resetTokenExpiration: {
+    type: Date,
+    default: null
   }
 });
 

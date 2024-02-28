@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axiosInstance from '../../api/api.js';
-import './secretNodes.css'; // Import CSS file for styling
+import './SecretNodes.css'; // Import CSS file for styling
 import Spinner from "../Alert/Spinner";
 import {AlertContext} from '../Alert/AlertService.js';
 
