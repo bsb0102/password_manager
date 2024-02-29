@@ -78,6 +78,36 @@ const sendVerificationCodeEmail = (to, verificationCode) => {
   });
 };
 
+const sendEmailMFAVerificationEmail = (to, verificationCode) => {
+  const templatePath = '/root/password_manager/backend/services/templates/successfulPasswordReset.html'; // Path to the verification email template file
+
+  fs.readFile(templatePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading verification email template file:", err);
+      return;
+    }
+
+    // Replace placeholders with provided parameters
+    const html = data
+      .replace('{{VERIFICATION_CODE}}', verificationCode);
+
+    const mailOptions = {
+      from: "noreply@noreply.safekey.gg",
+      to: to,
+      subject: "Login Multifactor",
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.error("Error sending verification email:", error);
+      } else {
+        console.log("Verification email sent successfully!");
+      }
+    });
+  });
+};
+
 
 const sendPasswordResetEmail = (to, resetPasswordLink) => {
   const templatePath = '/root/password_manager/backend/services/templates/resetPassword.html'; // Path to the password reset email template file
@@ -113,5 +143,6 @@ const sendPasswordResetEmail = (to, resetPasswordLink) => {
 module.exports = { 
   sendLoginNotification, 
   sendVerificationCodeEmail,
-  sendPasswordResetEmail 
+  sendPasswordResetEmail,
+  sendEmailMFAVerificationEmail
 };
