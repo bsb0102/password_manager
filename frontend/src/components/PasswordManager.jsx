@@ -286,13 +286,7 @@ const PasswordManager = () => {
         <div className="modal-content">
           <span className="close-button" onClick={handleAddPasswordModalClose}>&times;</span>
           <h2>{editData ? "Edit Password" : "Add Password"}</h2>
-            {/* <label className="filled">Date:
-              <input
-                type="text"
-                value={newPasswordData.updatedAt}
-                readOnly
-              />
-            </label> */}
+            
             <label>Website:
               <input
                 type="text"

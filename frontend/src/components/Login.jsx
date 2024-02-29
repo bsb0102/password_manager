@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/api.js';
-import '../styles/AuthForm.css';
+import '../styles/Login.css';
 import Modal from '../modals/Mfa.jsx'; // Import your MFA modal component here
 
 const Login = () => {
@@ -48,8 +48,7 @@ const Login = () => {
         localStorage.setItem('tempToken', response.data.token);
         setShowMfaModal(true); // Show the MFA modal
       } else {
-        // Successful login without MFA
-        navigate('/home'); // Redirect to the authenticated part of the app
+        navigate('/home');
       }
     } catch (error) {
       setError('Failed to Login');
@@ -95,10 +94,9 @@ const Login = () => {
   
 
   return (
-    <div className="auth-form-container animated-bg">
+    <div className="auth-form-container">
       <form onSubmit={handleLogin} className="auth-form">
         <h2>Login</h2>
-        <input type="hidden" name="_csrf" value={csrfToken} />
         {error && <div className="error-message">{error}</div>}
         <input
           type="text"
@@ -107,26 +105,25 @@ const Login = () => {
           onChange={(e) => setUsername(e.target.value)}
           required
           disabled={isLoading}
+          className="auth-input"
         />
-        <div className="password-input-group">
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isLoading}
-          />
-        </div>
-        <button type="submit" disabled={isLoading}>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
+          className="auth-input"
+        />
+        <button type="submit" disabled={isLoading} className="auth-button">
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
         <p className="alt-action">
-          Don't have an account?{' '}
-          <span onClick={() => navigate('/register')}>Register here</span>
+          Don't have an account? <span onClick={() => navigate('/register')} className="alt-action-link">Register here</span>
         </p>
-      </form>
-
+    </form>
+  
       {/* MFA Modal */}
       {showMfaModal && (
         <Modal onClose={() => setShowMfaModal(false)}>
@@ -137,14 +134,16 @@ const Login = () => {
               value={mfaToken}
               onChange={(e) => setMfaToken(e.target.value)}
               placeholder="Enter MFA token"
+              className="auth-input mfa-input"
             />
             {error && <div className="error-message">{error}</div>}
-            <button onClick={handleMfaLogin}>Login with MFA</button>
+            <button onClick={handleMfaLogin} className="auth-button mfa-button">Login with MFA</button>
           </div>
         </Modal>
       )}
     </div>
   );
-};
+  
+}  
 
 export default Login;

@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
@@ -7,45 +6,60 @@ const passwordRoutes = require('./routes/passwordRoutes');
 const mfaRoutes = require('./routes/mfaRoutes');
 const connectDB = require('./database');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-env = module.exports = process.env;
+const https = require('https');
+const fs = require('fs');
+const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
-
 const app = express();
+dotenv.config();
 
+// Load SSL/TLS certificate and private key
+const privateKey = fs.readFileSync(path.resolve(__dirname, '/etc/letsencrypt/live/safekey.gg/privkey.pem'), 'utf8');
+const certificate = fs.readFileSync(path.resolve(__dirname, '/etc/letsencrypt/live/safekey.gg/fullchain.pem'), 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
+// HTTPS options
+const httpsOptions = {
+  key: privateKey,
+  cert: certificate
+};
+
+// Set up middleware
 const corsOptions = {
-  origin: ['https://localhost:443', 'https://82.165.221.131:443', 'http://localhost:3000'], // Add your frontend URL here
+  origin: "*",
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
-  optionsSuccessStatus: 204,
+  optionsSuccessStatus: 204
 };
+
+const csrfProtection = csrf({ cookie: true });
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
 // Define the rate limit options
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 100
 });
-
-
 app.use(limiter);
 
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);
 app.use("/api", passwordRoutes);
-app.use('/api', mfaRoutes)
+app.use('/api', mfaRoutes);
 
 // Static file serving for production frontend
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../frontend/build')));
+    console.log(__dirname, '../frontend/build')
     app.get('*', (req, res) => {
+      console.log(req)
+      console.log(res)
         res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
     });
 }
@@ -53,7 +67,18 @@ if (process.env.NODE_ENV === 'production') {
 // Connect to Database
 connectDB();
 
-// Global error handler
-app.use(errorHandler);
+// Set the PORT based on the environment
+let PORT;
+if (process.env.NODE_ENV === 'developing') {
+    PORT = 3002;
+} else {
+    PORT = process.env.PORT || 443;
+}
 
-module.exports = app; // Export the app object for server.js to use
+// Create HTTPS server
+const server = https.createServer(httpsOptions, app);
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+module.exports = app;
