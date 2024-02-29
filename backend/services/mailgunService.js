@@ -80,7 +80,7 @@ const sendVerificationCodeEmail = (to, verificationCode) => {
 
 
 const sendPasswordResetEmail = (to, resetPasswordLink) => {
-  const templatePath = '/root/password_manager/backend/services/templates/passwordResetEmail.html'; // Path to the password reset email template file
+  const templatePath = '/root/password_manager/backend/services/templates/resetPassword.html'; // Path to the password reset email template file
 
   // Read HTML template from file
   fs.readFile(templatePath, "utf8", (err, data) => {

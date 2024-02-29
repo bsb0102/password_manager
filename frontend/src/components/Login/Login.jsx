@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
 import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
 import Cookies from 'js-cookie';
 import ResetPasswordModal from "../ResetPassword/ResetPasswordModal.jsx"
+import {AlertContext} from '../Alert/AlertService.js';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Login = () => {
   const [csrfToken, setCsrfToken] = useState('');
   const [showMfaModal, setShowMfaModal] = useState(false); // State to control MFA modal visibility
   const [mfaToken, setMfaToken] = useState('');
+  const { setAlert } = useContext(AlertContext);
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
 
   useEffect(() => {
@@ -111,6 +113,24 @@ const Login = () => {
       setTimeout(() => setError(''), 3000); // Clear the error message after 3 seconds
     }
   };
+
+
+  const submitResetPassword = async (username) => {
+    try {
+      console.log(username)
+      await axiosInstance.post(
+        '/api/request-password-reset',
+        {username: username}
+        )
+      console.log("Resetting Password")
+      handleForgotPasswordClose();
+      setAlert("success", "Successfully sent Email for Password Reset")
+
+    } catch( error ) {
+      console.log(error)
+      setAlert("error", "Failed to sent Email for Password Reset")
+    }
+  }
   
   
   
@@ -146,9 +166,10 @@ const Login = () => {
           Don't have an account?{' '}
           <span onClick={() => navigate('/register')}>Register here</span>
         </p>
-        <span className="forgot-password-link" onClick={handleForgotPassword}>
-          You forgot your Password? Click here
-        </span>
+        <p className="alt-action">
+          You forgot your Password? {' '}
+          <span onClick={handleForgotPassword}>Click here</span>
+        </p>
 
       </form>
 
@@ -171,7 +192,8 @@ const Login = () => {
 
       {showResetPasswordForm && (
         <ResetPasswordModal 
-        onClose={handleForgotPasswordClose}
+        onPasswordResetClose={handleForgotPasswordClose}
+        onPasswordResetSubmit={submitResetPassword}
         />
       )}
 

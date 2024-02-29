@@ -5,6 +5,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const passwordRoutes = require('./routes/passwordRoutes');
 const secretNodesRoutes = require('./routes/secretNodeRoutes');
+const resetPasswordRoutes = require('./routes/resetPassword')
 const mfaRoutes = require('./routes/mfaRoutes');
 const connectDB = require('./database');
 const mailGunService = require("./services/mailgunService")
@@ -33,6 +34,7 @@ app.use(cookieParser());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  legacyHeaders: false,
 });
 
 
@@ -40,9 +42,11 @@ app.use(limiter);
 
 // Remove the API_BASE_URL prefix from here
 app.use('/api', authRoutes);
-app.use("/api", passwordRoutes);
+app.use('/api', passwordRoutes);
 app.use('/api', mfaRoutes);
+app.use('/api', resetPasswordRoutes);
 app.use('/api', secretNodesRoutes);
+
 
 // Static file serving for production frontend
 if (process.env.NODE_ENV === 'production') {

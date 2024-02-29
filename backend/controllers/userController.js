@@ -8,6 +8,10 @@ const hashPassword = async (password) => {
   return bcrypt.hash(password, salt);
 };
 
+const generateResetPasswordToken = () => {
+  return Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+};
+
 // Function to create a new user record in the database
 const createUser = async (username, hashedPassword) => {
   try {
@@ -125,5 +129,6 @@ module.exports = {
   getVerificationCodeExpiration,
   deleteVerificationCode,
   generateVerificationCode,
-  calculateVerificationCodeExpiration
+  calculateVerificationCodeExpiration,
+  generateResetPasswordToken
 };
