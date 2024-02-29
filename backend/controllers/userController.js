@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User'); // Import your User model
 const VerificationCode = require('../models/VerificationCode');
+const jwt = require('jsonwebtoken');
 
 // Function to hash a password
 const hashPassword = async (password) => {
@@ -8,8 +9,24 @@ const hashPassword = async (password) => {
   return bcrypt.hash(password, salt);
 };
 
-const generateResetPasswordToken = () => {
-  return Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+const generateResetPasswordToken = (userId) => {
+  const payload = {
+      userId,
+      expiresIn: '1h', // Token expires in 1 hour
+  };
+  const secretKey = process.env.JWT_SECRET;
+  return jwt.sign(payload, secretKey);
+};
+
+// Function to verify if a reset password token is valid
+const verifyResetPasswordToken = (token) => {
+  try {
+      const secretKey = process.env.JWT_SECRET;
+      const decoded = jwt.verify(token, secretKey);
+      return { isValid: true, userId: decoded.userId };
+  } catch (error) {
+      return { isValid: false };
+  }
 };
 
 // Function to create a new user record in the database
@@ -130,5 +147,6 @@ module.exports = {
   deleteVerificationCode,
   generateVerificationCode,
   calculateVerificationCodeExpiration,
-  generateResetPasswordToken
+  generateResetPasswordToken,
+  verifyResetPasswordToken
 };

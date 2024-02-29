@@ -175,11 +175,12 @@ exports.getMfaStatus = async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    res.json({ mfaEnabled: user.mfaEnabled });
+    res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled }); // Add emailMFAEnabled to the response
   } catch (error) {
     res.status(500).send('Error fetching MFA status');
   }
 };
+
 
 exports.toggleMFA = async (req, res) => {
   try {

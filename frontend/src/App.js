@@ -6,7 +6,8 @@ import Settings from './components/Settings/Settings';
 import Dashboard from './components/Dashboard/Dashboard';
 import { AlertProvider } from './components/Alert/AlertService';
 import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoute";
-import LandingPage from "./components/LandingPage"
+import LandingPage from "./components/LandingPage";
+import ResetPassword from "./components/ResetPassword/ResetPassword"; // Import the ResetPassword component
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* Add this line */}
             <Route
               path="/home"
               element={
