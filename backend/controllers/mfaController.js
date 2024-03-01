@@ -153,9 +153,12 @@ exports.disableMFA = async (req, res) => {
     const user = await UserModel.findById(userId);
     user.mfaSecret = '';
     user.mfaEnabled = false;
+
+    user.emailMFAEnabled = false;
+    user.emailMFAVerificationCode = '';
     await user.save();
 
-    res.send('MFA is disabled');
+    res.json({message: "Successfully disabled MFA"});
   } catch (error) {
     res.status(500).send('Error disabling MFA');
   }

@@ -119,8 +119,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Determine if MFA is enabled for the user
-    const requireMfa = user.mfaEnabled;
-
+    const requireMfa = user.mfaEnabled || user.emailMFAEnabled;
     // Generate a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
 
@@ -134,6 +133,8 @@ router.post('/login', async (req, res) => {
     // Send login notification email
     const userIPAddress = req.ip.toString(); // Get the user's IP address
     await sendLoginNotification("entitiplayer@gmail.com", userIPAddress);
+
+    console.log(requireMfa)
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
   } catch (error) {
@@ -174,7 +175,6 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 
@@ -251,7 +251,6 @@ router.put('/change-password', async (req, res) => {
 
     // Hash the new password
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
 
     user.password = hashedNewPassword;
 

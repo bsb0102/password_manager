@@ -27,7 +27,7 @@ function Settings() {
     const fetchMfaStatus = async () => {
       try {
         const response = await axiosInstance.get('/api/mfa-status');
-        setIsMfaEnabled(response.data.mfaEnabled);
+        setIsMfaEnabled(response.data.mfaEnabled || response.data.emailMFAEnabled);
       } catch (error) {
         console.error('Fehler beim Abrufen des MFA-Status:', error);
       }
@@ -49,6 +49,15 @@ function Settings() {
         console.error('Error adding MFA:', error);
     }
   };
+
+  const handleAddEmailMFA = async () => {
+    try {
+      const response = await axiosInstance.post('/api/verify-Email-mfa');
+      setIsMfaEnabled(true);
+    } catch (error) { 
+      setAlert("error", "Failed to add Email MFA")
+    }
+  }
 
   const handleVerifyToken = async () => {
     try {
@@ -117,12 +126,7 @@ function Settings() {
         currentPassword: currentPassword,
         newPassword: newPassword
       };
-
-      console.log(requestData)
-
       const changePass = await axiosInstance.put('/api/change-password', requestData);
-
-      console.log("what is changepass", changePass)
 
       if (changePass) {
         console.log("Successfully saved Password")
@@ -161,14 +165,14 @@ function Settings() {
 
         <div className="settings-options">
           <div className="setting-item">
-            <label>Change Username</label>
+            <label>Change E-Mail</label>
             <input
               type="text"
-              placeholder="New Username"
+              placeholder="New E-Mail"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
             />
-            <button onClick={handleChangeUsername}>Change Username</button>
+            <button onClick={handleChangeUsername}>Change E-Mail</button>
           </div>
           <div className="setting-item">
             <label>New Password</label>
@@ -196,7 +200,7 @@ function Settings() {
             ) : (
               <>
                 <button className="mfa-button" onClick={handleAddMFA}>Add Google MFA</button>
-                <button className="mfa-button">Add Email MFA</button>
+                <button className="mfa-button" onClick={handleAddEmailMFA}>Add Email MFA</button>
               </>
               
             )}

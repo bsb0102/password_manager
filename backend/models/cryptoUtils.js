@@ -1,6 +1,7 @@
 // At the top of your cryptoUtils.js
 const crypto = require('crypto-browserify');
 const algorithm = 'aes-256-ctr';
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const secretKey = process.env.SECRET_KEY;
@@ -32,5 +33,16 @@ exports.decrypt = (content, iv) => {
     console.error("Error in decryption:", error);
     return null;
   }
-}
+};
+
+exports.getUserIdFromToken = (token) => {
+  try {
+    console.log("Testing")
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.userId;
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
+};
 

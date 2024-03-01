@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean, // Indicates whether Email MFA is enabled for the user
     default: false
   },
+  emailMFAVerificationCode: {
+    type: String,
+    default: ''
+  },
   // Verification code related fields
   verificationCode: {
     type: String,

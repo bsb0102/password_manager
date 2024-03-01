@@ -18,6 +18,7 @@ const Login = () => {
   const [mfaToken, setMfaToken] = useState('');
   const { setAlert } = useContext(AlertContext);
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
+  const [mfaStatus, setMfaStatus] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,6 +33,7 @@ const Login = () => {
     fetchData();
   }, []);
 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,27 +46,31 @@ const Login = () => {
   
     try {
       const response = await axiosInstance.post('/api/login', data);
-  
+    
       if (response.data.message === "Login successful") {
         // Store the token in cookies
         Cookies.set('token', response.data.token, { expires: 7 }); // Token is stored for 7 days. Adjust as necessary.
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
         localStorage.setItem('token', response.data.token);
         navigate('/home');
-
+    
         // If MFA is not required, navigate to /home
         if (!response.data.requireMfa) {
           // Navigate to /home using React Router
           navigate('/home'); // Assuming 'navigate' is obtained from useNavigate() hook.
-          console.log("Successfully logged in");
         } else {
           localStorage.setItem('tempToken', response.data.token);
+    
+          const response_mfa = await axiosInstance.get('/api/mfa-status')
+    
+          setMfaStatus(response_mfa.data); // Set mfaStatus to the response data received from response_mfa
+          console.log("mfa status new", mfaStatus);
+          
           setShowMfaModal(true);
         }
       } else {
         setError('Failed to Login');
       }
-
     } catch (error) {
       setError('Failed to Login');
       if (error.response) {
