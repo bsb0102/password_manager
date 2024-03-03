@@ -16,13 +16,14 @@ router.post('/disable-mfa', authenticateToken, mfaController.disableMFA);
 router.delete('/delete-mfa', authenticateToken, mfaController.deleteMFA);
 
 
-router.post('/enable-Email-mfa', authenticateToken, emailMFAController.enableEmailMFA)
-router.post('/disable-Email-mfa', authenticateToken, emailMFAController.disableEmailMFA)
-router.post('/verify-Email-mfa', authenticateToken, emailMFAController.enableEmailMFA)
-
+router.post('/enable-email-mfa', authenticateToken, emailMFAController.enableEmailMFA)
+router.post('/disable-email-mfa', authenticateToken, emailMFAController.disableEmailMFA)
+router.post('/verify-email-mfa', authenticateToken, emailMFAController.verifyEmailMFA)
+router.post('/send-email-mfa', authenticateToken, emailMFAController.sendEmailMfa)
 
 
 router.get('/mfa-status', authenticateToken, mfaController.getMfaStatus);
+
 
 
 module.exports = router;

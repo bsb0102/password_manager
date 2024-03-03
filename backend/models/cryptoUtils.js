@@ -37,7 +37,6 @@ exports.decrypt = (content, iv) => {
 
 exports.getUserIdFromToken = (token) => {
   try {
-    console.log("Testing")
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return decoded.userId;
   } catch (error) {

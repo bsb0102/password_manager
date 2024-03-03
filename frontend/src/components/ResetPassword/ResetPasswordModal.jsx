@@ -39,3 +39,4 @@ const ResetPasswordModal = ({ onPasswordResetClose, onPasswordResetSubmit }) => 
 }
 
 export default ResetPasswordModal;
+

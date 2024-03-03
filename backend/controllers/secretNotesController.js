@@ -1,7 +1,7 @@
 // secretNoteController.js
 
 const SecretNote = require('../models/SecretNotes');
-const { generateRandomIV, encrypt, decrypt } = require('../models/cryptoUtils');
+const { generateRandomIV, encrypt, decrypt, getUserIdFromToken } = require('../models/cryptoUtils');
 require('dotenv').config();
 
 

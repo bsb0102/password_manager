@@ -1,4 +1,4 @@
-const { sendSuccessEmailMFAEmail } = require("../services/mailgunService")
+const { sendSuccessEmailMFAEmail, sendEmailMFACode } = require("../services/mailgunService")
 const { generateVerificationCode, getUserById } = require("../controllers/userController")
 const { getUserIdFromToken } = require('../models/cryptoUtils'); // Adjust the path as necessary
 
@@ -42,29 +42,24 @@ exports.verifyEmailMFA = async (req, res) => {
         const { verificationCode } = req.body;
 
         const token = req.headers.authorization.split(' ')[1];
-        const user = getUserIdFromToken(token);
+        const user = await fetchUserData(token);
 
 
         if (!user) {
-        return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "User not found" });
         }
+        const user_emailMFA_Code = await user.emailMFAVerificationCode;
 
-        if (!user.emailMFAVerificationCode) {
-        return res.status(400).json({ error: "No verification code found for this user" });
+        if (verificationCode === user_emailMFA_Code) {
+            return res.json({ status: 'success' });
+        } else if (verificationCode !== user_emailMFA_Code) {
+            return res.status(400).json({status: 'Failed'});
+        } else {
+            return res.status(404).send('Error 404')
         }
-
-        if (verificationCode !== user.emailMFAVerificationCode) {
-        return res.status(400).json({ error: "Invalid verification code" });
-        }
-
-        user.emailMFAEnabled = true;
-        user.emailMFAVerificationCode = ''; // Clear verification code
-        await user.save();
-
-        res.json({ message: 'Email MFA enabled successfully' });
     } catch (error) {
         console.error('Verify Email MFA error:', error);
-        res.status(500).send('Error verifying Email MFA');
+        return res.status(500).send('Error verifying Email MFA');
     }
 };
 
@@ -92,3 +87,26 @@ exports.disableEmailMFA = async (req, res) => {
     }
 };
   
+
+
+exports.sendEmailMfa = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const user = await fetchUserData(token)
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        user.emailMFAEnabled = true;
+        await user.save();
+        const verification_token = await sendEmailMFACode(user.username);
+        user.emailMFAVerificationCode = await verification_token
+        await user.save();
+
+        res.json({ message: 'Successfully sent MFA to your Email' });
+    } catch (error) {
+        console.error('Send Email MFA error:', error);
+        res.status(500).send('Error sending Email MFA');
+    }
+};

@@ -178,11 +178,23 @@ exports.getMfaStatus = async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled }); // Add emailMFAEnabled to the response
+    let mfaType;
+    if (!user.mfaEnabled && !user.emailMFAEnabled) {
+      mfaType = null;
+    } else if (user.mfaEnabled) {
+      mfaType = "google";
+    } else if (user.emailMFAEnabled) {
+      mfaType = "email";
+    } else {
+      mfaType = null;
+    }
+
+    res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled, mfaType: mfaType });
   } catch (error) {
     res.status(500).send('Error fetching MFA status');
   }
 };
+
 
 
 exports.toggleMFA = async (req, res) => {

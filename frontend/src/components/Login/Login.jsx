@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
-import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
 import Cookies from 'js-cookie';
 import ResetPasswordModal from "../ResetPassword/ResetPasswordModal.jsx"
 import {AlertContext} from '../Alert/AlertService.js';
+import MultiFactorModal from './MultiFactorModal'
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,11 +15,10 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState('');
-  const [showMfaModal, setShowMfaModal] = useState(false); // State to control MFA modal visibility
-  const [mfaToken, setMfaToken] = useState('');
+  const [showMfaModal, setShowMfaModal] = useState(false);
+  const [mfaType, setMfaType] = useState(''); // State to determine the type of MFA
   const { setAlert } = useContext(AlertContext);
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
-  const [mfaStatus, setMfaStatus] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +29,6 @@ const Login = () => {
         console.error('Failed to fetch CSRF token:', error);
       }
     };
-
     fetchData();
   }, []);
 
@@ -48,24 +47,17 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', data);
     
       if (response.data.message === "Login successful") {
-        // Store the token in cookies
-        Cookies.set('token', response.data.token, { expires: 7 }); // Token is stored for 7 days. Adjust as necessary.
+        Cookies.set('token', response.data.token, { expires: 7 });
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
         localStorage.setItem('token', response.data.token);
-        navigate('/home');
-    
-        // If MFA is not required, navigate to /home
+        
         if (!response.data.requireMfa) {
-          // Navigate to /home using React Router
-          navigate('/home'); // Assuming 'navigate' is obtained from useNavigate() hook.
+          navigate('/home');
         } else {
           localStorage.setItem('tempToken', response.data.token);
     
-          const response_mfa = await axiosInstance.get('/api/mfa-status')
-    
-          setMfaStatus(response_mfa.data); // Set mfaStatus to the response data received from response_mfa
-          console.log("mfa status new", mfaStatus);
-          
+          const response_mfa = await axiosInstance.get('/api/mfa-status');
+          await setMfaType(response_mfa.data.mfaType); // Assuming response_mfa.data.mfaType contains either 'mfaEnabled' or 'emailMFAEnabled'
           setShowMfaModal(true);
         }
       } else {
@@ -78,7 +70,7 @@ const Login = () => {
       } else if (error.request) {
         console.error('Network error:', error.request);
       } else {
-        console.error('Other error:', error.message);
+        console.error('Error:', error.message);
       }
     } finally {
       setIsLoading(false);
@@ -96,27 +88,13 @@ const Login = () => {
 
   const handleMfaLogin = async () => {
     try {
-      const tempToken = localStorage.getItem('tempToken'); // Retrieve the temporary JWT token
-      if (!tempToken) {
-        setError('Temporary JWT token not found');
-        return;
-      }
-  
-      // Verify MFA token with the temporary JWT token
-      await axiosInstance.post(
-        '/api/verify-mfa',
-        { token: mfaToken },
-        { headers: { Authorization: `Bearer ${tempToken}` } }
-      );
-  
-      // Handle successful MFA login
+      console.log("Mfa Testing")
       setShowMfaModal(false);
       navigate('/home');
     } catch (error) {
       console.error('Error verifying MFA token:', error);
       setError('Invalid MFA token. Please try again.');
-      setMfaToken(''); // Clear the MFA token input field
-      setTimeout(() => setError(''), 3000); // Clear the error message after 3 seconds
+      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -137,7 +115,6 @@ const Login = () => {
       setAlert("error", "Failed to sent Email for Password Reset")
     }
   }
-  
   
   
 
@@ -181,19 +158,12 @@ const Login = () => {
 
       {/* MFA Modal */}
       {showMfaModal && (
-        <Modal onClose={() => setShowMfaModal(false)}>
-          <div className="mfa-login">
-            <h3>MFA Login</h3>
-            <input
-              type="text"
-              value={mfaToken}
-              onChange={(e) => setMfaToken(e.target.value)}
-              placeholder="Enter MFA token"
-            />
-            {error && <div className="error-message">{error}</div>}
-            <button onClick={handleMfaLogin}>Login with MFA</button>
-          </div>
-        </Modal>
+        <MultiFactorModal
+          isOpen={showMfaModal}
+          mfaType={mfaType}
+          onMfaSubmit={handleMfaLogin} // Your existing MFA login handler
+          onClose={() => setShowMfaModal(false)} // Function to close the modal
+        />
       )}
 
       {showResetPasswordForm && (
