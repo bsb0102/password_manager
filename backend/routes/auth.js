@@ -92,6 +92,7 @@ router.post('/login', async (req, res) => {
 
     // Determine if MFA is enabled for the user
 <<<<<<< HEAD
+<<<<<<< HEAD
     const requireMfa = user.mfaEnabled;
 
     // Generate and send a JWT token upon successful login
@@ -100,6 +101,8 @@ router.post('/login', async (req, res) => {
     // Respond with the JWT token and whether MFA is required
     res.json({ message: 'Login successful', token, requireMfa });
 =======
+=======
+>>>>>>> v1
     const requireMfa = user.mfaEnabled || user.emailMFAEnabled;
     // Generate a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
@@ -156,7 +159,10 @@ router.post('/register', async (req, res) => {
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> v1
 router.post('/verifyCode', async (req, res) => {
   try {
     const { username, verificationCode, password } = req.body;

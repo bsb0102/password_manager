@@ -45,6 +45,9 @@ app.use(cookieParser());
 =======
 
 
+<<<<<<< HEAD
+>>>>>>> v1
+=======
 >>>>>>> v1
 // Define the rate limit options
 const limiter = rateLimit({

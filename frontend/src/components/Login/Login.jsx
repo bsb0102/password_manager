@@ -25,7 +25,6 @@ const Login = () => {
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
   const [tempMFAToken, setTempMFAToken] = useState("");
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,8 +87,6 @@ const Login = () => {
     }
   };
   
-<<<<<<< HEAD
-=======
   
 
   const handleForgotPassword = () => {
@@ -98,7 +95,6 @@ const Login = () => {
   const handleForgotPasswordClose = () => {
     setShowResetPasswordForm(false);
   };
->>>>>>> v1
   
 
   const handleMfaLogin = async () => {
@@ -111,7 +107,6 @@ const Login = () => {
       setTimeout(() => setError(''), 3000);
     }
   };
-  
   
 
   return (
@@ -147,7 +142,6 @@ const Login = () => {
   
       {/* MFA Modal */}
       {showMfaModal && (
-<<<<<<< HEAD
         <Modal onClose={() => setShowMfaModal(false)}>
           <div className="mfa-login">
             <h3>MFA Login</h3>
@@ -162,7 +156,6 @@ const Login = () => {
             <button onClick={handleMfaLogin} className="auth-button mfa-button">Login with MFA</button>
           </div>
         </Modal>
-=======
         <MultiFactorModal
           isOpen={showMfaModal}
           mfaType={mfaType}
@@ -170,7 +163,6 @@ const Login = () => {
           onClose={() => setShowMfaModal(false)} // Function to close the modal
           tempMFAToken={tempMFAToken}
         />
->>>>>>> v1
       )}
     </div>
   );
