@@ -41,7 +41,7 @@ exports.verifyEmailMFA = async (req, res) => {
     try {
         const { verificationCode } = req.body;
 
-        const token = req.headers.authorization.split(' ')[1];
+        let token = req.headers.authorization.split(' ')[1];
         const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
 
         // Check if tempToken exists, if so, use it as the authToken
@@ -74,6 +74,7 @@ exports.verifyEmailMFA = async (req, res) => {
 };
 
 
+
 exports.disableEmailMFA = async (req, res) => {
     try {
         
@@ -102,16 +103,16 @@ exports.disableEmailMFA = async (req, res) => {
 
 exports.sendEmailMfa = async (req, res) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
+        let token = req.headers.authorization.split(' ')[1];
         const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
 
         // Check if tempToken exists, if so, use it as the authToken
         if (tempToken) {
             token = tempToken;
         }
-
-        const user = await fetchUserData(token)
-        console.log(user)
+        
+        // Fetch user data using the token
+        const user = await fetchUserData(token);
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });

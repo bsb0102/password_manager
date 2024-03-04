@@ -168,14 +168,11 @@ exports.getMfaStatus = async (req, res) => {
   try {
     let authToken = req.headers.authorization.split(' ')[1];
     const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
-    console.log("nr1", tempToken)
 
     // Check if tempToken exists, if so, use it as the authToken
     if (tempToken) {
       authToken = tempToken;
     }
-
-    console.log(authToken)
     // Ensure the token is valid before proceeding
     const userId = getUserIdFromToken(authToken);
 
