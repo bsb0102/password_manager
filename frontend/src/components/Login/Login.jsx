@@ -19,6 +19,7 @@ const Login = () => {
   const [mfaType, setMfaType] = useState(''); // State to determine the type of MFA
   const { setAlert } = useContext(AlertContext);
   const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
+  const [tempMFAToken, setTempMFAToken] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,11 +59,11 @@ const Login = () => {
           Cookies.set('tempToken', tempToken, { expires: 1 }); // Set temporary token in cookie with 1-day expiry
           const response_mfa = await axiosInstance.get('/api/mfa-status', {
             headers: {
-              'Authorization': `Bearer ${tempToken}`,
               'x-temp-token': tempToken, // Send temporary token in headers
             }
           });
           await setMfaType(response_mfa.data.mfaType);
+          setTempMFAToken(tempToken)
           setShowMfaModal(true);
         }
       } else {
@@ -168,6 +169,7 @@ const Login = () => {
           mfaType={mfaType}
           onMfaSubmit={handleMfaLogin} // Your existing MFA login handler
           onClose={() => setShowMfaModal(false)} // Function to close the modal
+          tempMFAToken={tempMFAToken}
         />
       )}
 

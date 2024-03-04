@@ -95,8 +95,6 @@ exports.updateSecretNote = async (req, res) => {
       const encryptedContent = encrypt(content, ivContent); // 
       const encryptedPassphrase = encrypt(passphrase, ivPassphrase); // 
 
-      console.log(encryptedContent)
-      console.log(encryptedPassphrase)
       // Update the secret node with the new encrypted content and passphrase
       await SecretNote.findByIdAndUpdate(id, {
         title,

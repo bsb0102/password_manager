@@ -4,7 +4,7 @@ import axiosInstance from '../../api/api.js';
 import { useNavigate } from 'react-router-dom';
 import { AlertContext } from '../Alert/AlertService.js';
 
-const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
+const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose, tempMFAToken }) => {
   const [mfaToken, setMfaToken] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const [emailSent, setEmailSent] = useState(false); // Track whether email has been sent
@@ -21,7 +21,11 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
   const sendEmailMfa = async () => {
     try {
       // Send request to send email MFA
-      await axiosInstance.post('/api/send-email-mfa', {});
+      await axiosInstance.post('/api/send-email-mfa', {
+        headers: {
+          'x-temp-token': tempMFAToken, // Send temporary token in headers
+        }
+      });
       console.log("Send Email MFA");
     } catch (error) {
       console.error('Error sending email MFA:', error);
@@ -34,10 +38,15 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
       setAlert('Error', 'MFA token is missing');
       return;
     }
-    try {
-      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken });
 
-      console.log("response data: ", response.data); // Corrected from response.body to response.data
+    console.log("temp mfa token: ", tempMFAToken)
+
+    try {
+      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken }, {
+        headers: {
+          'x-temp-token': tempMFAToken, // Send temporary token in headers
+        }
+      });
       if (response.data.status === 'success') {
         navigate('/home');
       } else {

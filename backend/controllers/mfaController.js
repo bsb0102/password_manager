@@ -165,21 +165,19 @@ exports.disableMFA = async (req, res) => {
 };
 
 exports.getMfaStatus = async (req, res) => {
-  console.log("Testing STAtus")
   try {
     let authToken = req.headers.authorization.split(' ')[1];
-    const tempToken = req.headers['X-Temp-Token']; // Assuming the temporary token is sent in the headers
-
-    console.log("test temptoken",tempToken)
+    const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
+    console.log("nr1", tempToken)
 
     // Check if tempToken exists, if so, use it as the authToken
     if (tempToken) {
       authToken = tempToken;
     }
 
+    console.log(authToken)
     // Ensure the token is valid before proceeding
     const userId = getUserIdFromToken(authToken);
-
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid or missing token" });

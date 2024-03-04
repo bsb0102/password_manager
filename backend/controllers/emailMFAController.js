@@ -41,12 +41,13 @@ exports.verifyEmailMFA = async (req, res) => {
     try {
         const { verificationCode } = req.body;
 
-        // Check if authorization header is present
-        if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ') || !req.headers.startsWith('token ')) {
-            return res.status(401).json({ error: "Unauthorized access" });
-        }
-
         const token = req.headers.authorization.split(' ')[1];
+        const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
+
+        // Check if tempToken exists, if so, use it as the authToken
+        if (tempToken) {
+            token = tempToken;
+        }
         
         // Fetch user data using the token
         const user = await fetchUserData(token);
@@ -102,14 +103,20 @@ exports.disableEmailMFA = async (req, res) => {
 exports.sendEmailMfa = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
+        const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
+
+        // Check if tempToken exists, if so, use it as the authToken
+        if (tempToken) {
+            token = tempToken;
+        }
+
         const user = await fetchUserData(token)
+        console.log(user)
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        user.emailMFAEnabled = true;
-        await user.save();
         const verification_token = await sendEmailMFACode(user.username);
         user.emailMFAVerificationCode = await verification_token
         await user.save();
