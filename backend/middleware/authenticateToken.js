@@ -4,10 +4,16 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-  if (!token) return res.status(401).json({ error: 'Access denied' });
+  // Check if there's a temporary token in the headers
+  const tempToken = req.headers['x-temp-token'];
+
+  // Use the temporary token if it exists
+  const authToken = tempToken || token;
+
+  if (!authToken) return res.status(401).json({ error: 'Access denied' });
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(authToken, process.env.JWT_SECRET);
     req.user = verified;
 
     // Debugging: Log the decoded token payload

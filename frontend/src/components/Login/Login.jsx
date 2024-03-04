@@ -45,19 +45,24 @@ const Login = () => {
   
     try {
       const response = await axiosInstance.post('/api/login', data);
-    
+  
       if (response.data.message === "Login successful") {
-        Cookies.set('token', response.data.token, { expires: 7 });
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        localStorage.setItem('token', response.data.token);
-        
         if (!response.data.requireMfa) {
+          Cookies.set('token', response.data.token, { expires: 7 });
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+          localStorage.setItem('token', response.data.token);
           navigate('/home');
         } else {
+          const tempToken = response.data.token;
           localStorage.setItem('tempToken', response.data.token);
-    
-          const response_mfa = await axiosInstance.get('/api/mfa-status');
-          await setMfaType(response_mfa.data.mfaType); // Assuming response_mfa.data.mfaType contains either 'mfaEnabled' or 'emailMFAEnabled'
+          Cookies.set('tempToken', tempToken, { expires: 1 }); // Set temporary token in cookie with 1-day expiry
+          const response_mfa = await axiosInstance.get('/api/mfa-status', {
+            headers: {
+              'Authorization': `Bearer ${tempToken}`,
+              'x-temp-token': tempToken, // Send temporary token in headers
+            }
+          });
+          await setMfaType(response_mfa.data.mfaType);
           setShowMfaModal(true);
         }
       } else {
@@ -77,6 +82,7 @@ const Login = () => {
     }
   };
   
+  
 
   const handleForgotPassword = () => {
     setShowResetPasswordForm(true); // Show the PasswordResetForm when "Forgot Password" link is clicked
@@ -88,7 +94,6 @@ const Login = () => {
 
   const handleMfaLogin = async () => {
     try {
-      console.log("Mfa Testing")
       setShowMfaModal(false);
       navigate('/home');
     } catch (error) {

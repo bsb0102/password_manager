@@ -2,20 +2,21 @@ import React, { useState, useEffect, useContext } from 'react';
 import '../ResetPassword/ResetPasswordModal.css';
 import axiosInstance from '../../api/api.js';
 import { useNavigate } from 'react-router-dom';
-import {AlertContext} from '../Alert/AlertService.js';
+import { AlertContext } from '../Alert/AlertService.js';
 
 const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
   const [mfaToken, setMfaToken] = useState('');
   const [cooldown, setCooldown] = useState(0);
+  const [emailSent, setEmailSent] = useState(false); // Track whether email has been sent
   const navigate = useNavigate();
   const { setAlert } = useContext(AlertContext);
 
-
   useEffect(() => {
-    if (mfaType === 'email') {
+    if (mfaType === 'email' && isOpen && !emailSent) {
       sendEmailMfa();
+      setEmailSent(true);
     }
-  }, [isOpen]); // Trigger sending email MFA when modal is opened
+  }, [isOpen, emailSent]); // Trigger sending email MFA when modal is opened
 
   const sendEmailMfa = async () => {
     try {
@@ -28,30 +29,34 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
   };
 
   const verifyEmailMfa = async () => {
+    if (!mfaToken) {
+      console.log('MFA token is missing');
+      setAlert('Error', 'MFA token is missing');
+      return;
+    }
     try {
-      // Send request to send email MFA
-      await axiosInstance.get('/api/mfa-status');
-      console.log("Send Email MFA 123123123123123123");
+      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken });
+
+      console.log("response data: ", response.data); // Corrected from response.body to response.data
+      if (response.data.status === 'success') {
+        navigate('/home');
+      } else {
+        setAlert('Error', 'Failed to verify email MFA');
+      }
     } catch (error) {
-      console.error('Error sending email MFA:', error);
+      if (error.response) {
+        setAlert("error", "Invalid MultiFactor Key. Try again")
+        setMfaToken('')
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      setAlert('Error', 'Failed to send email MFA');
     }
   };
-
-
-    // console.log(response.body);
-
-      
-      // if ("success" === response.body.status) {
-      //     navigate('/home');
-      //     setAlert("Success", "Successfully logged in with multi-factor authentication.");
-      // } else if (response.status === 401) {
-      //     console.log("wrong key")
-      //     setAlert("Error", "Unauthorized access. Please log in again.");
-      // } else {
-      //     setAlert("Error", `Failed to log in: ${response.body.status}`);
-      //     console.log(response);
-      // }
-
 
   const verifyGoogleMfa = async () => {
     try {
@@ -60,7 +65,7 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
         { token: mfaToken },
         { headers: { Authorization: `Bearer ${tempToken}` } }
       );
-      
+
       console.log(response.data)
     } catch (error) {
       console.error(error)
@@ -117,7 +122,7 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
         </form>
       </div>
     </div>
-  );  
+  );
 };
 
 export default MultiFactorModal;

@@ -165,19 +165,33 @@ exports.disableMFA = async (req, res) => {
 };
 
 exports.getMfaStatus = async (req, res) => {
+  console.log("Testing STAtus")
   try {
-    const authToken = req.headers.authorization.split(' ')[1];
+    let authToken = req.headers.authorization.split(' ')[1];
+    const tempToken = req.headers['X-Temp-Token']; // Assuming the temporary token is sent in the headers
+
+    console.log("test temptoken",tempToken)
+
+    // Check if tempToken exists, if so, use it as the authToken
+    if (tempToken) {
+      authToken = tempToken;
+    }
+
+    // Ensure the token is valid before proceeding
     const userId = getUserIdFromToken(authToken);
+
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid or missing token" });
     }
 
+    // Fetch user details from the database based on userId
     const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
 
+    // Determine the MFA type based on user settings
     let mfaType;
     if (!user.mfaEnabled && !user.emailMFAEnabled) {
       mfaType = null;
@@ -189,11 +203,15 @@ exports.getMfaStatus = async (req, res) => {
       mfaType = null;
     }
 
+    // Return the MFA status to the frontend
     res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled, mfaType: mfaType });
   } catch (error) {
+    // Handle any errors that occur during the process
     res.status(500).send('Error fetching MFA status');
   }
 };
+
+
 
 
 

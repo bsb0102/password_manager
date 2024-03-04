@@ -104,6 +104,8 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    console.log("Helloworldiungton")
+
     // Authenticate the user by fetching user data from the database
     const user = await getUserByEmail(username);
 
@@ -131,14 +133,11 @@ router.post('/login', async (req, res) => {
     });
     
     // Send login notification email
-    const userIPAddress = req.ip.toString(); // Get the user's IP address
+    const userIPAddress = req.ip.toString(); // Get the user's IP addresss
 
     if (!requireMfa) {
       await sendLoginNotification(username, userIPAddress);
     }
-
-
-    console.log(requireMfa)
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
   } catch (error) {
