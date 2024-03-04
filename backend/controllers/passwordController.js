@@ -1,20 +1,12 @@
 const jwt = require('jsonwebtoken');
 const Password = require('../models/Password');
-const { generateRandomIV, encrypt, decrypt } = require('../models/cryptoUtils'); // Adjust the path as necessary
+const { generateRandomIV, encrypt, decrypt, getUserIdFromToken } = require('../models/cryptoUtils'); // Adjust the path as necessary
 require('dotenv').config();
 
 
 const secretKey = process.env.SECRET_KEY;
 
-getUserIdFromToken = (token) => {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return decoded.userId;
-  } catch (error) {
-    console.error("Error decoding JWT:", error);
-    return null;
-  }
-};
+
 
 exports.addPassword = async (req, res) => {
   try {

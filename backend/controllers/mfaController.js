@@ -153,9 +153,12 @@ exports.disableMFA = async (req, res) => {
     const user = await UserModel.findById(userId);
     user.mfaSecret = '';
     user.mfaEnabled = false;
+
+    user.emailMFAEnabled = false;
+    user.emailMFAVerificationCode = '';
     await user.save();
 
-    res.send('MFA is disabled');
+    res.json({message: "Successfully disabled MFA"});
   } catch (error) {
     res.status(500).send('Error disabling MFA');
   }
@@ -163,24 +166,60 @@ exports.disableMFA = async (req, res) => {
 
 exports.getMfaStatus = async (req, res) => {
   try {
-    const authToken = req.headers.authorization.split(' ')[1];
+    let authToken = req.headers.authorization.split(' ')[1];
+    const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
+    console.log("nr1", tempToken)
+
+    // Check if tempToken exists, if so, use it as the authToken
+    if (tempToken) {
+      authToken = tempToken;
+    }
+
+    console.log(authToken)
+    // Ensure the token is valid before proceeding
     const userId = getUserIdFromToken(authToken);
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid or missing token" });
     }
 
+    // Fetch user details from the database based on userId
     const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
 
+<<<<<<< HEAD
     res.json({ mfaEnabled: user.mfaEnabled });
+=======
+    // Determine the MFA type based on user settings
+    let mfaType;
+    if (!user.mfaEnabled && !user.emailMFAEnabled) {
+      mfaType = null;
+    } else if (user.mfaEnabled) {
+      mfaType = "google";
+    } else if (user.emailMFAEnabled) {
+      mfaType = "email";
+    } else {
+      mfaType = null;
+    }
+
+    // Return the MFA status to the frontend
+    res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled, mfaType: mfaType });
+>>>>>>> v1
   } catch (error) {
+    // Handle any errors that occur during the process
     res.status(500).send('Error fetching MFA status');
   }
 };
 
+<<<<<<< HEAD
+=======
+
+
+
+
+>>>>>>> v1
 exports.toggleMFA = async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];

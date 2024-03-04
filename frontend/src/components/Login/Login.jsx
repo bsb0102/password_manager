@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD:frontend/src/components/Login.jsx
 import axiosInstance from '../api/api.js';
 import '../styles/Login.css';
 import Modal from '../modals/Mfa.jsx'; // Import your MFA modal component here
-=======
 import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
-import Modal from '../../modals/Mfa.jsx'; // Import your MFA modal component here
 import Cookies from 'js-cookie';
->>>>>>> v1:frontend/src/components/Login/Login.jsx
+import ResetPasswordModal from "../ResetPassword/ResetPasswordModal.jsx"
+import {AlertContext} from '../Alert/AlertService.js';
+import MultiFactorModal from './MultiFactorModal'
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +20,11 @@ const Login = () => {
   const [csrfToken, setCsrfToken] = useState('');
   const [showMfaModal, setShowMfaModal] = useState(false); // State to control MFA modal visibility
   const [mfaToken, setMfaToken] = useState('');
+  const [mfaType, setMfaType] = useState(''); // State to determine the type of MFA
+  const { setAlert } = useContext(AlertContext);
+  const [showResetPasswordForm, setShowResetPasswordForm] = useState(false);
+  const [tempMFAToken, setTempMFAToken] = useState("");
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,9 +35,9 @@ const Login = () => {
         console.error('Failed to fetch CSRF token:', error);
       }
     };
-
     fetchData();
   }, []);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -48,25 +53,27 @@ const Login = () => {
       const response = await axiosInstance.post('/api/login', data);
   
       if (response.data.message === "Login successful") {
-        // Store the token in cookies
-        Cookies.set('token', response.data.token, { expires: 7 }); // Token is stored for 7 days. Adjust as necessary.
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        localStorage.setItem('token', response.data.token);
-        navigate('/home');
-
-        // If MFA is not required, navigate to /home
         if (!response.data.requireMfa) {
-          // Navigate to /home using React Router
-          navigate('/home'); // Assuming 'navigate' is obtained from useNavigate() hook.
-          console.log("Successfully logged in");
+          Cookies.set('token', response.data.token, { expires: 7 });
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+          localStorage.setItem('token', response.data.token);
+          navigate('/home');
         } else {
+          const tempToken = response.data.token;
           localStorage.setItem('tempToken', response.data.token);
+          Cookies.set('tempToken', tempToken, { expires: 1 }); // Set temporary token in cookie with 1-day expiry
+          const response_mfa = await axiosInstance.get('/api/mfa-status', {
+            headers: {
+              'x-temp-token': tempToken, // Send temporary token in headers
+            }
+          });
+          await setMfaType(response_mfa.data.mfaType);
+          setTempMFAToken(tempToken)
           setShowMfaModal(true);
         }
       } else {
         setError('Failed to Login');
       }
-
     } catch (error) {
       setError('Failed to Login');
       if (error.response) {
@@ -74,41 +81,36 @@ const Login = () => {
       } else if (error.request) {
         console.error('Network error:', error.request);
       } else {
-        console.error('Other error:', error.message);
+        console.error('Error:', error.message);
       }
     } finally {
       setIsLoading(false);
     }
   };
   
+<<<<<<< HEAD
+=======
+  
+
+  const handleForgotPassword = () => {
+    setShowResetPasswordForm(true); // Show the PasswordResetForm when "Forgot Password" link is clicked
+  };
+  const handleForgotPasswordClose = () => {
+    setShowResetPasswordForm(false);
+  };
+>>>>>>> v1
   
 
   const handleMfaLogin = async () => {
     try {
-      const tempToken = localStorage.getItem('tempToken'); // Retrieve the temporary JWT token
-      if (!tempToken) {
-        setError('Temporary JWT token not found');
-        return;
-      }
-  
-      // Verify MFA token with the temporary JWT token
-      await axiosInstance.post(
-        '/api/verify-mfa',
-        { token: mfaToken },
-        { headers: { Authorization: `Bearer ${tempToken}` } }
-      );
-  
-      // Handle successful MFA login
       setShowMfaModal(false);
       navigate('/home');
     } catch (error) {
       console.error('Error verifying MFA token:', error);
       setError('Invalid MFA token. Please try again.');
-      setMfaToken(''); // Clear the MFA token input field
-      setTimeout(() => setError(''), 3000); // Clear the error message after 3 seconds
+      setTimeout(() => setError(''), 3000);
     }
   };
-  
   
   
 
@@ -145,6 +147,7 @@ const Login = () => {
   
       {/* MFA Modal */}
       {showMfaModal && (
+<<<<<<< HEAD
         <Modal onClose={() => setShowMfaModal(false)}>
           <div className="mfa-login">
             <h3>MFA Login</h3>
@@ -159,6 +162,15 @@ const Login = () => {
             <button onClick={handleMfaLogin} className="auth-button mfa-button">Login with MFA</button>
           </div>
         </Modal>
+=======
+        <MultiFactorModal
+          isOpen={showMfaModal}
+          mfaType={mfaType}
+          onMfaSubmit={handleMfaLogin} // Your existing MFA login handler
+          onClose={() => setShowMfaModal(false)} // Function to close the modal
+          tempMFAToken={tempMFAToken}
+        />
+>>>>>>> v1
       )}
     </div>
   );

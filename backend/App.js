@@ -41,6 +41,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> v1
 // Define the rate limit options
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

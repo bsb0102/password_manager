@@ -90,13 +90,23 @@ function Dashboard() {
     
     // Remove the token and any other related data from localStorage
     localStorage.removeItem('token');
-    localStorage.removeItem('tempToken'); // Remove tempToken if used for MFA
+    
+    // Check if there's a temporary token stored in localStorage
+    const tempToken = localStorage.getItem('tempToken');
+    if (tempToken) {
+      // Remove the temporary token from localStorage
+      localStorage.removeItem('tempToken');
+      
+      // Also remove the temporary token from cookies if it exists
+      Cookies.remove('tempToken');
+    }
     
     // Navigate to the login page or another appropriate page
     navigate('/login'); // Assuming 'navigate' is obtained from useNavigate() hook.
     
     console.log("Successfully logged out");
   };
+  
   
 
   const handleSidebarItemClick = (text) => {
