@@ -336,6 +336,7 @@ const PasswordManager = () => {
                 value={newPasswordData.website || (editData ? editData.website : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, website: e.target.value })}
                 className="input-field"
+                autoComplete="off"
             />
         </div>
         <div className="form-group">
@@ -345,6 +346,7 @@ const PasswordManager = () => {
                 value={newPasswordData.email || (editData ? editData.email : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, email: e.target.value })}
                 className="input-field"
+                autoComplete="nope"
             />
         </div>
         <div className="form-group">
@@ -354,29 +356,32 @@ const PasswordManager = () => {
                 value={newPasswordData.username || (editData ? editData.username : '')}
                 onChange={(e) => setNewPasswordData({ ...newPasswordData, username: e.target.value })}
                 className="input-field"
+                autoComplete="new-username"
             />
         </div>
         <div className="form-group password-group">
-          <label>Password:</label>
-          <div className="input-container">
-              <input
-                  type={showPassword ? "text" : "password"}
-                  value={newPasswordData.password}
-                  onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
-                  className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
-                  disabled={showGenerateStrongPassword}
-              />
-              <span className={`toggle-password ${showPassword ? '' : 'hidden'}`} onClick={() => setShowPassword(false)}>
-                  <FontAwesomeIcon icon={faEyeSlash} />
-              </span>
-              <span className={`toggle-password ${showPassword ? 'hidden' : ''}`} onClick={() => setShowPassword(true)}>
-                  <FontAwesomeIcon icon={faEye} />
-              </span>
-          </div>
-          {!passwordValidation && (
-              <div className="error-message">Password cannot be empty</div>
-          )}
-      </div>
+            <label>Password:</label>
+            <div className="input-container">
+                <input
+                    type={showPassword ? "text" : "password"}
+                    value={newPasswordData.password}
+                    onChange={(e) => setNewPasswordData({ ...newPasswordData, password: e.target.value })}
+                    className={`input-field ${!passwordValidation ? 'error-input' : ''}`}
+                    disabled={showGenerateStrongPassword}
+                    autoComplete="new-password"
+                />
+                <span className={`toggle-password ${showPassword ? '' : 'hidden'}`} onClick={() => setShowPassword(false)}>
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                </span>
+                <span className={`toggle-password ${showPassword ? 'hidden' : ''}`} onClick={() => setShowPassword(true)}>
+                    <FontAwesomeIcon icon={faEye} />
+                </span>
+            </div>
+            {!passwordValidation && (
+                <div className="error-message">Password cannot be empty</div>
+            )}
+        </div>
+
 
 
 

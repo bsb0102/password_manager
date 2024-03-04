@@ -13,6 +13,7 @@ function Settings() {
   const [successModal, setSuccessModal] = useState(false);
   const [error, setError] = useState('');
   const [newUsername, setNewUsername] = useState('');
+  const [newUsernamePassword, setNewUsernamePassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [userId, setUserId] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -52,7 +53,7 @@ function Settings() {
 
   const handleAddEmailMFA = async () => {
     try {
-      const response = await axiosInstance.post('/api/verify-Email-mfa');
+      const response = await axiosInstance.post('/api/enable-email-mfa');
       setIsMfaEnabled(true);
     } catch (error) { 
       setAlert("error", "Failed to add Email MFA")
@@ -171,6 +172,12 @@ function Settings() {
               placeholder="New E-Mail"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Confirm with Password"
+              value={newUsernamePassword}
+              onChange={(e) => setNewUsernamePassword(e.target.value)}
             />
             <button onClick={handleChangeUsername}>Change E-Mail</button>
           </div>
