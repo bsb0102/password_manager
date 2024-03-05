@@ -23,8 +23,6 @@ const userSchema = new mongoose.Schema({
   mfaEnabled: {
     type: Boolean, // Indicates whether MFA is enabled for the user
     default: false
-<<<<<<< HEAD
-=======
   },
   // Email MFA related fields
   emailMFAEnabled: {
@@ -52,7 +50,6 @@ const userSchema = new mongoose.Schema({
   resetTokenExpiration: {
     type: Date,
     default: null
->>>>>>> v1
   }
   // You can add more fields as needed
 });

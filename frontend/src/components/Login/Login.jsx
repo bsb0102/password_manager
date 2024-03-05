@@ -6,7 +6,6 @@ import Modal from '../modals/Mfa.jsx'; // Import your MFA modal component here
 import axiosInstance from '../../api/api.js';
 import './AuthForm.css';
 import Cookies from 'js-cookie';
-import ResetPasswordModal from "../ResetPassword/ResetPasswordModal.jsx"
 import {AlertContext} from '../Alert/AlertService.js';
 import MultiFactorModal from './MultiFactorModal'
 

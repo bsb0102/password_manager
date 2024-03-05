@@ -2,17 +2,45 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { getUserByEmail, createUser } = require('../controllers/userController'); // Replace with your user controller
+const { 
+  getUserByEmail, 
+  createUser, 
+  getUserById, 
+  storeVerificationCode, 
+  getVerificationCode, 
+  getVerificationCodeExpiration, 
+  deleteVerificationCode, 
+  generateVerificationCode, 
+  calculateVerificationCodeExpiration 
+} = require('../controllers/userController'); // Replace with your user controller
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
-
+const { sendLoginNotification, sendVerificationCodeEmail } = require('../services/mailgunService');
 
 
 router.get("/user_test", async (req, res) => {
   res.json({message: "Status True"})
 });
+
+const validateToken = (req, res, next) => {
+  // Get token from headers, cookies, or wherever you're sending it from
+  const token = req.headers.authorization;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+      // Verify token
+      const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+      // Attach user data to request for later use if needed
+      req.user = decoded;
+      next();
+  } catch (error) {
+      console.error('Token validation failed:', error);
+      return res.status(401).json({ error: 'Unauthorized' });
+  }
+};
+
 
 // Testing route with JWT authentication
 
@@ -34,9 +62,6 @@ router.get('/decryptPasswordById', async (req, res) => {
 
     // Extract the iv and content from the password entry
     const { iv, content } = passwordEntry.encryptedPassword;
-
-    console.log("iv: ", iv)
-    console.log("content: ", content)
 
     // Decrypt the password
     const decryptedPassword = cryptoUtils.decrypt({ content }, iv);
@@ -70,11 +95,14 @@ router.post('/encryptPassword', (req, res) => {
 });
 
 
+router.post('/validate-token', validateToken, (req, res) => {
+  res.json({ isValid: true });
+});
+
+
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    console.log("Helloworldiungton")
 
     // Authenticate the user by fetching user data from the database
     const user = await getUserByEmail(username);
@@ -91,18 +119,6 @@ router.post('/login', async (req, res) => {
     }
 
     // Determine if MFA is enabled for the user
-<<<<<<< HEAD
-<<<<<<< HEAD
-    const requireMfa = user.mfaEnabled;
-
-    // Generate and send a JWT token upon successful login
-    const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
-
-    // Respond with the JWT token and whether MFA is required
-    res.json({ message: 'Login successful', token, requireMfa });
-=======
-=======
->>>>>>> v1
     const requireMfa = user.mfaEnabled || user.emailMFAEnabled;
     // Generate a JWT token upon successful login
     const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET);
@@ -122,7 +138,6 @@ router.post('/login', async (req, res) => {
     }
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
->>>>>>> v1
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -130,24 +145,32 @@ router.post('/login', async (req, res) => {
 });
 
 
+
+
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const existingUser = await getUserByEmail(username);
 
+    // Check if the user already exists
+    const existingUser = await getUserByEmail(username);
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generate a verification code
+    const generatedVerificationCode = generateVerificationCode();
 
-    const newUser = await createUser(username, hashedPassword);
-    newUser.mfaEnabled = false; // Set MFA to false when registering
+    // Calculate the expiration time for the verification code
+    const expiresAt = calculateVerificationCodeExpiration();
 
-    await newUser.save();
+    // Store the verification code and its expiration time in the database
+    await storeVerificationCode(username, generatedVerificationCode, expiresAt);
 
-    const token = jwt.sign({ userId: newUser.id, username: newUser.username }, process.env.JWT_SECRET);
-    res.status(201).json({ message: 'Registration successful', token });
+    // Respond with success message
+    res.status(201).json({ message: 'Verification code generated. Please check your email for the verification code.' });
+
+    // Send the verification code to the user's email
+    await sendVerificationCodeEmail(username, generatedVerificationCode); // Implement this function
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -158,11 +181,6 @@ router.post('/register', async (req, res) => {
 
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> v1
 router.post('/verifyCode', async (req, res) => {
   try {
     const { username, verificationCode, password } = req.body;
@@ -250,5 +268,4 @@ router.put('/change-password', async (req, res) => {
 
 
 
->>>>>>> v1
 module.exports = router;

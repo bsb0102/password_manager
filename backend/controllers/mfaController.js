@@ -186,12 +186,7 @@ exports.getMfaStatus = async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     res.json({ mfaEnabled: user.mfaEnabled });
-=======
-=======
->>>>>>> v1
     // Determine the MFA type based on user settings
     let mfaType;
     if (!user.mfaEnabled && !user.emailMFAEnabled) {
@@ -206,26 +201,14 @@ exports.getMfaStatus = async (req, res) => {
 
     // Return the MFA status to the frontend
     res.json({ mfaEnabled: user.mfaEnabled, emailMFAEnabled: user.emailMFAEnabled, mfaType: mfaType });
-<<<<<<< HEAD
->>>>>>> v1
-=======
->>>>>>> v1
+
   } catch (error) {
     // Handle any errors that occur during the process
     res.status(500).send('Error fetching MFA status');
   }
 };
 
-<<<<<<< HEAD
-=======
 
-
-
-
-<<<<<<< HEAD
->>>>>>> v1
-=======
->>>>>>> v1
 exports.toggleMFA = async (req, res) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
