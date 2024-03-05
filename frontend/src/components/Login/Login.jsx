@@ -59,8 +59,8 @@ const Login = () => {
           navigate('/home');
         } else {
           const tempToken = response.data.token;
-          localStorage.setItem('tempToken', response.data.token);
-          Cookies.set('tempToken', tempToken, { expires: 1 }); // Set temporary token in cookie with 1-day expiry
+          // localStorage.setItem('tempToken', response.data.token);
+          // Cookies.set('tempToken', tempToken, { expires: 1 }); // Set temporary token in cookie with 1-day expiry
           const response_mfa = await axiosInstance.get('/api/mfa-status', {
             headers: {
               'x-temp-token': tempToken, // Send temporary token in headers
@@ -107,6 +107,27 @@ const Login = () => {
       setTimeout(() => setError(''), 3000);
     }
   };
+<<<<<<< HEAD
+=======
+
+
+  const submitResetPassword = async (username) => {
+    try {
+      await axiosInstance.post(
+        '/api/request-password-reset',
+        {username: username}
+        )
+      console.log("Resetting Password")
+      handleForgotPasswordClose();
+      setAlert("success", "Successfully sent Email for Password Reset")
+
+    } catch( error ) {
+      console.log(error)
+      setAlert("error", "Failed to sent Email for Password Reset")
+    }
+  }
+  
+>>>>>>> v1
   
 
   return (

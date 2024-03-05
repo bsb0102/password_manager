@@ -228,7 +228,7 @@ function SecretNodeCreator() {
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close" onClick={toggleModal}>&times;</span>
+            <span className="modal-addnotes-close" onClick={toggleModal}>&times;</span>
             <h2>Enter your Passphrase</h2>
             <input
               type="password"
