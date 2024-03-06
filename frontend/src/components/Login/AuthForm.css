@@ -183,7 +183,7 @@
 .password-input-group input[type="password"],
 .password-input-group input[type="text"] {
   flex-grow: 1;
-  padding-right: 40px; /* Adjust padding to prevent text from going under the icon */
+  /* padding-right: 40px; /* Adjust padding to prevent text from going under the icon */
 }
 
 

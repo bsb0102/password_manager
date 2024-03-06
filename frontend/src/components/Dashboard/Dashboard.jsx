@@ -135,7 +135,7 @@ function Dashboard() {
         return <div>Dashboard Content</div>;
       case 'Passwords':
         return <PasswordManager />;
-      case 'Secret Nodes':
+      case 'Secret Notes':
         return <SecretNodeCreator />;
       case 'Settings':
         return <Settings />;
@@ -176,9 +176,10 @@ function Dashboard() {
               variant="h6"
               color="inherit"
               noWrap
-              sx={{ flexGrow: 1 }}
+              sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }} // Align image and text vertically
             >
-              Dashboard
+              <img src="http://82.165.221.131/logo.png" alt="SafeKey Logo" style={{ marginRight: '8px', width: '24px', height: '24px' }} /> {/* Add image with styling */}
+              SafeKey
             </Typography>
           </Toolbar>
         </AppBar>

@@ -32,22 +32,29 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(username)) {
       setAlert('error', 'Please enter a valid email address.');
       return;
     }
-
+  
+    // Password validation
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{3,}$/;
+    if (!passwordRegex.test(password)) {
+      setAlert('error', 'Password must contain at least 1 capital letter, 1 number, and be at least 3 characters long.');
+      return;
+    }
+  
     const data = {
       username: username,
       password: password,
       _csrf: csrfToken,
     };
-
+  
     try {
       const registrationResponse = await axiosInstance.post('/api/register', data);
-
+  
       if (registrationResponse.status === 201) {
         setShowVerificationModal(true); // Open the verification code modal
       } else if (registrationResponse.status === 400) {
@@ -65,6 +72,7 @@ const Register = () => {
       setAlert('error', error.request.response);
     }
   };
+  
 
   const handleVerificationSubmit = async (verificationCode) => {
     const verificationData = {

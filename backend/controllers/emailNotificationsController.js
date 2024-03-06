@@ -12,6 +12,11 @@ const fetchUserData = async (token) => {
 }
 
 
+const getLoginNotificationStatus = async (user) => {
+    
+}
+
+
 exports.getEmailNotificationStatus = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];

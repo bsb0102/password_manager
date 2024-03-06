@@ -58,9 +58,6 @@ router.post('/reset-password', async (req, res) => {
         if (!user) {
         return res.status(400).json({ error: 'Invalid or expired token' });
         }
-
-        // Fetch the user by ID to ensure consistency with the token
-        console.log(user)
         const userById = await getUserById(user.userId);
         if (!userById) {
             return res.status(404).json({ error: 'User not found' });

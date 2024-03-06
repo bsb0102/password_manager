@@ -18,8 +18,7 @@ const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
-const { sendLoginNotification, sendVerificationCodeEmail } = require('../services/mailgunService');
-const { getUserIdFromToken } = require('../models/cryptoUtils');
+const { sendLoginNotification, sendVerificationCodeEmail, sendSuccessRegistration } = require('../services/mailgunService');
 
 
 router.get("/user_test", async (req, res) => {
@@ -179,6 +178,8 @@ router.post('/register', async (req, res) => {
 
     // Send the verification code to the user's email
     await sendVerificationCodeEmail(username, generatedVerificationCode); // Implement this function
+
+    await sendSuccessRegistration(username);
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -188,7 +189,7 @@ router.post('/register', async (req, res) => {
 
 
 
-
+ 
 router.post('/verifyCode', async (req, res) => {
   try {
     const { username, verificationCode, password } = req.body;
@@ -220,8 +221,6 @@ router.post('/verifyCode', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Hash the password
-    console.log(password)
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Proceed with registration logic to create the new user

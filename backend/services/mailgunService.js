@@ -113,6 +113,37 @@ const sendSuccessEmailMFAEmail = (to) => {
 };
 
 
+const sendSuccessRegistration = (to) => {
+  const templatePath = '/root/password_manager/backend/services/templates/Success-Register.html'; // Path to the verification email template file
+
+  fs.readFile(templatePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading verification email template file:", err);
+      return;
+    }
+
+    // Replace placeholders with provided parameters
+    const html = data
+      .replace('{{EMAIL_MFA_ACTIVATION}}', to);
+
+    const mailOptions = {
+      from: "noreply@noreply.safekey.gg",
+      to: to,
+      subject: "Enabled Multifactor Authentication",
+      html: html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        console.error("Error sending verification email:", error);
+      } else {
+        console.log("Verification email sent successfully!");
+      }
+    });
+  });
+};
+
+
 const sendPasswordResetEmail = (to, resetPasswordLink) => {
   const templatePath = '/root/password_manager/backend/services/templates/resetPassword.html'; // Path to the password reset email template file
 
@@ -183,5 +214,6 @@ module.exports = {
   sendVerificationCodeEmail,
   sendPasswordResetEmail,
   sendSuccessEmailMFAEmail,
+  sendSuccessRegistration,
   sendEmailMFACode
 };

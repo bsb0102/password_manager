@@ -22,11 +22,11 @@ export const mainListItems = ({ onItemClick }) => (
       </ListItemIcon>
       <ListItemText primary="Passwords" />
     </ListItemButton>
-    <ListItemButton onClick={() => onItemClick('Secret Nodes')}>
+    <ListItemButton onClick={() => onItemClick('Secret Notes')}>
       <ListItemIcon>
         <LayersIcon />
       </ListItemIcon>
-      <ListItemText primary="Secret Nodes" />
+      <ListItemText primary="Secret Notes" />
     </ListItemButton>
   </React.Fragment>
 );

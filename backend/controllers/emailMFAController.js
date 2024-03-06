@@ -17,6 +17,8 @@ exports.enableEmailMFA = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const user = await fetchUserData(token)
 
+        const { verificationCode } = req.body;
+ 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -25,8 +27,11 @@ exports.enableEmailMFA = async (req, res) => {
             return res.status(400).json({ error: "Email MFA is already enabled for this user" });
         }
 
+        if (verificationCode !== user.emailMFAVerificationCode) {
+            return res.status(400).json({error: "Invalid Activation Code"})
+        }
+
         user.emailMFAEnabled = true;
-        user.emailMFAVerificationCode = '';
         await user.save();
         await sendSuccessEmailMFAEmail(user.username);
 
