@@ -8,7 +8,8 @@ function Settings() {
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
   const [mfaSetupData, setMfaSetupData] = useState(null);
   const [mfaToken, setMfaToken] = useState('');
-  const [showModal, setShowModal] = useState(false); 
+  const [showModal, setShowModal] = useState(false);
+  const [showEmailMfaModal, setShowEmailMfaModal] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState(false); 
   const [successModal, setSuccessModal] = useState(false);
   const [error, setError] = useState('');
@@ -19,6 +20,8 @@ function Settings() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [emailNotificationStatus, setEmailNotificationStatus] = useState({});
   const { setAlert } = useContext(AlertContext)
+  const [verificationCode, setVerificationCode] = useState('');
+
 
   useEffect(() => {
 
@@ -100,13 +103,9 @@ function Settings() {
   };
 
   const handleAddEmailMFA = async () => {
-    try {
-      const response = await axiosInstance.post('/api/enable-email-mfa');
-      setIsMfaEnabled(true);
-    } catch (error) { 
-      setAlert("error", "Failed to add Email MFA")
-    }
-  }
+    await sendEmailMfa(); // This will trigger the email MFA code to be sent
+    setShowEmailMfaModal(true); // Assuming you want to show a modal for code input, set this to true
+  };
 
   const handleVerifyToken = async () => {
     try {
@@ -139,6 +138,20 @@ function Settings() {
     }
   };
 
+  const handleVerifyEmailMFA = async () => {
+    try {
+      const payload = { code: verificationCode };
+      const response = await axiosInstance.post('/api/enable-email-mfa', payload);
+      setIsMfaEnabled(true); // Assuming the MFA is successfully enabled
+      setShowEmailMfaModal(false); // Close the modal
+      setAlert("success", "Successfully Added MFA for Email")
+    } catch (error) {
+      console.error('Failed to verify email MFA:', error);
+      setError(error.response.data.message || "Verification failed"); // Set error message
+      // Optionally, show error message/modal
+    }
+  };
+
 
   const confirmDisableMFA = async () => {
     try {
@@ -152,18 +165,34 @@ function Settings() {
     setConfirmationModal(false); // Close the confirmation modal regardless of success or failure
   };
 
+
+  const sendEmailMfa = async () => {
+    try {
+      // Send request to send email MFA
+      const response = await axiosInstance.get(
+        '/api/send-email-mfa');
+
+    } catch (error) {
+      console.error('Error sending email MFA:', error);
+    }
+  };
   
 
   const handleChangeUsername = async () => {
     try {
-      // Make a request to change the username using newUsername state
-      await axiosInstance.put('/api/change-username', { newUsername });
-      // Optionally update the UI or show a success message
-      // ...
+      await axiosInstance.post('/api/update-username', { 
+        newUsername: newUsername,
+        password: newUsernamePassword 
+      });
+
+      setAlert('success', 'Successfully updated Username')
+
+      setNewUsername('');
+      setNewPassword('');
+
     } catch (error) {
       console.error('Error changing username:', error);
-      // Handle errors or show an error message
-      // ...
+      setAlert('error', 'Failed to Change Username')
     }
   };
 
@@ -222,16 +251,16 @@ function Settings() {
             <input
               type="text"
               placeholder="New E-Mail"
-              value={newUsername}
+              value={newUsername} // Update the value to reflect the newUsername state
               onChange={(e) => setNewUsername(e.target.value)}
             />
             <input
               type="password"
               placeholder="Confirm with Password"
-              value={newUsernamePassword}
+              value={newUsernamePassword} // Update the value to reflect the newUsernamePassword state
               onChange={(e) => setNewUsernamePassword(e.target.value)}
             />
-            <button onClick={handleChangeUsername}>Change E-Mail</button>
+            <button onClick={handleChangeUsername}>Change E-Mail</button> {/* Call handleChangeUsername function */}
           </div>
           <div className="setting-item">
             <label>New Password</label>
@@ -283,12 +312,6 @@ function Settings() {
               </div>
             ))}
           </div>
-
-
-
-
-
-
         </div>
 
       </div>
@@ -320,6 +343,34 @@ function Settings() {
           </div>
         </Modal>
       )}
+
+      {
+          showEmailMfaModal && (
+            <div className="reset-password-modal-overlay">
+              <div className="reset-password-modal-content">
+                <button className="reset-password-modal-close-button" onClick={() => setShowEmailMfaModal(false)} aria-label="Close modal">
+                  &times;
+                </button>
+                <h2 className="reset-password-modal-title">Enter Verification Code</h2>
+                <form className="reset-password-modal-form">
+                  <input
+                    className="reset-password-modal-input"
+                    type="text"
+                    placeholder="Enter verification code"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    required
+                  />
+                  <div className="reset-password-modal-actions">
+                    <button className="reset-password-modal-submit-button" type="submit" onClick={handleVerifyEmailMFA}>Submit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )
+        }
+
+
       <div className="confirmation-modal">
         {confirmationModal && (
           <Modal onClose={() => setConfirmationModal(false)}>

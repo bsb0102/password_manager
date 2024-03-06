@@ -80,32 +80,48 @@ function Dashboard() {
   };
 
   const handleLogout = () => {
-    // Remove the token from cookies
-    Cookies.remove('token'); // This removes the token stored in the cookies
-    
-    // Clear the Authorization header from the axios instance
-    if (axiosInstance.defaults.headers.common['Authorization']) {
-      delete axiosInstance.defaults.headers.common['Authorization'];
-    }
-    
-    // Remove the token and any other related data from localStorage
-    localStorage.removeItem('token');
-    
-    // Check if there's a temporary token stored in localStorage
-    const tempToken = localStorage.getItem('tempToken');
-    if (tempToken) {
-      // Remove the temporary token from localStorage
-      localStorage.removeItem('tempToken');
+    // Define a function to handle logout
+    const logout = () => {
+      // Remove the token from cookies
+      Cookies.remove('token'); // This removes the token stored in the cookies
       
-      // Also remove the temporary token from cookies if it exists
-      Cookies.remove('tempToken');
+      // Clear the Authorization header from the axios instance
+      if (axiosInstance.defaults.headers.common['Authorization']) {
+        delete axiosInstance.defaults.headers.common['Authorization'];
+      }
+      
+      // Remove the token and any other related data from localStorage
+      localStorage.removeItem('token');
+      
+      // Check if there's a temporary token stored in localStorage
+      const tempToken = localStorage.getItem('tempToken');
+      if (tempToken) {
+        // Remove the temporary token from localStorage
+        localStorage.removeItem('tempToken');
+        
+        // Also remove the temporary token from cookies if it exists
+        Cookies.remove('tempToken');
+      }
+      
+      // Navigate to the login page or another appropriate page
+      navigate('/login'); // Assuming 'navigate' is obtained from useNavigate() hook.
+      
+      console.log("Successfully logged out");
+    };
+  
+    // Display confirmation prompt
+    const confirmed = window.confirm("Are you sure you want to logout?");
+    
+    // If user confirms, proceed with logout
+    if (confirmed) {
+      logout(); // Call logout function
+    } else {
+      // If user cancels, do nothing
+      console.log("Logout canceled");
     }
-    
-    // Navigate to the login page or another appropriate page
-    navigate('/login'); // Assuming 'navigate' is obtained from useNavigate() hook.
-    
-    console.log("Successfully logged out");
   };
+  
+  
   
   
 

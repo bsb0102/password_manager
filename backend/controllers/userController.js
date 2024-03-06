@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User'); // Import your User model
 const VerificationCode = require('../models/VerificationCode');
 const jwt = require('jsonwebtoken');
+const { getUserIdFromToken } = require('../models/cryptoUtils');
 
 // Function to hash a password
 const hashPassword = async (password) => {
@@ -134,6 +135,13 @@ const calculateVerificationCodeExpiration = () => {
   return expirationTime;
 };
 
+const fetchUserData = async (token) => {
+  const userId = await getUserIdFromToken(token);
+  const user = await getUserById(userId);
+  return user;
+
+}
+
 
 
 module.exports = {
@@ -148,5 +156,6 @@ module.exports = {
   generateVerificationCode,
   calculateVerificationCodeExpiration,
   generateResetPasswordToken,
-  verifyResetPasswordToken
+  verifyResetPasswordToken,
+  fetchUserData
 };

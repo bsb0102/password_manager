@@ -11,13 +11,15 @@ const {
   getVerificationCodeExpiration, 
   deleteVerificationCode, 
   generateVerificationCode, 
-  calculateVerificationCodeExpiration 
+  calculateVerificationCodeExpiration,
+  fetchUserData
 } = require('../controllers/userController'); // Replace with your user controller
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
 const { sendLoginNotification, sendVerificationCodeEmail } = require('../services/mailgunService');
+const { getUserIdFromToken } = require('../models/cryptoUtils');
 
 
 router.get("/user_test", async (req, res) => {
@@ -272,6 +274,33 @@ router.put('/change-password', async (req, res) => {
 
 
 
+router.post('/update-username', async (req, res) => {
+  try {
+    const { newUsername, password } = req.body;
 
+    const token = req.headers.authorization.split(' ')[1];
+    const user = await fetchUserData(token)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify password using bcrypt
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+
+    user.username = newUsername;
+    await user.save()
+
+
+    res.json({ message: 'Username updated successfully' });
+  } catch (error) {
+    console.error('Update username error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 module.exports = router;

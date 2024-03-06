@@ -3,9 +3,11 @@ import '../styles/Mfa.css'; // Ensure you have this CSS file
 
 const Modal = ({ children, onClose }) => {
     return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
-          <span className="modal-close-btn" onClick={onClose}>&times;</span>
+      <div className="reset-password-modal-overlay" onClick={onClose}>
+        <div className="reset-password-modal-content" onClick={e => e.stopPropagation()}>
+        <button className="reset-password-modal-close-button" onClick={onClose} aria-label="Close modal">
+            &times;
+          </button>
           {children}
         </div>
       </div>
