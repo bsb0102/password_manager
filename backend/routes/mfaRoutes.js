@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mfaController = require('../controllers/mfaController');
 const emailMFAController = require('../controllers/emailMFAController')
+const emailNotificationMFAController = require('../controllers/emailNotificationsController')
 const authenticateToken = require('../middleware/authenticateToken'); // Assuming MFA operations require a user to be authenticated
 
 // Route to enable MFA for a user, requires authentication
@@ -23,6 +24,8 @@ router.get('/send-email-mfa', authenticateToken, emailMFAController.sendEmailMfa
 
 
 router.get('/mfa-status', authenticateToken, mfaController.getMfaStatus);
+router.get('/email-notifications', authenticateToken, emailNotificationMFAController.getEmailNotificationStatus);
+router.post('/update-email-notification-status', authenticateToken, emailNotificationMFAController.updateEmailNotificationStatus)
 
 
 

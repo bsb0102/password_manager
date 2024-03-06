@@ -29,6 +29,28 @@
   flex-direction: column;
 }
 
+.notification-group {
+  margin-bottom: 10px;
+}
+
+.notification-checkbox {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.notification-label {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.setting-item label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 /* Label for Setting */
 label {
   font-weight: bold;

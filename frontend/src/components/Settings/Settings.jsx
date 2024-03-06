@@ -17,6 +17,7 @@ function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [userId, setUserId] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
+  const [emailNotificationStatus, setEmailNotificationStatus] = useState({});
   const { setAlert } = useContext(AlertContext)
 
   useEffect(() => {
@@ -33,8 +34,55 @@ function Settings() {
         console.error('Fehler beim Abrufen des MFA-Status:', error);
       }
     };
+
+
+    const fetchEmailNotificationStatus = async () => {
+      try {
+        const response = await axiosInstance.get('/api/email-notifications');
+        console.log(response.data)
+        setEmailNotificationStatus(response.data)
+
+        console.log(emailNotificationStatus)
+
+      } catch (error) {
+        console.log("failed to fetch Email Notification")
+      }
+    }
+
     fetchMfaStatus();
+    fetchEmailNotificationStatus();
   }, []);
+
+
+  const handleEmailNotificationChange = async (parentKey, childKey, checked) => {
+    try {
+      // Make API call to update the notification status
+      const response = await axiosInstance.post('/api/update-email-notification-status', {
+        parentKey,
+        childKey,
+        status: checked
+      });
+  
+      // Update the state locally upon successful response
+      setEmailNotificationStatus(prevStatus => ({
+        ...prevStatus,
+        [parentKey]: {
+          ...prevStatus[parentKey],
+          [childKey]: checked
+        }
+      }));
+  
+      // Show success message or handle response as needed
+      setAlert('success', response.data.message);
+    } catch (error) {
+      console.error('Error updating email notification status:', error);
+      // Show error message or handle error as needed
+      setAlert('error', 'Failed to update email notification status');
+    }
+  };
+  
+  
+  
 
   const handleDisableMFA = async () => {
     // Vor dem Deaktivieren von MFA das Bestätigungsmodal anzeigen
@@ -119,6 +167,8 @@ function Settings() {
     }
   };
 
+  
+
   const handleChangePassword = async () => {
     try {
 
@@ -155,6 +205,8 @@ function Settings() {
       console.error('Fehler beim Löschen von MFA:', error);
     }
   };
+
+  
 
   return (
     <div className="settings-container">
@@ -215,8 +267,27 @@ function Settings() {
           
           <div className="setting-item">
             <label>Email Notifications</label>
-            
+            {Object.entries(emailNotificationStatus).map(([parentKey, childObject]) => (
+              <div key={parentKey}>
+                {Object.entries(childObject).map(([childKey, value]) => (
+                  <div key={childKey}>
+                    <input
+                      className="notification-checkbox"
+                      type="checkbox"
+                      checked={value}
+                      onChange={(e) => handleEmailNotificationChange(parentKey, childKey, e.target.checked)}
+                    />
+                    <label className="notification-label">{childKey}</label>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
+
+
+
+
+
 
         </div>
 

@@ -136,7 +136,11 @@ router.post('/login', async (req, res) => {
     const userIPAddress = req.ip.toString(); // Get the user's IP addresss
 
     if (!requireMfa) {
-      await sendLoginNotification(username, userIPAddress);
+      if (user.emailNotification.loginNotification) {
+        await sendLoginNotification(username, userIPAddress);
+      } else {
+        console.log("Login Email Off")
+      }
     }
 
     res.json({ message: 'Login successful', token: token,  requireMfa });

@@ -24,9 +24,7 @@ const VerificationModal = ({ onClose, onSubmit, verificationError }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={onClose} aria-label="Close modal">
-          &times;
-        </button>
+        <span className="modal-addnotes-close" onClick={onClose}>&times;</span>
         <h2 className="modal-title">Enter Verification Code</h2>
         <form onSubmit={handleSubmit} className="modal-form">
           <input
@@ -39,7 +37,7 @@ const VerificationModal = ({ onClose, onSubmit, verificationError }) => {
           />
           {verificationError && <div className="error-message">{verificationError}</div>} {/* Display verification error message */}
           <div className="modal-actions">
-            <button className="submit-button" type="submit">Submit</button>
+            <button className="modal-addnotes-button" type="submit">Submit</button>
             <button className="cancel-button" type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
