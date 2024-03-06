@@ -212,7 +212,14 @@ function Settings() {
               
             )}
           </div>
+          
+          <div className="setting-item">
+            <label>Email Notifications</label>
+            
+          </div>
+
         </div>
+
       </div>
       {showModal && (
         <Modal onClose={() => setShowModal(false)}>

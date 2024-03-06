@@ -50,6 +50,13 @@ const userSchema = new mongoose.Schema({
   resetTokenExpiration: {
     type: Date,
     default: null
+  },
+  emailNotification: {
+    loginNotification: {
+      type: Boolean,
+      default: true,
+    }
+    // technically can add more notifications parms here
   }
 });
 
