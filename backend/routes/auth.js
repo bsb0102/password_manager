@@ -11,14 +11,13 @@ const {
   getVerificationCodeExpiration, 
   deleteVerificationCode, 
   generateVerificationCode, 
-  calculateVerificationCodeExpiration,
-  fetchUserData
+  calculateVerificationCodeExpiration 
 } = require('../controllers/userController'); // Replace with your user controller
 const cryptoUtils = require('../models/cryptoUtils');
 const Password = require("../models/Password");
 const mongoose = require('mongoose');
 const mfaService = require('../models/mfaService'); // Import your MFA service functions here
-const { sendLoginNotification, sendVerificationCodeEmail, sendSuccessRegistration } = require('../services/mailgunService');
+const { sendLoginNotification, sendVerificationCodeEmail } = require('../services/mailgunService');
 
 
 router.get("/user_test", async (req, res) => {
@@ -105,8 +104,6 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    console.log("Helloworldiungton")
-
     // Authenticate the user by fetching user data from the database
     const user = await getUserByEmail(username);
 
@@ -137,11 +134,7 @@ router.post('/login', async (req, res) => {
     const userIPAddress = req.ip.toString(); // Get the user's IP addresss
 
     if (!requireMfa) {
-      if (user.emailNotification.loginNotification) {
-        await sendLoginNotification(username, userIPAddress);
-      } else {
-        console.log("Login Email Off")
-      }
+      await sendLoginNotification(username, userIPAddress);
     }
 
     res.json({ message: 'Login successful', token: token,  requireMfa });
@@ -178,8 +171,6 @@ router.post('/register', async (req, res) => {
 
     // Send the verification code to the user's email
     await sendVerificationCodeEmail(username, generatedVerificationCode); // Implement this function
-
-    await sendSuccessRegistration(username);
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -189,7 +180,7 @@ router.post('/register', async (req, res) => {
 
 
 
- 
+
 router.post('/verifyCode', async (req, res) => {
   try {
     const { username, verificationCode, password } = req.body;
@@ -221,6 +212,8 @@ router.post('/verifyCode', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
+    // Hash the password
+    console.log(password)
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Proceed with registration logic to create the new user
@@ -273,33 +266,6 @@ router.put('/change-password', async (req, res) => {
 
 
 
-router.post('/update-username', async (req, res) => {
-  try {
-    const { newUsername, password } = req.body;
 
-    const token = req.headers.authorization.split(' ')[1];
-    const user = await fetchUserData(token)
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Verify password using bcrypt
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Authentication failed' });
-    }
-
-    user.username = newUsername;
-    await user.save()
-
-
-    res.json({ message: 'Username updated successfully' });
-  } catch (error) {
-    console.error('Update username error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 module.exports = router;

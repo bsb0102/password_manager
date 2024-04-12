@@ -17,8 +17,6 @@ exports.enableEmailMFA = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const user = await fetchUserData(token)
 
-        const { verificationCode } = req.body;
- 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -27,11 +25,8 @@ exports.enableEmailMFA = async (req, res) => {
             return res.status(400).json({ error: "Email MFA is already enabled for this user" });
         }
 
-        if (verificationCode !== user.emailMFAVerificationCode) {
-            return res.status(400).json({error: "Invalid Activation Code"})
-        }
-
         user.emailMFAEnabled = true;
+        user.emailMFAVerificationCode = '';
         await user.save();
         await sendSuccessEmailMFAEmail(user.username);
 
@@ -46,13 +41,12 @@ exports.verifyEmailMFA = async (req, res) => {
     try {
         const { verificationCode } = req.body;
 
-        let token = req.headers.authorization.split(' ')[1];
-        const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
-
-        // Check if tempToken exists, if so, use it as the authToken
-        if (tempToken) {
-            token = tempToken;
+        // Check if authorization header is present
+        if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+            return res.status(401).json({ error: "Unauthorized access" });
         }
+
+        const token = req.headers.authorization.split(' ')[1];
         
         // Fetch user data using the token
         const user = await fetchUserData(token);
@@ -77,7 +71,6 @@ exports.verifyEmailMFA = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
-
 
 
 exports.disableEmailMFA = async (req, res) => {
@@ -108,21 +101,15 @@ exports.disableEmailMFA = async (req, res) => {
 
 exports.sendEmailMfa = async (req, res) => {
     try {
-        let token = req.headers.authorization.split(' ')[1];
-        const tempToken = req.headers['x-temp-token']; // Assuming the temporary token is sent in the headers
-
-        // Check if tempToken exists, if so, use it as the authToken
-        if (tempToken) {
-            token = tempToken;
-        }
-        
-        // Fetch user data using the token
-        const user = await fetchUserData(token);
+        const token = req.headers.authorization.split(' ')[1];
+        const user = await fetchUserData(token)
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
+        user.emailMFAEnabled = true;
+        await user.save();
         const verification_token = await sendEmailMFACode(user.username);
         user.emailMFAVerificationCode = await verification_token
         await user.save();

@@ -1,0 +1,99 @@
+/* SecurePassApp.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+.secure-pass-app {
+  color: #fff;
+  background-color: #000;
+  min-height: 100vh;
+}
+
+.secure-pass-nav {
+  background: #333;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.secure-pass-nav-links li {
+  display: inline;
+  margin-left: 20px;
+}
+
+.secure-pass-button {
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid #fff;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+}
+
+.secure-pass-button:hover {
+  background-color: #fff;
+  color: #333;
+}
+
+.secure-pass-intro {
+  text-align: center;
+  padding: 120px 20px;
+  background-image: url('../styles/image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.secure-pass-intro h1 {
+  font-size: 2.5em; /* Larger font size for main heading */
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.secure-pass-intro p {
+  font-size: 1.5em; /* Larger font size for paragraph */
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+
+.secure-pass-features {
+  display: flex;
+  justify-content: space-around;
+  padding: 50px 20px;
+  background: #111;
+}
+
+.secure-pass-feature {
+  width: 30%;
+  padding: 25px;
+  background: rgba(34, 34, 34, 0.85);
+  color: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  border: 1px solid #ccc;
+}
+
+.secure-pass-feature h2 {
+  font-size: 1.8em;
+  color: #fff;
+}
+
+.secure-pass-feature p {
+  font-size: 1.2em;
+  color: #ccc;
+}
+
+.secure-pass-footer {
+  text-align: center;
+  padding: 20px;
+  background: #222;
+  color: #ccc;
+}

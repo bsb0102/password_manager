@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  emailNotification: {
+  emailNotifications: {
     loginNotification: {
       type: Boolean,
       default: true,

@@ -3,9 +3,8 @@ import '../ResetPassword/ResetPasswordModal.css';
 import axiosInstance from '../../api/api.js';
 import { useNavigate } from 'react-router-dom';
 import { AlertContext } from '../Alert/AlertService.js';
-import Cookies from 'js-cookie';
 
-const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose, tempMFAToken }) => {
+const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
   const [mfaToken, setMfaToken] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const [emailSent, setEmailSent] = useState(false); // Track whether email has been sent
@@ -16,23 +15,14 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose, tempMFAToken 
     if (mfaType === 'email' && isOpen && !emailSent) {
       sendEmailMfa();
       setEmailSent(true);
-
     }
   }, [isOpen, emailSent]); // Trigger sending email MFA when modal is opened
 
   const sendEmailMfa = async () => {
     try {
       // Send request to send email MFA
-      const response = await axiosInstance.get(
-        '/api/send-email-mfa', 
-        {
-        headers: {
-          'x-temp-token': tempMFAToken, // Send temporary token in headers
-        }
-      });
-
-      console.log(response.body)
-
+      await axiosInstance.post('/api/send-email-mfa', {});
+      console.log("Send Email MFA");
     } catch (error) {
       console.error('Error sending email MFA:', error);
     }
@@ -45,20 +35,8 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose, tempMFAToken 
       return;
     }
     try {
-      const response = await axiosInstance.post(
-        '/api/verify-email-mfa', 
-        { verificationCode: mfaToken }, 
-        {
-        headers: {
-          'x-temp-token': tempMFAToken, // Send temporary token in headers
-        }
-      });
-
-
+      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken });
       if (response.data.status === 'success') {
-        Cookies.set('token', tempMFAToken, { expires: 7 });
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tempMFAToken}`;
-        localStorage.setItem('token', tempMFAToken);
         navigate('/home');
       } else {
         setAlert('Error', 'Failed to verify email MFA');
