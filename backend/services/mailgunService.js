@@ -8,12 +8,15 @@ const readFileAsync = util.promisify(fs.readFile);
 const { generateVerificationCode } = require('../controllers/userController')
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.eu.mailgun.org",
+  host: "smtp.postmarkapp.com",
   port: 587,
   secure: false,
   auth: {
     user: process.env.MAILGUN_USERNAME,
     pass: process.env.MAILGUN_PASSWORD
+  },
+  headers: {
+    "X-PM-Message-Stream": "safekey"
   }
 });
 
@@ -44,7 +47,7 @@ const sendLoginNotification = (to, IP_ADDRESS) => {
       if (error) {
         console.error("Error sending email:", error);
       } else {
-        console.log("Email sent successfully!");
+        console.log("Login Email sent successfully! ", info);
       }
     });
   });

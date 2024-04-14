@@ -1,99 +1,165 @@
-/* SecurePassApp.css */
+/* General Resets and Typography */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
 }
-
-.secure-pass-app {
-  color: #fff;
-  background-color: #000;
-  min-height: 100vh;
-}
-
-.secure-pass-nav {
-  background: #333;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.secure-pass-nav-links li {
-  display: inline;
-  margin-left: 20px;
-}
-
-.secure-pass-button {
-  background: rgba(255, 255, 255, 0.85);
-  border: 2px solid #fff;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 16px;
-  font-weight: bold;
-  color: #000;
-}
-
-.secure-pass-button:hover {
-  background-color: #fff;
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f4f4f4;
   color: #333;
 }
+a {
+  text-decoration: none;
+  color: #555;
+}
+p, ul, h1, h2, h3, h4, li {
+  color: #555;
+}
 
-.secure-pass-intro {
-  text-align: center;
-  padding: 120px 20px;
-  background-image: url('../styles/image.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
-  width: 100vw;
+/* Header Styles */
+.sk-header {
+  background: radial-gradient(#bfdde7, #eaf5f8);
+}
+.sk-container, .sk-small-container {
+  max-width: 1300px;
+  margin: auto;
+  padding: 0 25px;
+}
+.sk-navbar {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  padding: 20px 0;
 }
-
-.secure-pass-intro h1 {
-  font-size: 2.5em; /* Larger font size for main heading */
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+.sk-navbar nav {
+  flex: 1;
+  text-align: right;
 }
-
-.secure-pass-intro p {
-  font-size: 1.5em; /* Larger font size for paragraph */
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+.sk-navbar ul {
+  display: inline-block;
+  list-style-type: none;
 }
-
-.secure-pass-features {
+.sk-navbar ul li {
+  display: inline;
+  margin-right: 20px;
+}
+.sk-menu-icon {
+  display: none;
+  cursor: pointer;
+}
+.sk-row {
   display: flex;
+  align-items: center;
   justify-content: space-around;
-  padding: 50px 20px;
-  background: #111;
+  flex-wrap: wrap;
+}
+.sk-col-2 {
+  flex-basis: 50%;
+  min-width: 300px;
+}
+.sk-col-2 img {
+  max-width: 100%;
+  padding: 50px 0;
+}
+.sk-col-2 h1 {
+  font-size: 50px;
+  line-height: 60px;
+  margin: 25px 0;
+}
+.sk-btn {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  padding: 8px 30px;
+  border-radius: 30px;
+  transition: background 0.5s;
+}
+.sk-btn:hover {
+  background: #ccc;
 }
 
-.secure-pass-feature {
-  width: 30%;
-  padding: 25px;
-  background: rgba(34, 34, 34, 0.85);
-  color: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-  border: 1px solid #ccc;
+/* Categories Styles */
+.sk-categories {
+  margin: 70px 0;
+}
+.sk-col-3 {
+  flex-basis: 30%;
+  min-width: 250px;
+  margin-bottom: 30px;
+}
+.sk-col-3 img {
+  width: 100%;
 }
 
-.secure-pass-feature h2 {
-  font-size: 1.8em;
-  color: #fff;
+/* Testimonial Styles */
+.sk-testimonial {
+  padding: 25px 0;
 }
-
-.secure-pass-feature p {
-  font-size: 1.2em;
-  color: #ccc;
-}
-
-.secure-pass-footer {
+.sk-testimonial .sk-col-3 {
   text-align: center;
-  padding: 20px;
-  background: #222;
-  color: #ccc;
+  padding: 40px 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s;
+  cursor: pointer;
 }
+.sk-testimonial .sk-col-3:hover {
+  transform: translateY(-10px);
+}
+.sk-testimonial .sk-col-3 img {
+  width: 50px;
+  margin-top: 10px;
+  border-radius: 50%;
+}
+
+/* Offer Styles */
+.sk-offer {
+  background: radial-gradient(#bfdde7, #eaf5f8);
+  margin-top: 80px;
+  padding: 30px 0;
+}
+
+/* Footer Styles */
+.sk-footer {
+  background: #fff;
+  color: #8a8a8a;
+  padding: 60px 0 20px;
+}
+.sk-footer h3, .sk-footer p, .sk-footer ul {
+  color: inherit;
+}
+.sk-footer-col2 img {
+  width: 180px;
+  margin-bottom: 20px;
+}
+
+/* Media Queries for Responsiveness */
+@media only screen and (max-width: 800px) {
+  .sk-navbar ul {
+      position: absolute;
+      top: 70px;
+      left: 0;
+      background: #333;
+      width: 100%;
+      overflow: hidden;
+      transition: max-height 0.5s;
+      max-height: 0;
+  }
+  .sk-navbar ul li {
+      display: block;
+      margin: 10px 20px;
+  }
+  .sk-navbar ul li a {
+      color: #fff;
+  }
+  .sk-menu-icon {
+      display: block;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .sk-row, .sk-col-1, .sk-col-2, .sk-col-3, .sk-col-4 {
+      flex-basis: 100%;
+      text-align: center;
+  }
+}
+
+/* Additional Media Queries and Styles can be added as needed */
