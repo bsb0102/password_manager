@@ -8,7 +8,7 @@ const readFileAsync = util.promisify(fs.readFile);
 const { generateVerificationCode } = require('../controllers/userController')
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.postmarkapp.com",
+  host: "smtp.eu.mailgun.org",
   port: 587,
   secure: false,
   auth: {
