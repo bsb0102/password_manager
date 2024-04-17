@@ -1,15 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import "./LandingPage.css"
-
+import "./images/logo.png"
+// import "cat3.png"
 // Header Component
+
+import SafeKeyLogo from "./images/image1.png"
+import cat1 from "./images/cat1.jpg"
+import cat2 from "./images/cat2.jpg"
+import cat3 from "./images/cat3.png"
+import exclusive from "./images/exclusive.png"
+import image1 from "./images/image1.png"
+import logo from "./images/logo.png"
+import menue from "./images/menu.png"
+import person from "./images/person.jpg"
+
 const Header = () => {
   return (
     <div className="sk-header">
       <div className="sk-container">
         <div className="sk-navbar">
           <div className="sk-logo">
-            <Link to="/"><img src="./images/logo.png" alt="SafeKey Logo" width="125" /></Link>
+            <Link to="/"><img src={logo} alt="SafeKey Logo" width="125" /></Link>
           </div>
           <nav>
             <ul className="sk-menu-items">
@@ -18,7 +30,7 @@ const Header = () => {
               <li><Link to="/register">Register</Link></li>
             </ul>
           </nav>
-          <img src="./images/menu.png" onClick={() => {}} alt="Menu" className="sk-menu-icon" />
+          <img src={menue} onClick={() => {}} alt="Menu" className="sk-menu-icon" />
         </div>
         <div className="sk-row">
           <div className="sk-col-2">
@@ -27,7 +39,7 @@ const Header = () => {
             <Link to="/login" className="sk-btn">Start Now</Link>
           </div>
           <div className="sk-col-2">
-            <img src="./images/image1.png" alt="Main Product" />
+            <img src={image1} alt="Main Product" />
           </div>
         </div>      
       </div>
@@ -42,17 +54,17 @@ const Categories = () => {
       <div className="sk-small-container">
         <div className="sk-row">
           <div className="sk-col-3">
-            <img src="./images/cat1.jpg" alt="Our Mission" />
+            <img src={cat1} alt="Our Mission" />
             <h3>Our Mission</h3>
             <p>We want to make it easy for users to securely access their sensitive information by providing a reliable, secure, easy-to-use password management program.</p>
           </div>
           <div className="sk-col-3">
-            <img src="images/cat2.jpg" alt="Our Approach" />
+            <img src={cat2} alt="Our Approach" />
             <h3>Our Approach</h3>
             <p>SafeKey protects your data using AES-256, SHA-256 and IV encryption. You are the only person who can decrypt your information!</p>
           </div>
           <div className="sk-col-3">
-            <img src="images/cat3.png" alt="Our Commitment" />
+            <img src={cat3} alt="Our Commitment" />
             <h3>Our Commitment</h3>
             <p>Your master password and stored passwords are kept secret, even from SafeKey. Your information is encrypted and decrypted only at device level.</p>
           </div>
@@ -83,7 +95,7 @@ const SpecialOffer = () => {
       <div className="sk-small-container">
         <div className="sk-row">
           <div className="sk-col-2">
-            <img src="/images/exclusive.png" alt="Exclusive" className="sk-offer-img" />
+            <img src={exclusive} alt="Exclusive" className="sk-offer-img" />
           </div>
           <div className="sk-col-2">
             <h2>Available on SafeKey</h2>
@@ -105,7 +117,7 @@ const Footer = () => {
       <div className="sk-container">
         <div className="sk-row">
           <div className="sk-footer-col2">
-            <img src="images/logo.png" alt="SafeKey Logo" />
+            <img src={logo} alt="SafeKey Logo" />
             <p>Begin your journey of secure data today.</p>
           </div>
           <div className="sk-footer-col3">
