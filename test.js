@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 const mailOptions = {
     from: "noreply@noreply.safekey.gg",
-    to: "entitiplayer@gmail.com",
+    to: "test@gmail.com",
     subject: "Login Attempt Notification",
   };
 

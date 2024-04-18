@@ -18,6 +18,7 @@ import Settings from "../Settings/Settings"
 import SecretNodeCreator from "../Secret Nodes/SecretNodeCreator"
 import axiosInstance from '../../api/api.js';
 import Cookies from 'js-cookie';
+import SafeKeyLogo from "../images/image1.png"
 
 const drawerWidth = 240;
 
@@ -70,7 +71,7 @@ const defaultTheme = createTheme();
 
 function Dashboard() {
   const [open, setOpen] = React.useState(true);
-  const defaultSelectedItem = 'Dashboard';
+  const defaultSelectedItem = 'Passwords';
   const [selectedItem, setSelectedItem] = React.useState(defaultSelectedItem);
   const navigate = useNavigate();
 
@@ -131,8 +132,6 @@ function Dashboard() {
 
   const renderContent = () => {
     switch (selectedItem) {
-      case 'Dashboard':
-        return <div>Dashboard Content</div>;
       case 'Passwords':
         return <PasswordManager />;
       case 'Secret Notes':
@@ -178,7 +177,7 @@ function Dashboard() {
               noWrap
               sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }} // Align image and text vertically
             >
-              <img src="http://82.165.221.131/logo.png" alt="SafeKey Logo" style={{ marginRight: '8px', width: '24px', height: '24px' }} /> {/* Add image with styling */}
+              <img src={SafeKeyLogo} alt="SafeKey Logo" style={{ marginRight: '8px', width: '32px', height: '32px' }} /> {/* Add image with styling */}
               SafeKey
             </Typography>
           </Toolbar>

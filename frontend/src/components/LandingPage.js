@@ -81,12 +81,54 @@ const Testimonials = () => {
       <div className="sk-small-container">
         <h2 className="sk-title">Our Testimonials</h2>
         <div className="sk-row">
-          {/* Additional testimonials can follow similar structure */}
+          {/* Testimonial 1 */}
+          <div className="sk-col-3">
+            <i className="fa fa-quote-left"></i>
+            <p>Many Internet users do not understand the importance of security! With SafeKey, I can store all my sensitive information and passwords without a worry.</p>
+            <div className="sk-rating">
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+            </div>
+            <img src={person} alt="Mike Strong" />
+            <h3>Mike Strong</h3>
+          </div>
+          {/* Testimonial 2 */}
+          <div className="sk-col-3">
+            <i className="fa fa-quote-left"></i>
+            <p>SafeKey and their products help you feel your safest. As a customer, you won't worry about cybersecurity threats or breaches as your data is safely encrypted.</p>
+            <div className="sk-rating">
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+            </div>
+            <img src={person} alt="Joe Secure" />
+            <h3>Joe Secure</h3>
+          </div>
+          {/* Testimonial 3 */}
+          <div className="sk-col-3">
+            <i className="fa fa-quote-left"></i>
+            <p>SafeKey is the application everyone is looking for. It's an easy win for those who want to stay secure and create and manage complex passwords that you don't need to remember.</p>
+            <div className="sk-rating">
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star"></i>
+              <i className="fa fa-star-half"></i>
+            </div>
+            <img src={person} alt="John Mcafee" />
+            <h3>John Mcafee</h3>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 // SpecialOffer Component
 const SpecialOffer = () => {
@@ -100,7 +142,7 @@ const SpecialOffer = () => {
           <div className="sk-col-2">
             <h2>Available on SafeKey</h2>
             <h1>Password Generation</h1>
-            <small>Generate secure and strong passwords for any site!</small>
+            <p>Generate secure and strong passwords for any site!</p>
             <br />
             <Link to="/login" className="sk-btn">Start Now</Link>
           </div>

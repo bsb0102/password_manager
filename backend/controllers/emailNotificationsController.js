@@ -6,7 +6,9 @@ const { getUserIdFromToken } = require('../models/cryptoUtils'); // Adjust the p
 
 const fetchUserData = async (token) => {
     const userId = await getUserIdFromToken(token);
+    // console.log(userId)
     const user = await getUserById(userId);
+    // console.log("user: ", user)
     return user;
 
 }
@@ -25,8 +27,11 @@ exports.getEmailNotificationStatus = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
+        
+        console.log("user: ", user)
+        const emailNotificaitonStatus = await user.emailNotifications;
 
-        const emailNotificaitonStatus = user.emailNotification
+        console.log(emailNotificaitonStatus)
 
         res.json({ emailNotificaitonStatus });
     } catch (error) {

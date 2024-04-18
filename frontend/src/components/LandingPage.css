@@ -138,7 +138,7 @@ p, ul, h1, h2, h3, h4, li {
       position: absolute;
       top: 70px;
       left: 0;
-      background: #333;
+      background: #fff; /* Adjusted background color */
       width: 100%;
       overflow: hidden;
       transition: max-height 0.5s;
@@ -149,10 +149,11 @@ p, ul, h1, h2, h3, h4, li {
       margin: 10px 20px;
   }
   .sk-navbar ul li a {
-      color: #fff;
+      color: #333; /* Adjusted text color */
   }
   .sk-menu-icon {
       display: block;
+      font-size: 0.5em; /* Adjusted menu icon size */
   }
 }
 @media only screen and (max-width: 600px) {
@@ -160,6 +161,25 @@ p, ul, h1, h2, h3, h4, li {
       flex-basis: 100%;
       text-align: center;
   }
+}
+
+.sk-title{
+  text-align: center;
+  margin: 0px auto 40px;
+  position: relative;
+  line-height: 60px;
+  color: #555;
+}
+.sk-title::after{
+  content: '';
+  background: #808080;
+  width: 1000px;
+  height: 2px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Additional Media Queries and Styles can be added as needed */

@@ -41,9 +41,10 @@ function Settings() {
 
     const fetchEmailNotificationStatus = async () => {
       try {
-        const response = await axiosInstance.get('/api/email-notifications');
+        const response = await axiosInstance.get('/api//email-settings');
         console.log(response.data)
         setEmailNotificationStatus(response.data)
+        setEmailNotificationStatus
 
         console.log(emailNotificationStatus)
 
@@ -297,21 +298,24 @@ function Settings() {
           <div className="setting-item">
             <label>Email Notifications</label>
             {Object.entries(emailNotificationStatus).map(([parentKey, childObject]) => (
-              <div key={parentKey}>
-                {Object.entries(childObject).map(([childKey, value]) => (
-                  <div key={childKey}>
-                    <input
-                      className="notification-checkbox"
-                      type="checkbox"
-                      checked={value}
-                      onChange={(e) => handleEmailNotificationChange(parentKey, childKey, e.target.checked)}
-                    />
-                    <label className="notification-label">{childKey}</label>
-                  </div>
-                ))}
-              </div>
+                <div key={parentKey}>
+                    {Object.entries(childObject).map(([childKey, value]) => (
+                        <div key={childKey}>
+                            <input
+                                className="notification-checkbox"
+                                type="checkbox"
+                                checked={value}
+                                onChange={(e) => handleEmailNotificationChange(parentKey, childKey, e.target.checked)}
+                            />
+                            <label className="notification-label">
+                                {childKey === 'loginNotification' ? 'Login Notification' : childKey}
+                            </label>
+                        </div>
+                    ))}
+                </div>
             ))}
-          </div>
+        </div>
+
         </div>
 
       </div>
