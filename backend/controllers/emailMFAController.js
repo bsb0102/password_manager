@@ -15,7 +15,7 @@ const fetchUserData = async (token) => {
 exports.enableEmailMFA = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const user = await fetchUserData(token)
+        const user = await fetchUserData(token);
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -40,16 +40,14 @@ exports.enableEmailMFA = async (req, res) => {
 exports.verifyEmailMFA = async (req, res) => {
     try {
         const { verificationCode } = req.body;
+        const { tempToken } = req.body;
 
-        // Check if authorization header is present
-        if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
-            return res.status(401).json({ error: "Unauthorized access" });
-        }
 
         const token = req.headers.authorization.split(' ')[1];
         
         // Fetch user data using the token
-        const user = await fetchUserData(token);
+        console.log(tempToken, token)
+        const user = await fetchUserData(tempToken ? tempToken : token);
 
         // If user data is not found, return 404
         if (!user) {
@@ -60,10 +58,10 @@ exports.verifyEmailMFA = async (req, res) => {
 
         // Check if the verification code matches
         if (verificationCode === user_emailMFA_Code) {
-            return res.json({ status: 'success' });
+            return res.json({ status: true });
         } else {
             // If verification fails, return 400
-            return res.status(400).json({ status: 'Failed' });
+            return res.status(400).json({ status: false });
         }
     } catch (error) {
         // Log and handle unexpected errors
@@ -108,7 +106,7 @@ exports.sendEmailMfa = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        user.emailMFAEnabled = true;
+        user.emailMFAEnabled = false;
         await user.save();
         const verification_token = await sendEmailMFACode(user.username);
         user.emailMFAVerificationCode = await verification_token

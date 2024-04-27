@@ -9,11 +9,11 @@ const authenticateToken = (req, res, next) => {
   // Use the temporary token if it exists
   const authToken = tempToken || token;
 
-
   if (!authToken) return res.status(401).json({ error: 'Access denied' });
-
+  console.log(authToken)
+  const verified = jwt.verify(authToken, process.env.JWT_SECRET);
+  console.log("tessssxxx", verified)
   try {
-    const verified = jwt.verify(authToken, process.env.JWT_SECRET);
     req.user = verified;
     // Debugging: Log the decoded token payload
 

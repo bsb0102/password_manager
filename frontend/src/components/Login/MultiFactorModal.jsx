@@ -3,13 +3,16 @@ import '../ResetPassword/ResetPasswordModal.css';
 import axiosInstance from '../../api/api.js';
 import { useNavigate } from 'react-router-dom';
 import { AlertContext } from '../Alert/AlertService.js';
+import Cookies from 'js-cookie';
 
-const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
+const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose, tempHeaderToken }) => {
   const [mfaToken, setMfaToken] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const [emailSent, setEmailSent] = useState(false); // Track whether email has been sent
   const navigate = useNavigate();
   const { setAlert } = useContext(AlertContext);
+
+  console.log("Temp headers;; ",tempHeaderToken)
 
   useEffect(() => {
     if (mfaType === 'email' && isOpen && !emailSent) {
@@ -30,14 +33,18 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
 
   const verifyEmailMfa = async () => {
     if (!mfaToken) {
-      console.log('MFA token is missing');
       setAlert('Error', 'MFA token is missing');
       return;
     }
     try {
-      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken });
-      if (response.data.status === 'success') {
-        navigate('/home');
+      console.log("Secindg email mfa")
+      const response = await axiosInstance.post('/api/verify-email-mfa', { verificationCode: mfaToken, tempToken: tempHeaderToken });
+      if (response.data.status === true) {
+        setAlert('Success', 'Successfully verified EMAIL MFA');
+        Cookies.set('token', tempHeaderToken, { expires: 7 });
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tempHeaderToken}`;
+          localStorage.setItem('token', tempHeaderToken);
+          navigate('/home');
       } else {
         setAlert('Error', 'Failed to verify email MFA');
       }
@@ -58,17 +65,30 @@ const MultiFactorModal = ({ isOpen, mfaType, onMfaSubmit, onClose }) => {
 
   const verifyGoogleMfa = async () => {
     try {
+
       const response = await axiosInstance.post(
         '/api/verify-mfa',
-        { token: mfaToken },
-        { headers: { Authorization: `Bearer ${tempToken}` } }
+        { token: mfaToken, tempToken:  tempHeaderToken},
+        { headers: { "x-temp-token": `Bearer ${tempHeaderToken}` } }
       );
+      try {
+        if (response.data && response.data.success === true) {
+          console.log("Successfull login");
+          Cookies.set('token', tempHeaderToken, { expires: 7 });
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${tempHeaderToken}`;
+          localStorage.setItem('token', tempHeaderToken);
+          navigate('/home');
+        } else {
 
-      console.log(response.data)
+        }
+      } catch (e) {
+        console.log("error: ", e)
+      }
+
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

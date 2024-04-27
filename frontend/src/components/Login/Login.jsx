@@ -46,6 +46,8 @@ const Login = () => {
   
     try {
       const response = await axiosInstance.post('/api/login', data);
+
+      console.log("data response: ",response.data)
   
       if (response.data.message === "Login successful") {
         if (!response.data.requireMfa) {
@@ -63,7 +65,7 @@ const Login = () => {
             }
           });
           await setMfaType(response_mfa.data.mfaType);
-          setTempMFAToken(tempToken)
+          setTempMFAToken(tempToken);
           setShowMfaModal(true);
         }
       } else {
@@ -165,6 +167,7 @@ const Login = () => {
       {showMfaModal && (
         <MultiFactorModal
           isOpen={showMfaModal}
+          tempHeaderToken = {tempMFAToken}
           mfaType={mfaType}
           onMfaSubmit={handleMfaLogin} // Your existing MFA login handler
           onClose={() => setShowMfaModal(false)} // Function to close the modal

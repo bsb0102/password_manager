@@ -10,7 +10,7 @@ router.post('/enable-mfa', authenticateToken, mfaController.enableMFA);
 // Route to add MFA for a user if not yet enabled, requires authentication
 router.post('/add-mfa', authenticateToken, mfaController.addMFA);
 // Route to verify MFA token, typically used in the login process
-router.post('/verify-mfa', authenticateToken, mfaController.verifyToken);
+router.post('/verify-mfa', mfaController.verifyToken);
 // Route to disable MFA for a user, requires authentication
 router.post('/disable-mfa', authenticateToken, mfaController.disableMFA);
 // Route to delete MFA for a user, requires authentication
@@ -19,7 +19,7 @@ router.delete('/delete-mfa', authenticateToken, mfaController.deleteMFA);
 
 router.post('/enable-email-mfa', authenticateToken, emailMFAController.enableEmailMFA);
 router.post('/disable-email-mfa', authenticateToken, emailMFAController.disableEmailMFA);
-router.post('/verify-email-mfa', authenticateToken, emailMFAController.verifyEmailMFA);
+router.post('/verify-email-mfa', emailMFAController.verifyEmailMFA);
 router.get('/send-email-mfa', authenticateToken, emailMFAController.sendEmailMfa);
 
 

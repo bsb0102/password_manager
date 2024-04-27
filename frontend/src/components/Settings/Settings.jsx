@@ -19,8 +19,8 @@ function Settings() {
   const [userId, setUserId] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [emailNotificationStatus, setEmailNotificationStatus] = useState({});
-  const { setAlert } = useContext(AlertContext)
   const [verificationCode, setVerificationCode] = useState('');
+  const { setAlert } = useContext(AlertContext);
 
 
   useEffect(() => {
@@ -42,11 +42,8 @@ function Settings() {
     const fetchEmailNotificationStatus = async () => {
       try {
         const response = await axiosInstance.get('/api//email-settings');
-        console.log(response.data)
         setEmailNotificationStatus(response.data)
         setEmailNotificationStatus
-
-        console.log(emailNotificationStatus)
 
       } catch (error) {
         console.log("failed to fetch Email Notification")
@@ -112,7 +109,7 @@ function Settings() {
     try {
       const response = await axiosInstance.post('/api/verify-mfa', { token: mfaToken });
       // Check if the verification was successful
-      if (response.data === 'MFA is verified and enabled') { // Adjust the condition based on your actual API response
+      if (response.data.success === true) { // Adjust the condition based on your actual API response
         setIsMfaEnabled(true);
         setShowModal(false); // Modal schließen
         setMfaToken('');
@@ -139,19 +136,42 @@ function Settings() {
     }
   };
 
-  const handleVerifyEmailMFA = async () => {
+  const handleVerifyEmailMFA = async (e) => {
+    // verificationCode
+    e.preventDefault(); // Prevents the form from submitting and redirecting
     try {
-      const payload = { code: verificationCode };
-      const response = await axiosInstance.post('/api/enable-email-mfa', payload);
-      setIsMfaEnabled(true); // Assuming the MFA is successfully enabled
-      setShowEmailMfaModal(false); // Close the modal
-      setAlert("success", "Successfully Added MFA for Email")
+      const response = await axiosInstance.post('/api/verify-mfa', { emailMFAToken: verificationCode });
+      // Check if the verification was successful
+      if (response.data.success === true) { // Adjust the condition based on your actual API response
+        setIsMfaEnabled(true);
+        setShowEmailMfaModal(false); // Close the modal
+        setVerificationCode('');
+        setAlert('success', 'Successfully enabled EMAIL MFA');
+      } else {
+        setAlert('error', 'Invalid MFA token. Please try again.');
+        setVerificationCode('');
+      }
     } catch (error) {
-      console.error('Failed to verify email MFA:', error);
-      setError(error.response.data.message || "Verification failed"); // Set error message
-      // Optionally, show error message/modal
+      // Handle error if request fails
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // Extract error message from server response
+        const errorMessage = error.response.data.message || 'An error occurred. Please try again.';
+        setAlert('error', errorMessage);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('Request made but no response received:', error.request);
+        setAlert('error', 'No response received from server. Please try again.');
+      } else {
+        // Something happened in setting up the request that triggered an error
+        console.error('Error setting up request:', error.message);
+        setAlert('error', 'An error occurred. Please try again.');
+      }
+      setVerificationCode('');
     }
   };
+  
+  
 
 
   const confirmDisableMFA = async () => {
@@ -169,6 +189,7 @@ function Settings() {
 
   const sendEmailMfa = async () => {
     try {
+      
       // Send request to send email MFA
       const response = await axiosInstance.get(
         '/api/send-email-mfa');
@@ -320,23 +341,26 @@ function Settings() {
 
       </div>
       {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <div className="mfa-setup">
-            <h3>Setup MFA</h3>
-            <p>Scan this QR Code with your MFA app:</p>
-            <div className="qr-code-container">
-              <img src={mfaSetupData.qrCode} alt="MFA QR Code" />
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setShowModal(false)}>&times;</span>
+            <div className="mfa-setup">
+              <h3>Setup MFA</h3>
+              <p>Scan this QR Code with your MFA app:</p>
+              <div className="qr-code-container">
+                <img src={mfaSetupData.qrCode} alt="MFA QR Code" />
+              </div>
+              <input
+                type="text"
+                value={mfaToken}
+                onChange={(e) => setMfaToken(e.target.value)}
+                placeholder="Enter MFA token"
+              />
+              {error && <p className="error-message">{error}</p>}
+              <button onClick={handleVerifyToken}>Verify Token</button>
             </div>
-            <input
-              type="text"
-              value={mfaToken}
-              onChange={(e) => setMfaToken(e.target.value)}
-              placeholder="Enter MFA token"
-            />
-            {error && <p className="error-message">{error}</p>}
-            <button onClick={handleVerifyToken}>Verify Token</button>
           </div>
-        </Modal>
+        </div>
       )}
       {successModal && (
         <Modal onClose={() => setSuccessModal(false)}>
@@ -348,31 +372,31 @@ function Settings() {
         </Modal>
       )}
 
-      {
-          showEmailMfaModal && (
-            <div className="reset-password-modal-overlay">
-              <div className="reset-password-modal-content">
-                <button className="reset-password-modal-close-button" onClick={() => setShowEmailMfaModal(false)} aria-label="Close modal">
-                  &times;
-                </button>
-                <h2 className="reset-password-modal-title">Enter Verification Code</h2>
-                <form className="reset-password-modal-form">
-                  <input
-                    className="reset-password-modal-input"
-                    type="text"
-                    placeholder="Enter verification code"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    required
-                  />
-                  <div className="reset-password-modal-actions">
-                    <button className="reset-password-modal-submit-button" type="submit" onClick={handleVerifyEmailMFA}>Submit</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )
-        }
+  {showEmailMfaModal && (
+    <div className="reset-password-modal-overlay">
+      <div className="reset-password-modal-content">
+        <button className="reset-password-modal-close-button" onClick={() => setShowEmailMfaModal(false)} aria-label="Close modal">
+          &times;
+        </button>
+        <h2 className="reset-password-modal-title">Enter Verification Code</h2>
+        <form className="reset-password-modal-form" onSubmit={(e) => handleVerifyEmailMFA(e)}>
+          <input
+            className="reset-password-modal-input"
+            type="text"
+            placeholder="Enter verification code"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            required
+          />
+          <div className="reset-password-modal-actions">
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )}
+
+
 
 
       <div className="confirmation-modal">

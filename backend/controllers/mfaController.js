@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const mfaService = require('../models/mfaService');
 const UserModel = require('../models/User'); // Adjust the path to your user model
+const authenticateToken = require('../middleware/authenticateToken'); // Assuming MFA operations require a user to be authenticated
 
 // Helper function to extract user ID from JWT token
 const getUserIdFromToken = (token) => {
@@ -105,22 +106,37 @@ exports.addMFA = async (req, res) => {
 exports.verifyToken = async (req, res) => {
   try {
     const { token } = req.body;
-    const authToken = req.headers.authorization.split(' ')[1];
-    const userId = getUserIdFromToken(authToken);
+    const { tempToken } = req.body;
+    const { emailMFAToken } = req.body;
+    const authToken = tempToken ? tempToken : req.headers.authorization.split(' ')[1];
+// Use tempToken if available, otherwise fall back to authToken
+    const userId = getUserIdFromToken(tempToken ? tempToken : authToken);
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid or missing token" });
     }
+    
 
     const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).send('User not found');
     }
 
+    if (emailMFAToken) {
+      const check_email_token = user.emailMFAVerificationCode;
+
+      if (emailMFAToken === check_email_token) {
+        user.emailMFAEnabled = true;
+        await user.save();
+        return res.status(200).send({success: true})
+      } else {
+        return res.status(400).send({success: false})
+      }
+    }
+
     if (!user.mfaSecret) {
       return res.status(400).send('MFA is not enabled for this user');
     }
-
     const verified = mfaService.verifyToken(user.mfaSecret, token);
 
     if (verified) {
@@ -129,9 +145,9 @@ exports.verifyToken = async (req, res) => {
       user.tempSecret = '';
       await user.save();
 
-      res.send('MFA is verified and enabled');
+      res.send({success: true});
     } else {
-      res.status(400).send('Invalid MFA Token');
+      res.status(400).send({success: false});
     }
   } catch (error) {
     console.error('Error verifying MFA token:', error);
